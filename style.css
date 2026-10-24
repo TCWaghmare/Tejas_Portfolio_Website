@@ -1183,7 +1183,9 @@ img {
    ========================================================================== */
 .hero-floating-tools-layer {
   position: absolute;
-  inset: -45px -65px -55px -75px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 6;
 }
@@ -1196,8 +1198,8 @@ img {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 66px;
-  height: 66px;
+  width: 64px;
+  height: 64px;
   user-select: none;
   -webkit-user-select: none;
   perspective: 900px;
@@ -1209,13 +1211,13 @@ img {
 
 .hero-tool-orb.is-dragging {
   cursor: grabbing !important;
-  z-index: 25 !important;
+  z-index: 30 !important;
 }
 
 .hero-tool-orb.is-dragging .orb-glass {
-  transform: scale(1.18);
+  transform: scale(1.15);
   box-shadow: 
-    0 26px 55px rgba(0, 0, 0, 0.85),
+    0 24px 50px rgba(0, 0, 0, 0.85),
     0 0 35px rgba(245, 224, 37, 0.55),
     inset 0 1px 2px rgba(255, 255, 255, 0.6);
   border-color: #FFDF01;
@@ -1336,35 +1338,30 @@ img {
   box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(0, 188, 242, 0.55);
 }
 
-/* Dispersed Layout: Placed in open space near profile image, NOT touching rim */
+/* Floating Close Around the Profile Image (Protected from Section Edge Clipping) */
 .orb-excel {
-  top: -25px;
-  right: 90px;
-  animation: toolFloatExcel 7.6s ease-in-out infinite;
+  top: -12px;
+  right: 120px;
 }
 
 .orb-powerbi {
-  top: 40px;
-  right: -25px;
-  animation: toolFloatPowerBI 6.8s ease-in-out infinite;
+  top: 14%;
+  right: 6px;
 }
 
 .orb-python {
-  bottom: 35px;
-  right: -25px;
-  animation: toolFloatPython 6.2s ease-in-out infinite;
+  bottom: 12%;
+  right: 10px;
 }
 
 .orb-sql {
-  bottom: 75px;
-  left: -40px;
-  animation: toolFloatSQL 7.1s ease-in-out infinite;
+  bottom: 12%;
+  left: 10px;
 }
 
 .orb-fabric {
-  top: 75px;
-  left: -50px;
-  animation: toolFloatFabric 8.4s ease-in-out infinite;
+  top: 14%;
+  left: 6px;
 }
 
 @keyframes toolFloatExcel {
@@ -6630,7 +6627,7 @@ img {
   }
 
   .hero-floating-tools-layer {
-    inset: -25px -25px -35px -25px;
+    inset: 0;
   }
 
   .hero-tool-orb {
@@ -6820,7 +6817,7 @@ img {
   }
 
   .hero-floating-tools-layer {
-    inset: -15px -15px -25px -15px;
+    inset: 0;
   }
 
   .hero-tool-orb {

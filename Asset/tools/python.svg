@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="py_blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#387EB8"/>
+      <stop offset="50%" stop-color="#366994"/>
+      <stop offset="100%" stop-color="#1F496B"/>
+    </linearGradient>
+    <linearGradient id="py_yellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE873"/>
+      <stop offset="50%" stop-color="#FFD43B"/>
+      <stop offset="100%" stop-color="#E5A910"/>
+    </linearGradient>
+    <filter id="py_shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#py_shadow)">
+    <!-- Blue Upper Snake -->
+    <path d="M31.8 7 C21.4 7 22.1 11.5 22.1 11.5 L22.1 16.2 L32.2 16.2 L32.2 17.6 L18.1 17.6 C18.1 17.6 11 16.8 11 27.2 C11 37.6 17.2 37.1 17.2 37.1 L23.2 37.1 L23.2 31.9 C23.2 31.9 22.9 25.7 29.2 25.7 L39.2 25.7 C39.2 25.7 45.1 25.9 45.1 20.1 L45.1 13.9 C45.1 13.9 45.8 7 31.8 7 Z M26.9 11.6 C28.2 11.6 29.2 12.6 29.2 13.9 C29.2 15.2 28.2 16.2 26.9 16.2 C25.6 16.2 24.6 15.2 24.6 13.9 C24.6 12.6 25.6 11.6 26.9 11.6 Z" fill="url(#py_blue)"/>
+    
+    <!-- Yellow Lower Snake -->
+    <path d="M32.2 57 C42.6 57 41.9 52.5 41.9 52.5 L41.9 47.8 L31.8 47.8 L31.8 46.4 L45.9 46.4 C45.9 46.4 53 47.2 53 36.8 C53 26.4 46.8 26.9 46.8 26.9 L40.8 26.9 L40.8 32.1 C40.8 32.1 41.1 38.3 34.8 38.3 L24.8 38.3 C24.8 38.3 18.9 38.1 18.9 43.9 L18.9 50.1 C18.9 50.1 18.2 57 32.2 57 Z M37.1 52.4 C35.8 52.4 34.8 51.4 34.8 50.1 C34.8 48.8 35.8 47.8 37.1 47.8 C38.4 47.8 39.4 48.8 39.4 50.1 C39.4 51.4 38.4 52.4 37.1 52.4 Z" fill="url(#py_yellow)"/>
+  </g>
+</svg>

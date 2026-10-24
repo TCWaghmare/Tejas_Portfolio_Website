@@ -1174,6 +1174,228 @@ img {
   transform: scale(1.05);
 }
 
+/* ==========================================================================
+   3D Data Analytics Tools Floating Orbs (Power BI, Fabric, SQL, Excel, Python)
+   ========================================================================== */
+.hero-floating-tools-layer {
+  position: absolute;
+  inset: -15px;
+  width: calc(100% + 30px);
+  height: calc(100% + 30px);
+  pointer-events: none;
+  z-index: 6;
+}
+
+.hero-tool-orb {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 62px;
+  height: 62px;
+  user-select: none;
+  perspective: 900px;
+  transform-style: preserve-3d;
+  transition: filter 0.3s ease;
+  will-change: transform;
+}
+
+.hero-tool-orb .orb-glass {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(18, 20, 28, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 14px 28px rgba(0, 0, 0, 0.65),
+    inset 0 1px 2px rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
+}
+
+.hero-tool-orb .orb-sheen {
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.06) 42%,
+    transparent 62%
+  );
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+.hero-tool-orb .orb-icon {
+  width: 33px;
+  height: 33px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-tool-orb:hover .orb-icon {
+  transform: scale(1.12);
+}
+
+/* Tooltip Badge on Hover */
+.hero-tool-orb .orb-tag {
+  position: absolute;
+  bottom: -24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(14, 16, 22, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+}
+
+.hero-tool-orb:hover .orb-tag,
+.hero-tool-orb:focus-visible .orb-tag {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Individual Tool Color Signatures on Hover */
+.orb-excel:hover .orb-glass {
+  border-color: #21A366;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(33, 163, 102, 0.5);
+}
+
+.orb-powerbi:hover .orb-glass {
+  border-color: #F2C811;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(242, 200, 17, 0.55);
+}
+
+.orb-python:hover .orb-glass {
+  border-color: #387EB8;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 126, 184, 0.55);
+}
+
+.orb-sql:hover .orb-glass {
+  border-color: #E53935;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(229, 57, 53, 0.55);
+}
+
+.orb-fabric:hover .orb-glass {
+  border-color: #00BCF2;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 188, 242, 0.55);
+}
+
+/* Base Position & Ambient Continuous Floating Keyframes */
+.orb-excel {
+  top: -16px;
+  left: 50%;
+  animation: toolFloatExcel 7.2s ease-in-out infinite;
+}
+
+.orb-powerbi {
+  top: 14%;
+  right: -20px;
+  animation: toolFloatPowerBI 5.8s ease-in-out infinite;
+}
+
+.orb-python {
+  bottom: 12%;
+  right: -16px;
+  animation: toolFloatPython 7.6s ease-in-out infinite;
+}
+
+.orb-sql {
+  bottom: 15%;
+  left: -14px;
+  animation: toolFloatSQL 6.4s ease-in-out infinite;
+}
+
+.orb-fabric {
+  top: 18%;
+  left: -22px;
+  animation: toolFloatFabric 8.2s ease-in-out infinite;
+}
+
+@keyframes toolFloatExcel {
+  0%, 100% {
+    transform: translateX(-50%) translate3d(0, 0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translateX(-50%) translate3d(10px, -14px, 12px) rotate(4deg);
+  }
+  66% {
+    transform: translateX(-50%) translate3d(-12px, -6px, -8px) rotate(-3deg);
+  }
+}
+
+@keyframes toolFloatPowerBI {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  40% {
+    transform: translate3d(-10px, -16px, 15px) rotate(-5deg);
+  }
+  75% {
+    transform: translate3d(8px, 12px, -10px) rotate(3deg);
+  }
+}
+
+@keyframes toolFloatPython {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  35% {
+    transform: translate3d(12px, 10px, -14px) rotate(4deg);
+  }
+  70% {
+    transform: translate3d(-14px, -12px, 14px) rotate(-4deg);
+  }
+}
+
+@keyframes toolFloatSQL {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  45% {
+    transform: translate3d(-12px, 14px, 10px) rotate(5deg);
+  }
+  80% {
+    transform: translate3d(10px, -10px, -12px) rotate(-3deg);
+  }
+}
+
+@keyframes toolFloatFabric {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  30% {
+    transform: translate3d(-14px, -10px, -12px) rotate(-4deg);
+  }
+  70% {
+    transform: translate3d(12px, 16px, 14px) rotate(5deg);
+  }
+}
+
 /* Light Theme Mode Adaptations */
 [data-theme="light"] .hero-solid-yellow-circle {
   border-color: #ffffff;
@@ -1184,6 +1406,20 @@ img {
 
 [data-theme="light"] .hero-circle-ambient-glow {
   background: radial-gradient(circle at center, rgba(255, 223, 1, 0.25) 0%, rgba(245, 180, 20, 0.08) 50%, transparent 70%);
+}
+
+[data-theme="light"] .hero-tool-orb .orb-glass {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 
+    0 12px 24px rgba(0, 0, 0, 0.1),
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+}
+
+[data-theme="light"] .hero-tool-orb .orb-tag {
+  background: #0f172a;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #ffffff;
 }
 
 .hero-left-3d-backdrop:active {
@@ -6362,6 +6598,40 @@ img {
     height: min(420px, 92vw);
   }
 
+  .hero-tool-orb {
+    width: 50px;
+    height: 50px;
+  }
+
+  .hero-tool-orb .orb-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .orb-excel {
+    top: -12px;
+  }
+
+  .orb-powerbi {
+    top: 13%;
+    right: -12px;
+  }
+
+  .orb-python {
+    bottom: 12%;
+    right: -10px;
+  }
+
+  .orb-sql {
+    bottom: 14%;
+    left: -10px;
+  }
+
+  .orb-fabric {
+    top: 17%;
+    left: -14px;
+  }
+
   .hero-badges-row {
     gap: 10px;
   }
@@ -6504,6 +6774,46 @@ img {
   .hero-circle-ambient-glow {
     width: min(320px, 88vw);
     height: min(320px, 88vw);
+  }
+
+  .hero-tool-orb {
+    width: 44px;
+    height: 44px;
+  }
+
+  .hero-tool-orb .orb-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .hero-tool-orb .orb-tag {
+    font-size: 9.5px;
+    padding: 1px 7px;
+    bottom: -20px;
+  }
+
+  .orb-excel {
+    top: -8px;
+  }
+
+  .orb-powerbi {
+    top: 15%;
+    right: -6px;
+  }
+
+  .orb-python {
+    bottom: 14%;
+    right: -4px;
+  }
+
+  .orb-sql {
+    bottom: 15%;
+    left: -4px;
+  }
+
+  .orb-fabric {
+    top: 18%;
+    left: -6px;
   }
 
   .kova-image-caption {

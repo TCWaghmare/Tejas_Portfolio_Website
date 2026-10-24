@@ -1191,6 +1191,89 @@
     }
   }
 
+  // --- Floating 3D Data Analytics Tool Orbs: Interactive Random Physics ---
+  function initFloatingTools() {
+    const orbs = document.querySelectorAll('.hero-tool-orb');
+    if (!orbs.length) return;
+
+    orbs.forEach((orb) => {
+      let intervalId = null;
+      let isHovered = false;
+
+      // Function to apply an unpredictable 3D floating impulse
+      function randomizeFloat() {
+        if (!isHovered) return;
+
+        // Generate unpredictable 3D displacement vectors
+        const dx = (Math.random() - 0.5) * 56; // -28px to +28px
+        const dy = (Math.random() - 0.5) * 56; // -28px to +28px
+        const dz = Math.random() * 32 + 10;    // 10px to 42px toward screen
+        const rotX = (Math.random() - 0.5) * 34; // -17deg to +17deg
+        const rotY = (Math.random() - 0.5) * 34; // -17deg to +17deg
+        const rotZ = (Math.random() - 0.5) * 26; // -13deg to +13deg
+        const scale = 1.18 + Math.random() * 0.12; // 1.18x to 1.30x
+
+        // Check if orb has centering transform (like Excel with translateX(-50%))
+        const isCentered = orb.classList.contains('orb-excel');
+        const baseTranslate = isCentered ? 'translateX(-50%) ' : '';
+
+        orb.style.transition = 'transform 0.32s cubic-bezier(0.25, 1, 0.5, 1)';
+        orb.style.transform = `${baseTranslate}translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, ${dz.toFixed(1)}px) rotateX(${rotX.toFixed(1)}deg) rotateY(${rotY.toFixed(1)}deg) rotateZ(${rotZ.toFixed(1)}deg) scale(${scale.toFixed(2)})`;
+      }
+
+      function startRandomFloat() {
+        if (isHovered) return;
+        isHovered = true;
+        orb.style.animationPlayState = 'paused';
+        randomizeFloat();
+
+        // While cursor remains hovered over the orb, continuously dance and float randomly
+        clearInterval(intervalId);
+        intervalId = setInterval(randomizeFloat, 300);
+      }
+
+      function stopRandomFloat() {
+        isHovered = false;
+        clearInterval(intervalId);
+        intervalId = null;
+
+        const isCentered = orb.classList.contains('orb-excel');
+        const baseTranslate = isCentered ? 'translateX(-50%) ' : '';
+
+        // Smoothly glide back to resting state
+        orb.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        orb.style.transform = `${baseTranslate}translate3d(0, 0, 0) scale(1)`;
+
+        setTimeout(() => {
+          if (!isHovered) {
+            orb.style.transition = '';
+            orb.style.transform = '';
+            orb.style.animationPlayState = 'running';
+          }
+        }, 450);
+      }
+
+      // Pointer / Mouse events
+      orb.addEventListener('pointerenter', startRandomFloat);
+      orb.addEventListener('pointerleave', stopRandomFloat);
+      orb.addEventListener('mouseenter', startRandomFloat);
+      orb.addEventListener('mouseleave', stopRandomFloat);
+
+      // On mousemove within orb, add an immediate random micro-wobble
+      orb.addEventListener('mousemove', () => {
+        if (isHovered && Math.random() > 0.45) {
+          randomizeFloat();
+        }
+      });
+
+      // Mobile Touch Support: Tap triggers a 1.2s playful random float dance
+      orb.addEventListener('touchstart', () => {
+        startRandomFloat();
+        setTimeout(stopRandomFloat, 1200);
+      }, { passive: true });
+    });
+  }
+
   // --- Tools I Use For My Work: Interactive Marquee & Tooltips ---
   function initToolsMarquee() {
     const marqueeTrack = document.getElementById('tools-marquee-track');
@@ -1666,6 +1749,7 @@
       initSplineCleaner();
       initAllCarousels();
       initHeroAnimations();
+      initFloatingTools();
       initToolsMarquee();
       initKineticTypography();
       initScrollReveals();
@@ -1677,6 +1761,7 @@
     initSplineCleaner();
     initAllCarousels();
     initHeroAnimations();
+    initFloatingTools();
     initToolsMarquee();
     initKineticTypography();
     initScrollReveals();

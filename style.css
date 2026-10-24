@@ -981,7 +981,7 @@ img {
   background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
   background-size: 24px 24px;
   opacity: 0.6;
-  z-index: 2;
+  z-index: 0;
   pointer-events: none;
 }
 
@@ -990,23 +990,24 @@ img {
   opacity: 0.5;
 }
 
-/* Profile Heroes Image Backdrop: centered, rich yellow arch aura, seamless fade */
+/* Profile Heroes Image: prominent hero centerpiece like reference design */
 .hero-bg-photo-img {
   position: absolute;
-  top: 48%;
+  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(620px, 86vw);
-  height: min(640px, 86vh);
-  max-height: 92%;
+  transform: translate(-50%, -46%);
+  width: min(600px, 90vw);
+  height: clamp(420px, 64vh, 600px);
+  max-height: 95%;
   object-fit: contain;
-  object-position: center center;
-  opacity: 0.38;
-  filter: contrast(1.08) brightness(0.95) drop-shadow(0 0 35px rgba(245, 238, 56, 0.12));
-  -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 48%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0.75) 70%, transparent 96%);
-  mask-image: radial-gradient(ellipse 85% 80% at 50% 48%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0.75) 70%, transparent 96%);
-  transition: opacity 0.4s ease, filter 0.4s ease;
+  object-position: center bottom;
+  opacity: 1;
+  filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 35px rgba(245, 238, 56, 0.2));
+  -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.85) 82%, transparent 98%);
+  mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.85) 82%, transparent 98%);
+  transition: transform 0.5s ease, opacity 0.4s ease;
   z-index: 1;
+  pointer-events: none;
 }
 
 /* Smooth top transition into header */
@@ -1050,11 +1051,11 @@ img {
 
 /* Light Theme Mode Overrides */
 [data-theme="light"] .hero-bg-photo-img {
-  opacity: 0.18;
-  filter: grayscale(70%) contrast(1.1) brightness(0.9);
-  mix-blend-mode: multiply;
-  -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 48%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0.6) 68%, transparent 94%);
-  mask-image: radial-gradient(ellipse 85% 80% at 50% 48%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0.6) 68%, transparent 94%);
+  opacity: 0.95;
+  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.15)) drop-shadow(0 0 25px rgba(226, 219, 41, 0.25));
+  mix-blend-mode: normal;
+  -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.85) 82%, transparent 98%);
+  mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, rgba(0, 0, 0, 1) 68%, rgba(0, 0, 0, 0.85) 82%, transparent 98%);
 }
 
 [data-theme="light"] .hero-bg-photo-gradient-top {
@@ -6265,17 +6266,17 @@ img {
   }
 
   .hero-bg-photo-img {
-    top: 40%;
+    top: 36%;
     width: min(390px, 94vw);
-    height: min(440px, 62vh);
-    max-height: 70%;
-    opacity: 0.22;
-    -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 42%, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0.6) 68%, transparent 94%);
-    mask-image: radial-gradient(ellipse 90% 80% at 50% 42%, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0.6) 68%, transparent 94%);
+    height: clamp(340px, 52vh, 460px);
+    max-height: 75%;
+    opacity: 0.55;
+    -webkit-mask-image: radial-gradient(ellipse 90% 84% at 50% 45%, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0.7) 75%, transparent 96%);
+    mask-image: radial-gradient(ellipse 90% 84% at 50% 45%, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0.7) 75%, transparent 96%);
   }
 
   [data-theme="light"] .hero-bg-photo-img {
-    opacity: 0.12;
+    opacity: 0.45;
   }
 
   .hero-stage {

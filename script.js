@@ -1237,14 +1237,10 @@
   }
 
   // ==========================================================================
-  // Kinetic Typography Engine: Cursor Character Scatter Physics (Kova.me Style)
+  // Kinetic Typography Engine: Cursor & Touch Character Scatter Physics (Kova.me Style)
   // ==========================================================================
   function initKineticTypography() {
-    // Only enable interactive cursor physics on fine-pointer devices (saves mobile CPU)
-    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if (!canHover) return;
-
-    // Selector covering hero name, brand name, section titles, card headers, and kova.me interactive titles
+    // Selector covering hero name, brand name, section titles, card headers, and interactive titles
     const selector = [
       '#hero-name-target',
       '.hero-line-intro > span:first-child',
@@ -1343,14 +1339,14 @@
       const fontSize = parseFloat(computed.fontSize) || 28;
 
       // Matches authentic kova.me physics parameters (ev=100, nv=60, jM=0.14, NM=0.07)
-      const radius = Math.min(130, Math.max(50, fontSize * 1.75));
-      const maxForce = Math.min(60, Math.max(16, fontSize * 0.75));
-      const maxRot = Math.min(18, Math.max(8, fontSize * 0.28));
+      const radius = Math.min(140, Math.max(55, fontSize * 1.85));
+      const maxForce = Math.min(65, Math.max(18, fontSize * 0.8));
+      const maxRot = Math.min(20, Math.max(9, fontSize * 0.3));
 
-      const easeEnter = 0.14; // Snappy repulsion when mouse is active
-      const easeLeave = 0.07; // Buttery soft deceleration returning to rest
+      const easeEnter = 0.15; // Snappy repulsion when pointer is active
+      const easeLeave = 0.08; // Buttery soft deceleration returning to rest
 
-      const mouseState = { x: 0, y: 0, active: false };
+      const pointerState = { x: 0, y: 0, active: false };
       let rafId = null;
 
       function renderFrame() {
@@ -1364,12 +1360,12 @@
           let targetY = 0;
           let targetRot = 0;
 
-          if (mouseState.active) {
+          if (pointerState.active) {
             const rect = span.getBoundingClientRect();
             const charCenterX = rect.left + rect.width / 2;
             const charCenterY = rect.top + rect.height / 2;
-            const diffX = charCenterX - mouseState.x;
-            const diffY = charCenterY - mouseState.y;
+            const diffX = charCenterX - pointerState.x;
+            const diffY = charCenterY - pointerState.y;
             const dist = Math.sqrt(diffX * diffX + diffY * diffY);
 
             if (dist < radius && dist > 0) {
@@ -1380,7 +1376,7 @@
             }
           }
 
-          const ease = mouseState.active ? easeEnter : easeLeave;
+          const ease = pointerState.active ? easeEnter : easeLeave;
           state.dx += (targetX - state.dx) * ease;
           state.dy += (targetY - state.dy) * ease;
           state.rot += (targetRot - state.rot) * ease;
@@ -1398,7 +1394,7 @@
           span.style.filter = velocity > 0.06 ? `blur(${velocity.toFixed(2)}px)` : '';
         }
 
-        if (mouseState.active || isMoving) {
+        if (pointerState.active || isMoving) {
           rafId = requestAnimationFrame(renderFrame);
         } else {
           // Reset clean to rest and stop RAF loop (0% idle CPU overhead)
@@ -1419,30 +1415,84 @@
         }
       }
 
+      function handlePointerPos(clientX, clientY) {
+        pointerState.x = clientX;
+        pointerState.y = clientY;
+        pointerState.active = true;
+        startLoop();
+      }
+
+      function stopPointer() {
+        pointerState.active = false;
+        startLoop();
+      }
+
+      // 1. Unified Pointer Events (covers mouse, touch, and stylus)
+      element.addEventListener('pointermove', (e) => {
+        handlePointerPos(e.clientX, e.clientY);
+      }, { passive: true });
+
+      element.addEventListener('pointerenter', (e) => {
+        handlePointerPos(e.clientX, e.clientY);
+      }, { passive: true });
+
+      element.addEventListener('pointerleave', stopPointer);
+      element.addEventListener('pointercancel', stopPointer);
+      element.addEventListener('pointerup', stopPointer);
+
+      // 2. Mouse Events Fallback
       element.addEventListener('mousemove', (e) => {
-        mouseState.x = e.clientX;
-        mouseState.y = e.clientY;
-        mouseState.active = true;
-        startLoop();
+        handlePointerPos(e.clientX, e.clientY);
       });
-
       element.addEventListener('mouseenter', (e) => {
-        mouseState.x = e.clientX;
-        mouseState.y = e.clientY;
-        mouseState.active = true;
-        startLoop();
+        handlePointerPos(e.clientX, e.clientY);
       });
+      element.addEventListener('mouseleave', stopPointer);
 
-      element.addEventListener('mouseleave', () => {
-        mouseState.active = false;
+      // 3. Touch Events (Mobile Drag & Touch Support)
+      element.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          handlePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      element.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          handlePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: true });
+
+      element.addEventListener('touchend', stopPointer, { passive: true });
+      element.addEventListener('touchcancel', stopPointer, { passive: true });
+
+      // 4. Tap / Click Spring Ripple Burst
+      element.addEventListener('click', (e) => {
+        const tapX = e.clientX || pointerState.x;
+        const tapY = e.clientY || pointerState.y;
+
+        for (let i = 0; i < chars.length; i++) {
+          const rect = chars[i].getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const dx = cx - tapX;
+          const dy = cy - tapY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < radius * 1.5 && dist > 0) {
+            charStates[i].dx += (dx / dist) * maxForce * 0.9;
+            charStates[i].dy += (dy / dist) * maxForce * 0.9;
+            charStates[i].rot += ((Math.random() - 0.5) * maxRot * 1.6);
+          }
+        }
         startLoop();
       });
 
       window.addEventListener('blur', () => {
-        mouseState.active = false;
+        pointerState.active = false;
         startLoop();
       });
     }
+
     // Export setupKineticElement to window for dynamic modal title activation
     window.setupKineticElement = setupKineticElement;
   }

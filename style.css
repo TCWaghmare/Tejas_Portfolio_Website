@@ -1002,8 +1002,8 @@ img {
   height: 600px;
   max-width: 165%;
   max-height: 165%;
-  z-index: 0;
-  pointer-events: auto;
+  z-index: 1;
+  pointer-events: auto !important;
   cursor: grab;
   overflow: hidden;
   mask-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.95) 40%, rgba(0, 0, 0, 0.55) 68%, transparent 88%);
@@ -1020,6 +1020,8 @@ img {
   height: calc(100% + 80px);
   margin-bottom: -80px;
   display: block;
+  pointer-events: auto !important;
+  touch-action: manipulation;
 }
 
 /* DARK THEME: Pure transparent blend over background frame animation */
@@ -6054,7 +6056,8 @@ img {
     height: 480px;
     max-width: 140%;
     max-height: 140%;
-    pointer-events: none;
+    pointer-events: auto !important;
+    touch-action: manipulation;
   }
 
   .hero-stage-col-portrait {
@@ -6152,10 +6155,12 @@ img {
   }
 
   .hero-left-3d-backdrop {
-    width: 340px;
-    height: 340px;
-    max-width: 130%;
-    max-height: 130%;
+    width: 360px;
+    height: 360px;
+    max-width: 140%;
+    max-height: 140%;
+    pointer-events: auto !important;
+    touch-action: manipulation;
   }
 
   .hero-arch-wrapper {
@@ -6887,6 +6892,10 @@ img {
    ========================================================================== */
 .scatter-heading {
   cursor: default;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .scatter-word {

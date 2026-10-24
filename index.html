@@ -147,64 +147,21 @@
     <section id="home" class="section hero-section">
       <div class="section-container">
         
-        <!-- Hero Showcase Layout (Left: Full-Height Portrait with 3x Certified Badge, Right: Name, Role, Bio, Actions & Quote) -->
+        <!-- Hero Showcase Layout (Left: Content & 3x Badges, Right: Big Profile Image Covering Half Page) -->
         <div class="hero-showcase">
           <div class="hero-stage">
             
-            <!-- 1. Left Column: Full-Height Profile Image (Upper Edge to Lower Edge) + 3x Certified Badge at Bottom -->
-            <div class="hero-stage-col hero-stage-col-portrait">
-              <div class="hero-portrait-stage">
-                <!-- Solid Shield Layer: guarantees no scroll canvas frames or ambient mesh bleed through the photo -->
-                <div class="hero-portrait-shield" aria-hidden="true"></div>
-
-                <!-- Profile Heroes Image: Big, crisp view spanning from top to bottom -->
-                <div class="hero-portrait-img-box">
-                  <img src="Asset/profile heroes image.png" alt="Tejas Waghmare - 3x Certified Microsoft Associate" class="hero-portrait-main-img" fetchpriority="high" loading="eager" decoding="async">
-                </div>
-
-                <!-- 3x Certified Microsoft Associate Badge Section at Bottom of Profile Image -->
-                <div class="hero-rating-block hero-portrait-badge-bottom">
-                  <!-- 3 Microsoft Exam Badges on top: PL-300, DP-600, DP-700 -->
-                  <div class="hero-badges-row" aria-label="Microsoft Exam Badges: PL-300, DP-600, DP-700">
-                    <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Power BI Data Analyst Associate (PL-300)">
-                      <img src="Badges/pl 300.png" alt="Microsoft Certified PL-300 Badge" class="hero-badge-img">
-                      <span class="hero-badge-tag">PL-300</span>
-                    </a>
-                    <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Fabric Analytics Engineer Associate (DP-600)">
-                      <img src="Badges/dp 600.png" alt="Microsoft Certified DP-600 Badge" class="hero-badge-img">
-                      <span class="hero-badge-tag">DP-600</span>
-                    </a>
-                    <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Fabric Data Engineer Associate (DP-700)">
-                      <img src="Badges/dp 700.png" alt="Microsoft Certified DP-700 Badge" class="hero-badge-img">
-                      <span class="hero-badge-tag">DP-700</span>
-                    </a>
-                  </div>
-
-                  <div class="rating-stat-num">3x Certified</div>
-                  <div class="rating-stat-label">Microsoft Associate</div>
-
-                  <div class="stars-list" aria-label="5 out of 5 stars">
-                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 2. Right Column: Name & Role Headline with 3D Interactive Particle Backdrop & Quote -->
-            <div class="hero-stage-col hero-stage-col-content">
-              <!-- 3D Spline Interactive Element behind the Headline -->
-              <div class="hero-content-3d-backdrop" aria-hidden="true">
+            <!-- 1. Left Column: Name & Role Headline, Summary, CTAs & 3x Certified Badges Section -->
+            <div class="hero-stage-col hero-stage-col-left">
+              <!-- 3D Spline Interactive Element behind Left Column Title -->
+              <div class="hero-left-3d-backdrop" aria-hidden="true">
                 <spline-viewer 
                   url="https://prod.spline.design/b7-CHRgCkPNrZriy/scene.splinecode"
                   id="hero-spline-viewer">
                 </spline-viewer>
               </div>
 
-              <!-- Foreground Content (Pill + Full Name Headline + Summary, CTA & Quote) -->
+              <!-- Foreground Content (Pill + Full Name Headline + Summary & CTA + 3x Certified Badges) -->
               <div class="hero-left-content">
                 <!-- Top Greeting Badge (Pill) -->
                 <div class="hero-hello-badge">
@@ -240,13 +197,47 @@
                   </a>
                 </div>
 
-                <!-- Testimonial Quote Block directly beneath actions -->
-                <div class="hero-quote-block">
-                  <div class="quote-symbol">&ldquo;</div>
-                  <p class="quote-content">
-                    Tejas's exceptional data analytics, star schemas, and executive BI dashboards delivered immediate business clarity and high ROI.
-                  </p>
-                  <span class="quote-author">Highly recommended.</span>
+                <!-- 3x Certified Microsoft Associate Badges Section on Left Side -->
+                <div class="hero-rating-block hero-left-rating-block">
+                  <!-- 3 Microsoft Exam Badges on top: PL-300, DP-600, DP-700 -->
+                  <div class="hero-badges-row" aria-label="Microsoft Exam Badges: PL-300, DP-600, DP-700">
+                    <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Power BI Data Analyst Associate (PL-300)">
+                      <img src="Badges/pl 300.png" alt="Microsoft Certified PL-300 Badge" class="hero-badge-img">
+                      <span class="hero-badge-tag">PL-300</span>
+                    </a>
+                    <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Fabric Analytics Engineer Associate (DP-600)">
+                      <img src="Badges/dp 600.png" alt="Microsoft Certified DP-600 Badge" class="hero-badge-img">
+                      <span class="hero-badge-tag">DP-600</span>
+                    </a>
+                    <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Fabric Data Engineer Associate (DP-700)">
+                      <img src="Badges/dp 700.png" alt="Microsoft Certified DP-700 Badge" class="hero-badge-img">
+                      <span class="hero-badge-tag">DP-700</span>
+                    </a>
+                  </div>
+
+                  <div class="rating-stat-num">3x Certified</div>
+                  <div class="rating-stat-label">Microsoft Associate</div>
+
+                  <div class="stars-list" aria-label="5 out of 5 stars">
+                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Right Column: Big Profile Image Covering Half the Hero Page -->
+            <div class="hero-stage-col hero-stage-col-portrait">
+              <div class="hero-portrait-stage">
+                <!-- Solid Shield Layer: ensures scrolled canvas frames or background visualization NEVER bleed into photo -->
+                <div class="hero-portrait-shield" aria-hidden="true"></div>
+
+                <!-- Big Profile Heroes Image: covers half the hero section -->
+                <div class="hero-portrait-img-box">
+                  <img src="Asset/profile heroes image.png" alt="Tejas Waghmare - 3x Certified Microsoft Associate" class="hero-portrait-main-img" fetchpriority="high" loading="eager" decoding="async">
                 </div>
               </div>
             </div>

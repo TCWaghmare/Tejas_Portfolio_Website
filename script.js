@@ -6,13 +6,18 @@
 (function () {
   'use strict';
 
+  // --- Device & Viewport Detection ---
+  const isMobile = window.innerWidth < 768;
+  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+
   // --- Configuration ---
   const CONFIG = {
     totalFrames: 240,
     framePath: (index) => `Asset/frames/frame_${String(index).padStart(4, '0')}.png`,
     lerpFactor: 0.20, // Quick, agile and silky smooth deceleration
-    concurrency: 12,  // Parallel preloading worker pool
-    minLoadToUnlock: 0.95
+    concurrency: isMobile ? 3 : 6, // Low-overhead parallel pool to prevent network throttling
+    frameStride: isMobile ? 6 : 2, // Sample frames: on mobile ~40 frames, on desktop 120 keyframes
+    minLoadToUnlock: 0.005 // Instant unlock as soon as first frame is ready!
   };
 
   // --- DOM Elements ---
@@ -182,6 +187,11 @@
   function startPreloading() {
     resizeCanvas();
 
+    // Safety fallback: Never let the user wait longer than 850ms, even on slow network
+    const unlockTimeout = setTimeout(() => {
+      unlockInterface();
+    }, 850);
+
     // 1. Immediately load Frame 1
     const firstImg = new Image();
     firstImg.src = CONFIG.framePath(1);
@@ -189,32 +199,65 @@
       images[1] = firstImg;
       loadedCount++;
       drawFrame(1);
-      updateLoaderUI(loadedCount, CONFIG.totalFrames);
+      
+      // Snappy, gratifying progress animation from 0% -> 100%
+      animateLoaderToFull(() => {
+        clearTimeout(unlockTimeout);
+        unlockInterface();
+      });
+
+      // Queue remaining background frames lazily
       queueRemainingFrames();
     };
     firstImg.onerror = () => {
-      console.warn('Initial frame load failed, starting queue.');
+      console.warn('Initial frame load fallback.');
+      clearTimeout(unlockTimeout);
+      unlockInterface();
       queueRemainingFrames();
     };
   }
 
+  function animateLoaderToFull(callback) {
+    const start = performance.now();
+    const duration = 320; // 320ms quick smooth visual fill
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(1, elapsed / duration);
+      updateLoaderUI(Math.round(progress * 100), 100);
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        if (callback) callback();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
   function queueRemainingFrames() {
     const queue = [];
-    for (let i = 2; i <= CONFIG.totalFrames; i++) {
+    const stride = CONFIG.frameStride || 1;
+    
+    // Priority 1: Keyframes spaced by stride
+    for (let i = 1 + stride; i <= CONFIG.totalFrames; i += stride) {
       queue.push(i);
+    }
+    if (queue[queue.length - 1] !== CONFIG.totalFrames) {
+      queue.push(CONFIG.totalFrames);
+    }
+
+    // Priority 2: On non-mobile screens, queue the remaining intermediate frames for ultra-high fidelity
+    if (!isMobile) {
+      for (let i = 2; i <= CONFIG.totalFrames; i++) {
+        if (!queue.includes(i)) {
+          queue.push(i);
+        }
+      }
     }
 
     let activeWorkers = 0;
 
     function work() {
-      if (!isPageInteractive && (loadedCount / CONFIG.totalFrames >= CONFIG.minLoadToUnlock)) {
-        unlockInterface();
-      }
-
-      if (queue.length === 0 && activeWorkers === 0) {
-        if (!isPageInteractive) unlockInterface();
-        return;
-      }
+      if (queue.length === 0 && activeWorkers === 0) return;
 
       while (activeWorkers < CONFIG.concurrency && queue.length > 0) {
         const frameIdx = queue.shift();
@@ -227,18 +270,20 @@
           images[frameIdx] = img;
           loadedCount++;
           activeWorkers--;
-          updateLoaderUI(loadedCount, CONFIG.totalFrames);
           work();
         };
 
         img.onload = onFinish;
-        img.onerror = () => {
-          onFinish();
-        };
+        img.onerror = onFinish;
       }
     }
 
-    work();
+    // Defer background frame loading to idle time so main UI thread stays 100% responsive
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => work(), { timeout: 800 });
+    } else {
+      setTimeout(work, 150);
+    }
   }
 
   function unlockInterface() {
@@ -249,28 +294,72 @@
       animationFrameId = requestAnimationFrame(renderLoop);
     }
 
+    // Immediately reveal all elements in the hero section so nothing starts invisible
+    const heroElements = document.querySelectorAll('#home .fade-up, #home .hero-mini-card, #home .bento-card, #home .hero-stage *');
+    heroElements.forEach((el) => {
+      el.classList.add('is-inview');
+    });
+
     setTimeout(() => {
-      loader.classList.add('hidden');
+      if (loader) {
+        loader.classList.add('hidden');
+      }
+
+      // Reveal elements currently in viewport
       document.querySelectorAll('.fade-up, .reveal-text').forEach((el) => {
         const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
+        if (rect.top < window.innerHeight + 150 && rect.bottom > 0) {
           el.classList.add('is-inview');
         }
       });
-    }, 250);
+
+      // Asynchronously load the Spline viewer web component now that critical UI is interactive
+      loadSplineViewerScript();
+    }, 200);
+  }
+
+  function loadSplineViewerScript() {
+    if (window.customElements && window.customElements.get('spline-viewer')) return;
+    if (document.querySelector('script[src*="spline-viewer"]')) return;
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = 'https://unpkg.com/@splinetool/viewer/build/spline-viewer.js';
+    document.body.appendChild(script);
   }
 
   // --- Mobile Navigation Toggle ---
   if (mobileToggle && navLinks) {
-    mobileToggle.addEventListener('click', () => {
-      navLinks.classList.toggle('mobile-open');
+    mobileToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navLinks.classList.toggle('mobile-open');
+      mobileToggle.classList.toggle('active', isOpen);
+      mobileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 
-    // Close menu when clicking any nav item
-    navItems.forEach((link) => {
+    // Close menu when clicking any nav item or mobile CTA
+    navLinks.querySelectorAll('.nav-item, .nav-mobile-cta').forEach((link) => {
       link.addEventListener('click', () => {
         navLinks.classList.remove('mobile-open');
+        mobileToggle.classList.remove('active');
+        mobileToggle.setAttribute('aria-expanded', 'false');
       });
+    });
+
+    // Close on outside click or Escape
+    document.addEventListener('click', (e) => {
+      if (!navLinks.contains(e.target) && !mobileToggle.contains(e.target)) {
+        navLinks.classList.remove('mobile-open');
+        mobileToggle.classList.remove('active');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navLinks.classList.contains('mobile-open')) {
+        navLinks.classList.remove('mobile-open');
+        mobileToggle.classList.remove('active');
+        mobileToggle.setAttribute('aria-expanded', 'false');
+      }
     });
   }
 
@@ -1360,15 +1449,20 @@
 
   // --- Kova.me Signature Scroll Reveal Controller (.fade-up and .reveal-text) ---
   function initScrollReveals() {
-    // Automatically attach .fade-up to prominent section blocks
+    // Automatically attach .fade-up to prominent section blocks (excluding #home elements so hero is always visible)
     const targetBlocks = document.querySelectorAll(
-      '.section-header, .bento-card, .cert-card-inner, .contact-item, .hero-mini-card, .tools-card-header, .fade-up, .reveal-text'
+      'section:not(#home) .section-header, section:not(#home) .bento-card, .cert-card-inner, .contact-item, .tools-card-header, section:not(#home) .fade-up, section:not(#home) .reveal-text'
     );
 
     targetBlocks.forEach((el) => {
       if (!el.classList.contains('fade-up') && !el.classList.contains('reveal-text')) {
         el.classList.add('fade-up');
       }
+    });
+
+    // Ensure all hero elements are visible immediately
+    document.querySelectorAll('#home .fade-up, #home .bento-card, #home .hero-mini-card').forEach((el) => {
+      el.classList.add('is-inview');
     });
 
     if (!('IntersectionObserver' in window)) {
@@ -1385,14 +1479,17 @@
       });
     }, {
       root: null,
-      rootMargin: '0px 0px -40px 0px',
-      threshold: 0.05
+      rootMargin: '160px 0px 100px 0px',
+      threshold: 0.02
     });
 
     document.querySelectorAll('.fade-up, .reveal-text').forEach((el) => {
-      // Elements already above or within the viewport get revealed immediately
+      if (el.closest('#home')) {
+        el.classList.add('is-inview');
+        return;
+      }
       const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
+      if (rect.top < window.innerHeight + 120 && rect.bottom > 0) {
         el.classList.add('is-inview');
       } else {
         observer.observe(el);

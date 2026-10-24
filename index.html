@@ -35,10 +35,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css?v=20261023_kovafonts">
-  
-  <!-- Spline 3D Runtime / Web Component -->
-  <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
+  <link rel="preload" href="style.css?v=20261024_fast" as="style">
+  <link rel="stylesheet" href="style.css?v=20261024_fast">
 </head>
 <body>
 
@@ -100,6 +98,9 @@
         <a href="#education" class="nav-item">Education</a>
         <a href="#hobbies" class="nav-item">Hobbies</a>
         <a href="#contact" class="nav-item">Contact</a>
+        <div class="nav-mobile-bottom">
+          <a href="#contact" class="btn btn-primary-yellow nav-mobile-cta">Let's Connect &rarr;</a>
+        </div>
       </nav>
 
       <div class="nav-actions">
@@ -208,7 +209,7 @@
                 
                 <!-- Portrait Image Frame with Uploaded Photo -->
                 <div class="hero-portrait-frame">
-                  <img src="Asset/Gemini_Generated_Image_uwdhpjuwdhpjuwdh.png" alt="Tejas Waghmare - Data Analyst" class="hero-portrait-img" id="hero-portrait-img">
+                  <img src="Asset/hero_portrait_optimized.jpg" alt="Tejas Waghmare - Data Analyst" class="hero-portrait-img" id="hero-portrait-img" fetchpriority="high" decoding="async">
                   <div class="portrait-sheen-sweep"></div>
                 </div>
 
@@ -2679,6 +2680,6 @@
   <!-- Floating Cursor Tooltip for "Let's build something" (kova.me style) -->
   <div class="footer-tip" id="footer-tip">Message me 💬</div>
 
-  <script src="script.js?v=20261023_theme"></script>
+  <script src="script.js?v=20261024_fast"></script>
 </body>
 </html>

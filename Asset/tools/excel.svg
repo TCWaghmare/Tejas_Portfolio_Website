@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="xls_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#107C41"/>
+      <stop offset="100%" stop-color="#0B552C"/>
+    </linearGradient>
+    <linearGradient id="xls_front" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#21A366"/>
+      <stop offset="100%" stop-color="#107C41"/>
+    </linearGradient>
+    <filter id="xls_shadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="3" stdDeviation="2.5" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <!-- Excel Back Grid Sheet -->
+  <rect x="22" y="10" width="34" height="44" rx="4" fill="url(#xls_bg)"/>
+  
+  <!-- Sheet Cells / Grid Lines -->
+  <rect x="28" y="18" width="10" height="7" rx="1" fill="#FFFFFF" fill-opacity="0.25"/>
+  <rect x="42" y="18" width="10" height="7" rx="1" fill="#FFFFFF" fill-opacity="0.25"/>
+  
+  <rect x="28" y="29" width="10" height="7" rx="1" fill="#FFFFFF" fill-opacity="0.25"/>
+  <rect x="42" y="29" width="10" height="7" rx="1" fill="#FFFFFF" fill-opacity="0.25"/>
+
+  <rect x="28" y="40" width="10" height="7" rx="1" fill="#FFFFFF" fill-opacity="0.25"/>
+  <rect x="42" y="40" width="10" height="7" rx="1" fill="#FFFFFF" fill-opacity="0.25"/>
+
+  <!-- Excel Front Square with X -->
+  <rect x="8" y="16" width="32" height="32" rx="5" fill="url(#xls_front)" filter="url(#xls_shadow)"/>
+  
+  <!-- Bold White 'X' -->
+  <path d="M18 24 L22 32 L17.5 40 H22.5 L24.8 35.2 L27.2 40 H32.5 L27.8 32 L32 24 H27 L24.8 28.5 L22.8 24 H18 Z" fill="#FFFFFF"/>
+</svg>

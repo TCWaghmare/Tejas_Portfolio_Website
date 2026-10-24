@@ -1,8 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Theme Initialization (Default Dark, Zero Flicker) -->
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('tejas_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      const targetTheme = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', targetTheme);
+      localStorage.setItem('tejas_theme', targetTheme);
+    }
+    window.toggleTheme = toggleTheme;
+  </script>
   
   <!-- SEO & Social Meta Tags -->
   <title>Tejas C. Waghmare | Data Analyst & BI Specialist Portfolio</title>
@@ -18,9 +33,12 @@
   <!-- Favicon / Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261023_kovafonts">
+  
+  <!-- Spline 3D Runtime / Web Component -->
+  <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
 </head>
 <body>
 
@@ -60,18 +78,6 @@
     <div class="canvas-overlay"></div>
   </div>
 
-  <!-- Realtime HUD Telemetry (Bottom Right) -->
-  <aside id="hud-telemetry" class="hud-telemetry" aria-label="Animation telemetry">
-    <div class="hud-pill">
-      <span class="hud-live-indicator"></span>
-      <span class="hud-label">FRAME</span>
-      <span id="hud-frame-num" class="hud-value">001</span>
-      <span class="hud-sep">/</span>
-      <span class="hud-total">240</span>
-      <span class="hud-divider"></span>
-      <span id="hud-percent-val" class="hud-value">0.0%</span>
-    </div>
-  </aside>
 
   <!-- Sticky Modern Navigation Header -->
   <header class="site-header" id="site-header">
@@ -97,6 +103,24 @@
       </nav>
 
       <div class="nav-actions">
+        <!-- Theme Toggle Button (Dark / Light) -->
+        <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark and light theme" title="Toggle theme">
+          <svg class="theme-icon icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
         <a href="tejas resume.pdf" target="_blank" class="btn btn-secondary-pill nav-resume-btn" download>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           <span>Resume</span>
@@ -122,151 +146,186 @@
     <section id="home" class="section hero-section">
       <div class="section-container">
         
-        <!-- Hero Bento Grid (Directly inspired by Reference Theme) -->
-        <div class="hero-bento-grid">
-          
-          <!-- Bento 1: Main Introduction Card -->
-          <div class="bento-card hero-main-card">
-            <div class="hero-tag-pill">
-              <span class="tag-sparkle">⚡</span>
-              <span>DATA ANALYST & BUSINESS INTELLIGENCE</span>
-            </div>
+        <!-- Hero Showcase Layout (Centered Name with 3D Background, Profile Photo at Centre) -->
+        <!-- Hero Showcase: 3-Column Stage (Left: Name & 3D Element, Center: Portrait Arch, Right: Rating & Testimonial) -->
+        <div class="hero-showcase">
+          <div class="hero-stage">
             
-            <h1 class="hero-title">
-              Turning complex data into <span class="highlight-yellow">strategic business value</span>.
-            </h1>
-            
-            <p class="hero-subtitle">
-              Mechanical Engineer turned Data Analyst with 3x Microsoft Associate certifications. Specializing in Power BI, SQL, Python, Excel & Fabric to build end-to-end analytics pipelines, KPI tracking systems, and executive dashboards.
-            </p>
-            
-            <div class="hero-cta-group">
-              <a href="#projects" class="btn btn-primary-yellow">
-                <span>Explore Projects</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-              </a>
-              <a href="tejas resume.pdf" target="_blank" class="btn btn-secondary-pill" download>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                <span>View Resume</span>
-              </a>
-            </div>
+            <!-- 1. Left Column: Name & Role Headline with 3D Interactive Particle Backdrop -->
+            <div class="hero-stage-col hero-stage-col-left">
+              <!-- 3D Spline Interactive Element behind the Left Column Title -->
+              <div class="hero-left-3d-backdrop" aria-hidden="true">
+                <spline-viewer 
+                  url="https://prod.spline.design/b7-CHRgCkPNrZriy/scene.splinecode"
+                  id="hero-spline-viewer">
+                </spline-viewer>
+              </div>
 
-            <div class="hero-trust-badges">
-              <span class="trust-label">CERTIFIED BY:</span>
-              <div class="trust-logos">
-                <span class="trust-pill">Microsoft Certified</span>
-                <span class="trust-pill">Power BI (PL-300)</span>
-                <span class="trust-pill">Fabric Analytics (DP-600)</span>
-                <span class="trust-pill">Fabric Data (DP-700)</span>
+              <!-- Foreground Content (Pill + Full Name Headline + Summary & CTA) -->
+              <div class="hero-left-content">
+                <!-- Top Greeting Badge (Pill) -->
+                <div class="hero-hello-badge">
+                  <span class="hello-dot"></span>
+                  <span>Hello!</span>
+                </div>
+
+                <!-- Left Full Name Headline with Kinetic Animations -->
+                <h1 class="hero-left-title">
+                  <span class="hero-line-intro">
+                    <span class="serif-accent">I am</span>
+                    <span class="hero-wave-hand" aria-hidden="true" title="Wave!">&#128075;</span>
+                  </span>
+                  <span class="hero-line-name highlight-yellow" id="hero-name-target" aria-label="Tejas Waghmare">Tejas Waghmare</span>
+                  <span class="hero-line-role" id="hero-role-wrapper" aria-label="Data Analyst and BI Specialist" title="Click to cycle roles">
+                    <span class="hero-role-prefix" aria-hidden="true">&gt;</span>
+                    <span class="hero-role-typed" id="hero-role-typed">Data Analyst</span>
+                    <span class="hero-role-cursor" aria-hidden="true"></span>
+                  </span>
+                </h1>
+
+                <p class="hero-left-desc">
+                  Transforming complex datasets into executive clarity, high-ROI business intelligence, and scalable data models.
+                </p>
+
+                <div class="hero-left-actions">
+                  <a href="#projects" class="btn btn-primary-yellow btn-sm">
+                    <span>Explore Work</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                  <a href="#contact" class="btn btn-secondary-pill btn-sm">
+                    <span>Let's Connect</span>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Bento 2: Hero Stat Card (Inspired by "36h" Reference Card) -->
-          <div class="bento-card hero-stat-card">
-            <div class="stat-highlight-number">$389.3M</div>
-            <h3 class="stat-title">Marketplace Revenue Analyzed</h3>
-            <p class="stat-desc">
-              Uncovered pricing, occupancy, and host performance across 30,259 NYC Airbnb listings and 980K+ reviews.
-            </p>
-            <a href="#projects" class="stat-link-btn">
-              <span>See case study</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            <!-- 2. Center Column: Portrait Arch Frame (Positioned at Centre) -->
+            <div class="hero-stage-col hero-stage-col-portrait">
+              <div class="hero-arch-wrapper">
+                <!-- Glowing Arch Backdrop (Theme Yellow & Graphite Accent) -->
+                <div class="hero-arch-backdrop"></div>
+                <div class="hero-arch-glow-ring"></div>
+                
+                <!-- Portrait Image Frame with Uploaded Photo -->
+                <div class="hero-portrait-frame">
+                  <img src="Asset/Gemini_Generated_Image_uwdhpjuwdhpjuwdh.png" alt="Tejas Waghmare - Data Analyst" class="hero-portrait-img" id="hero-portrait-img">
+                  <div class="portrait-sheen-sweep"></div>
+                </div>
+
+                <!-- Overlapping Floating Pill Action Capsule -->
+                <div class="hero-floating-pill">
+                  <a href="#projects" class="pill-btn-left">Portfolio</a>
+                  <a href="#contact" class="pill-btn-right">
+                    <span>Hire me</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Right Column: Star Rating & 3x Certified Metric + Testimonial Quote -->
+            <div class="hero-stage-col hero-stage-col-right">
+              <!-- Star Rating & 3x Certified Microsoft Associate Metric -->
+              <div class="hero-rating-block">
+                <!-- 3 Microsoft Exam Badges on top of 3x Certified -->
+                <div class="hero-badges-row" aria-label="Microsoft Exam Badges: PL-300, DP-600, DP-700">
+                  <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Power BI Data Analyst Associate (PL-300)">
+                    <img src="Badges/pl 300.png" alt="Microsoft Certified PL-300 Badge" class="hero-badge-img">
+                    <span class="hero-badge-tag">PL-300</span>
+                  </a>
+                  <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Fabric Analytics Engineer Associate (DP-600)">
+                    <img src="Badges/dp 600.png" alt="Microsoft Certified DP-600 Badge" class="hero-badge-img">
+                    <span class="hero-badge-tag">DP-600</span>
+                  </a>
+                  <a href="#badges" class="hero-badge-pill" title="Microsoft Certified: Fabric Data Engineer Associate (DP-700)">
+                    <img src="Badges/dp 700.png" alt="Microsoft Certified DP-700 Badge" class="hero-badge-img">
+                    <span class="hero-badge-tag">DP-700</span>
+                  </a>
+                </div>
+
+                <div class="rating-stat-num">3x Certified</div>
+                <div class="rating-stat-label">Microsoft Associate</div>
+
+                <div class="stars-list" aria-label="5 out of 5 stars">
+                  <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+              </div>
+
+              <!-- Testimonial Quote Block -->
+              <div class="hero-quote-block">
+                <div class="quote-symbol">&ldquo;</div>
+                <p class="quote-content">
+                  Tejas's exceptional data analytics, star schemas, and executive BI dashboards delivered immediate business clarity and high ROI.
+                </p>
+                <span class="quote-author">Highly recommended.</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Official Microsoft Credentials Trust Ribbon -->
+        <div class="hero-trust-ribbon">
+          <span class="trust-ribbon-title">OFFICIAL CREDENTIALS:</span>
+          <div class="trust-ribbon-pills">
+            <a href="#badges" class="trust-pill-link">
+              <span class="pill-dot"></span>
+              <span>Power BI Data Analyst (PL-300)</span>
             </a>
-            <div class="stat-footnote">*Across 5 NYC boroughs & 16.4K+ host portfolios</div>
+            <a href="#badges" class="trust-pill-link">
+              <span class="pill-dot"></span>
+              <span>Fabric Analytics Engineer (DP-600)</span>
+            </a>
+            <a href="#badges" class="trust-pill-link">
+              <span class="pill-dot"></span>
+              <span>Fabric Data Engineer (DP-700)</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Key Impact & Analytics Highlights Bento Row -->
+        <div class="hero-impact-grid">
+          <!-- Metric 1: NYC Airbnb -->
+          <div class="bento-card hero-mini-card">
+            <div class="mini-card-header">
+              <span class="mini-tag">PORTFOLIO IMPACT</span>
+              <span class="mini-highlight-num">$389.3M</span>
+            </div>
+            <h4 class="mini-card-title">Marketplace Revenue Analyzed</h4>
+            <p class="mini-card-desc">Evaluated 30,259 NYC listings & 980K+ reviews across 5 boroughs using SQL & Power BI.</p>
+            <a href="#projects" class="mini-card-link">View Case Study &rarr;</a>
           </div>
 
-          <!-- Bento 3: Analytics Lifecycle (Inspired by the Ver. 1 -> Ver. 4 Yellow Circles) -->
-          <div class="bento-card hero-process-card">
-            <div class="process-header">
-              <h3 class="process-title">End-to-End Analytics Workflow</h3>
-              <p class="process-desc">From raw enterprise data to measurable ROI and board-ready dashboards.</p>
+          <!-- Metric 2: Analytics Lifecycle -->
+          <div class="bento-card hero-mini-card">
+            <div class="mini-card-header">
+              <span class="mini-tag">METHODOLOGY</span>
+              <span class="mini-highlight-badge">4-Stage Pipeline</span>
             </div>
-            
-            <div class="process-stepper">
-              <div class="step-item">
-                <div class="step-circle step-circle-1">
-                  <span class="step-num">/ Step 1</span>
-                  <div class="step-wave wave-1"></div>
-                </div>
-                <span class="step-label">Ingest & ETL</span>
-              </div>
-              <div class="step-arrow">······></div>
-
-              <div class="step-item">
-                <div class="step-circle step-circle-2">
-                  <span class="step-num">/ Step 2</span>
-                  <div class="step-wave wave-2"></div>
-                </div>
-                <span class="step-label">Star Schema</span>
-              </div>
-              <div class="step-arrow">······></div>
-
-              <div class="step-item">
-                <div class="step-circle step-circle-3">
-                  <span class="step-num">/ Step 3</span>
-                  <div class="step-wave wave-3"></div>
-                </div>
-                <span class="step-label">DAX Measures</span>
-              </div>
-              <div class="step-arrow">······></div>
-
-              <div class="step-item">
-                <div class="step-circle step-circle-4">
-                  <span class="step-num">/ Step 4</span>
-                  <div class="step-wave wave-4"></div>
-                </div>
-                <span class="step-label">Actionable ROI</span>
-              </div>
+            <h4 class="mini-card-title">End-to-End Analytics Workflow</h4>
+            <div class="mini-workflow-steps">
+              <span>ETL Ingestion</span> &bull; 
+              <span>Star Schema</span> &bull; 
+              <span>DAX Measures</span> &bull; 
+              <span>Actionable ROI</span>
             </div>
-
-            <div class="process-footer">
-              <span class="badge-looks-great">Insights Ready!</span>
-              <span class="process-caption">Predictable, repeatable data models designed for scale.</span>
-            </div>
+            <p class="mini-card-desc">Architecting predictable, scalable data models that turn raw data into board-ready insights.</p>
           </div>
 
-          <!-- Bento 4: Cost Optimization Stat Card (Inspired by Invoice Comparison Card) -->
-          <div class="bento-card hero-metric-compare-card">
-            <div class="metric-dual-boxes">
-              <div class="metric-box box-before">
-                <span class="box-tag">Waste Ratio</span>
-                <span class="box-val text-muted">40%</span>
-                <div class="mini-bar-graph">
-                  <span class="bar bar-tall"></span>
-                  <span class="bar bar-mid"></span>
-                  <span class="bar bar-tall"></span>
-                </div>
-              </div>
-              <div class="metric-box box-after">
-                <span class="box-tag text-yellow">Turnaround</span>
-                <span class="box-val text-yellow">+15%</span>
-                <div class="mini-bar-graph">
-                  <span class="bar bar-yellow bar-tall"></span>
-                  <span class="bar bar-yellow bar-full"></span>
-                  <span class="bar bar-yellow bar-full"></span>
-                </div>
-              </div>
+          <!-- Metric 3: Bakery Turnaround -->
+          <div class="bento-card hero-mini-card">
+            <div class="mini-card-header">
+              <span class="mini-tag">REVENUE RECOVERY</span>
+              <span class="mini-highlight-num text-yellow">+15%</span>
             </div>
-            <h4 class="metric-compare-title">Bakery Waste & Profit Turnaround</h4>
-            <p class="metric-compare-desc">
-              Analyzed 16,569 transactions; identified 40% waste cost and deep discount leakages driving -6.7% margins, delivering recovery recommendations.
-            </p>
+            <h4 class="mini-card-title">Waste & Profit Optimization</h4>
+            <p class="mini-card-desc">Diagnosed 16.5K transactions to pinpoint 40% waste cost leakages and restore gross margins.</p>
+            <a href="#projects" class="mini-card-link">View Analysis &rarr;</a>
           </div>
-
-          <!-- Bento 5: Action Banner (Inspired by "See what we do" Card) -->
-          <div class="bento-card hero-action-card">
-            <div class="action-card-content">
-              <span class="action-tag">READY FOR IMPACT</span>
-              <h4 class="action-title">Need Business Intelligence?</h4>
-              <p class="action-desc">Open for full-time Data Analyst, BI Developer, and Analytics Engineer roles.</p>
-              <a href="#contact" class="btn btn-primary-yellow btn-full">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <span>Get In Touch</span>
-              </a>
-            </div>
-          </div>
-
         </div>
 
         <!-- Scroll Indicator Cue -->
@@ -288,7 +347,7 @@
         
         <div class="section-header">
           <div class="section-tag"><span class="tag-dot"></span> ABOUT ME</div>
-          <h2 class="section-title">Analytical Precision, <span class="highlight-yellow">Business Focus</span></h2>
+          <h2 class="section-title">Analytical Precision, <span class="highlight-yellow"><em class="serif-accent">Business Focus.</em></span></h2>
           <p class="section-desc">A snapshot of my background, journey, and professional data philosophy.</p>
         </div>
 
@@ -331,9 +390,9 @@
                 <div class="timeline-content">
                   <div class="role-header">
                     <h4 class="role-title">Data Analyst Intern</h4>
-                    <span class="role-dates">Feb 2026 – Mar 2026</span>
+                    <span class="role-dates">Feb 2026 &ndash; Mar 2026</span>
                   </div>
-                  <div class="role-company">Microsoft Elevate × AICTE <span class="badge-remote">Remote</span></div>
+                  <div class="role-company">Microsoft Elevate &times; AICTE <span class="badge-remote">Remote</span></div>
                   <ul class="role-bullets">
                     <li>Built interactive Power BI dashboards, transforming raw data into actionable business insights for decision-making.</li>
                     <li>Completed an intensive 20-hour curriculum covering data modeling, DAX, visualization best practices, and real-world BI use cases.</li>
@@ -347,7 +406,7 @@
                 <div class="timeline-content">
                   <div class="role-header">
                     <h4 class="role-title">Project Engineer</h4>
-                    <span class="role-dates">Sep 2025 – Dec 2025</span>
+                    <span class="role-dates">Sep 2025 &ndash; Dec 2025</span>
                   </div>
                   <div class="role-company">Cybernetic India</div>
                   <ul class="role-bullets">
@@ -362,10 +421,10 @@
                 <div class="timeline-marker"></div>
                 <div class="timeline-content">
                   <div class="role-header">
-                    <h4 class="role-title">Graduate Trainee Engineer — Emerging Tech</h4>
+                    <h4 class="role-title">Graduate Trainee Engineer &mdash; Emerging Tech</h4>
                     <span class="role-dates">Nov 2025</span>
                   </div>
-                  <div class="role-company">Bajaj BEST × ASDC India <span class="badge-score">Score: 87%</span></div>
+                  <div class="role-company">Bajaj BEST &times; ASDC India <span class="badge-score">Score: 87%</span></div>
                   <ul class="role-bullets">
                     <li>Hands-on data analysis and visualization using Power BI, Excel, and SQL to derive actionable insights from industrial datasets.</li>
                     <li>Studied foundational AI & Machine Learning concepts including supervised predictive modeling for business intelligence.</li>
@@ -376,7 +435,492 @@
             </div>
           </div>
 
-        </div>
+          <!-- ===================================================================
+               Tools I Use For My Work (Auto-Scrolling Stream with Rich Hover Cards)
+               =================================================================== -->
+          <div class="bento-card about-tools-card" id="about-tools-card">
+            <div class="tools-card-header">
+              <div class="tools-header-meta">
+                <span class="card-pill">DAILY DRIVERS & TECH STACK</span>
+                <h3 class="tools-card-title">Tools I Use For <em class="serif-accent highlight-yellow">My Work.</em></h3>
+                <p class="tools-card-desc">
+                  Core tools, analytical engines, and AI environments I leverage daily to extract data, automate pipelines, and build executive intelligence.
+                </p>
+              </div>
+              <div class="tools-header-badge">
+                <span class="tools-pulse-dot"></span>
+                <span class="tools-badge-text">12 Core Tools &bull; Live Stream</span>
+              </div>
+            </div>
+
+            <!-- Auto-scrolling marquee ribbon container with gradient edge fading -->
+            <div class="tools-marquee-viewport" id="tools-marquee-viewport" aria-label="Tools streaming ribbon">
+              <div class="tools-edge-fade tools-fade-left" aria-hidden="true"></div>
+              <div class="tools-edge-fade tools-fade-right" aria-hidden="true"></div>
+
+              <div class="tools-marquee-track" id="tools-marquee-track">
+                <!-- ==================== SET 1 ==================== -->
+                <!-- 1. Power BI -->
+                <div class="tool-item" data-tool-id="1" data-tool-name="Power BI" data-tool-category="Enterprise BI & DAX" tabindex="0" role="button" aria-label="Power BI">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/powerbi_logo.jpg" alt="Power BI Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Power BI</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#01</span>
+                      <span class="tooltip-category">Enterprise BI & DAX</span>
+                    </div>
+                    <div class="tooltip-title">Power BI</div>
+                    <p class="tooltip-desc">I build interactive dashboards with DAX measures, star schema models, and executive KPI reports.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 2. Microsoft Fabric -->
+                <div class="tool-item" data-tool-id="2" data-tool-name="Microsoft Fabric" data-tool-category="Unified Analytics Platform" tabindex="0" role="button" aria-label="Microsoft Fabric">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/fabric_logo.jpg" alt="Microsoft Fabric Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Microsoft Fabric</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#02</span>
+                      <span class="tooltip-category">Unified Analytics Platform</span>
+                    </div>
+                    <div class="tooltip-title">Microsoft Fabric</div>
+                    <p class="tooltip-desc">Unified SaaS analytics platform for lakehouses, OneLake shortcuts, Medallion architecture, and scalable pipelines.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 3. MS SQL Server -->
+                <div class="tool-item" data-tool-id="3" data-tool-name="MS SQL Server" data-tool-category="Database & ETL" tabindex="0" role="button" aria-label="MS SQL Server">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/mssql_logo.png" alt="MS SQL Server Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">MS SQL Server</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#03</span>
+                      <span class="tooltip-category">Database & ETL</span>
+                    </div>
+                    <div class="tooltip-title">MS SQL Server</div>
+                    <p class="tooltip-desc">I write optimized T-SQL queries, joins, CTEs, indexing, and stored procedures to transform business data.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 4. PostgreSQL -->
+                <div class="tool-item" data-tool-id="4" data-tool-name="PostgreSQL" data-tool-category="Analytics & Open-Source RDBMS" tabindex="0" role="button" aria-label="PostgreSQL">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/postgres_logo.jpg" alt="PostgreSQL Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">PostgreSQL</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#04</span>
+                      <span class="tooltip-category">Analytics & Open-Source RDBMS</span>
+                    </div>
+                    <div class="tooltip-title">PostgreSQL</div>
+                    <p class="tooltip-desc">I use it for advanced analytical queries, complex window functions, and relational data modeling.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 5. VS Code -->
+                <div class="tool-item" data-tool-id="5" data-tool-name="VS Code" data-tool-category="Primary Code Editor" tabindex="0" role="button" aria-label="VS Code">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/vscode_logo.jpg" alt="VS Code Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">VS Code</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#05</span>
+                      <span class="tooltip-category">Primary Code Editor</span>
+                    </div>
+                    <div class="tooltip-title">VS Code</div>
+                    <p class="tooltip-desc">My daily development environment for writing SQL, Python scripts, version control, and analytics code.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 6. GitHub Copilot -->
+                <div class="tool-item" data-tool-id="6" data-tool-name="GitHub Copilot" data-tool-category="AI Pair Programmer" tabindex="0" role="button" aria-label="GitHub Copilot">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/copilot_logo.jpg" alt="GitHub Copilot Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">GitHub Copilot</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#06</span>
+                      <span class="tooltip-category">AI Pair Programmer</span>
+                    </div>
+                    <div class="tooltip-title">GitHub Copilot</div>
+                    <p class="tooltip-desc">I use it for AI-assisted coding, auto-completing complex SQL logic and Python data pipelines.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 7. Claude -->
+                <div class="tool-item" data-tool-id="7" data-tool-name="Claude" data-tool-category="AI Reasoning & Architecture" tabindex="0" role="button" aria-label="Claude">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/claude_logo.png" alt="Claude Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Claude</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#07</span>
+                      <span class="tooltip-category">AI Reasoning & Architecture</span>
+                    </div>
+                    <div class="tooltip-title">Claude</div>
+                    <p class="tooltip-desc">I leverage Claude for deep query debugging, architectural explanations, documentation, and data logic.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 8. ChatGPT -->
+                <div class="tool-item" data-tool-id="8" data-tool-name="ChatGPT" data-tool-category="AI Brainstorming & Analysis" tabindex="0" role="button" aria-label="ChatGPT">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/chatgpt_logo.jpg" alt="ChatGPT Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">ChatGPT</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#08</span>
+                      <span class="tooltip-category">AI Brainstorming & Analysis</span>
+                    </div>
+                    <div class="tooltip-title">ChatGPT</div>
+                    <p class="tooltip-desc">I use it for brainstorming data modeling strategies, generating DAX/Excel formulas, and summarizing insights.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 9. Google Gemini -->
+                <div class="tool-item" data-tool-id="9" data-tool-name="Google Gemini" data-tool-category="Multimodal AI Research" tabindex="0" role="button" aria-label="Google Gemini">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/gemini_logo.jpg" alt="Google Gemini Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Google Gemini</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#09</span>
+                      <span class="tooltip-category">Multimodal AI Research</span>
+                    </div>
+                    <div class="tooltip-title">Google Gemini</div>
+                    <p class="tooltip-desc">I use it for multimodal data interpretation, fast technical research, and cross-validating patterns.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 10. Google Flow -->
+                <div class="tool-item" data-tool-id="10" data-tool-name="Google Flow" data-tool-category="Workflow & Video AI" tabindex="0" role="button" aria-label="Google Flow">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/google_flow_logo.jpg" alt="Google Flow Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Google Flow</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#10</span>
+                      <span class="tooltip-category">Workflow & Video AI</span>
+                    </div>
+                    <div class="tooltip-title">Google Flow</div>
+                    <p class="tooltip-desc">Automating visual workflows, data orchestration, and generating visual content for presentations.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 11. Antigravity -->
+                <div class="tool-item" data-tool-id="11" data-tool-name="Antigravity" data-tool-category="Agentic AI Environment" tabindex="0" role="button" aria-label="Antigravity">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/antigravity_logo.jpg" alt="Antigravity Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Antigravity</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#11</span>
+                      <span class="tooltip-category">Agentic AI Environment</span>
+                    </div>
+                    <div class="tooltip-title">Antigravity</div>
+                    <p class="tooltip-desc">Agentic AI coding and pair-programming environment used to prototype data projects and build web interfaces.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 12. Notion -->
+                <div class="tool-item" data-tool-id="12" data-tool-name="Notion" data-tool-category="Knowledge & Project Ops" tabindex="0" role="button" aria-label="Notion">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/notion_logo.webp" alt="Notion Logo" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Notion</span>
+                  </div>
+                  <div class="tool-tooltip" role="tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#12</span>
+                      <span class="tooltip-category">Knowledge & Project Ops</span>
+                    </div>
+                    <div class="tooltip-title">Notion</div>
+                    <p class="tooltip-desc">Central knowledge hub for documenting data dictionaries, sprint planning, project trackers, and notes.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- ==================== SET 2 (Seamless Infinite Loop) ==================== -->
+                <!-- 1. Power BI -->
+                <div class="tool-item" data-tool-id="1" data-tool-name="Power BI" data-tool-category="Enterprise BI & DAX" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/powerbi_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Power BI</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#01</span>
+                      <span class="tooltip-category">Enterprise BI & DAX</span>
+                    </div>
+                    <div class="tooltip-title">Power BI</div>
+                    <p class="tooltip-desc">I build interactive dashboards with DAX measures, star schema models, and executive KPI reports.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 2. Microsoft Fabric -->
+                <div class="tool-item" data-tool-id="2" data-tool-name="Microsoft Fabric" data-tool-category="Unified Analytics Platform" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/fabric_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Microsoft Fabric</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#02</span>
+                      <span class="tooltip-category">Unified Analytics Platform</span>
+                    </div>
+                    <div class="tooltip-title">Microsoft Fabric</div>
+                    <p class="tooltip-desc">Unified SaaS analytics platform for lakehouses, OneLake shortcuts, Medallion architecture, and scalable pipelines.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 3. MS SQL Server -->
+                <div class="tool-item" data-tool-id="3" data-tool-name="MS SQL Server" data-tool-category="Database & ETL" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/mssql_logo.png" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">MS SQL Server</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#03</span>
+                      <span class="tooltip-category">Database & ETL</span>
+                    </div>
+                    <div class="tooltip-title">MS SQL Server</div>
+                    <p class="tooltip-desc">I write optimized T-SQL queries, joins, CTEs, indexing, and stored procedures to transform business data.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 4. PostgreSQL -->
+                <div class="tool-item" data-tool-id="4" data-tool-name="PostgreSQL" data-tool-category="Analytics & Open-Source RDBMS" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/postgres_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">PostgreSQL</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#04</span>
+                      <span class="tooltip-category">Analytics & Open-Source RDBMS</span>
+                    </div>
+                    <div class="tooltip-title">PostgreSQL</div>
+                    <p class="tooltip-desc">I use it for advanced analytical queries, complex window functions, and relational data modeling.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 5. VS Code -->
+                <div class="tool-item" data-tool-id="5" data-tool-name="VS Code" data-tool-category="Primary Code Editor" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/vscode_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">VS Code</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#05</span>
+                      <span class="tooltip-category">Primary Code Editor</span>
+                    </div>
+                    <div class="tooltip-title">VS Code</div>
+                    <p class="tooltip-desc">My daily development environment for writing SQL, Python scripts, version control, and analytics code.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 6. GitHub Copilot -->
+                <div class="tool-item" data-tool-id="6" data-tool-name="GitHub Copilot" data-tool-category="AI Pair Programmer" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/copilot_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">GitHub Copilot</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#06</span>
+                      <span class="tooltip-category">AI Pair Programmer</span>
+                    </div>
+                    <div class="tooltip-title">GitHub Copilot</div>
+                    <p class="tooltip-desc">I use it for AI-assisted coding, auto-completing complex SQL logic and Python data pipelines.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 7. Claude -->
+                <div class="tool-item" data-tool-id="7" data-tool-name="Claude" data-tool-category="AI Reasoning & Architecture" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/claude_logo.png" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Claude</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#07</span>
+                      <span class="tooltip-category">AI Reasoning & Architecture</span>
+                    </div>
+                    <div class="tooltip-title">Claude</div>
+                    <p class="tooltip-desc">I leverage Claude for deep query debugging, architectural explanations, documentation, and data logic.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 8. ChatGPT -->
+                <div class="tool-item" data-tool-id="8" data-tool-name="ChatGPT" data-tool-category="AI Brainstorming & Analysis" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/chatgpt_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">ChatGPT</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#08</span>
+                      <span class="tooltip-category">AI Brainstorming & Analysis</span>
+                    </div>
+                    <div class="tooltip-title">ChatGPT</div>
+                    <p class="tooltip-desc">I use it for brainstorming data modeling strategies, generating DAX/Excel formulas, and summarizing insights.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 9. Google Gemini -->
+                <div class="tool-item" data-tool-id="9" data-tool-name="Google Gemini" data-tool-category="Multimodal AI Research" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/gemini_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Google Gemini</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#09</span>
+                      <span class="tooltip-category">Multimodal AI Research</span>
+                    </div>
+                    <div class="tooltip-title">Google Gemini</div>
+                    <p class="tooltip-desc">I use it for multimodal data interpretation, fast technical research, and cross-validating patterns.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 10. Google Flow -->
+                <div class="tool-item" data-tool-id="10" data-tool-name="Google Flow" data-tool-category="Workflow & Video AI" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/google_flow_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Google Flow</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#10</span>
+                      <span class="tooltip-category">Workflow & Video AI</span>
+                    </div>
+                    <div class="tooltip-title">Google Flow</div>
+                    <p class="tooltip-desc">Automating visual workflows, data orchestration, and generating visual content for presentations.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 11. Antigravity -->
+                <div class="tool-item" data-tool-id="11" data-tool-name="Antigravity" data-tool-category="Agentic AI Environment" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/antigravity_logo.jpg" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Antigravity</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#11</span>
+                      <span class="tooltip-category">Agentic AI Environment</span>
+                    </div>
+                    <div class="tooltip-title">Antigravity</div>
+                    <p class="tooltip-desc">Agentic AI coding and pair-programming environment used to prototype data projects and build web interfaces.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+                <!-- 12. Notion -->
+                <div class="tool-item" data-tool-id="12" data-tool-name="Notion" data-tool-category="Knowledge & Project Ops" aria-hidden="true">
+                  <div class="tool-card-surface">
+                    <div class="tool-logo-box">
+                      <img src="Asset/tools/notion_logo.webp" alt="" class="tool-logo" loading="lazy">
+                    </div>
+                    <span class="tool-name">Notion</span>
+                  </div>
+                  <div class="tool-tooltip">
+                    <div class="tool-tooltip-header">
+                      <span class="tooltip-num">#12</span>
+                      <span class="tooltip-category">Knowledge & Project Ops</span>
+                    </div>
+                    <div class="tooltip-title">Notion</div>
+                    <p class="tooltip-desc">Central knowledge hub for documenting data dictionaries, sprint planning, project trackers, and notes.</p>
+                    <div class="tooltip-arrow"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
 
       </div>
     </section>
@@ -389,211 +933,258 @@
         
         <div class="section-header">
           <div class="section-tag"><span class="tag-dot"></span> PORTFOLIO WORK</div>
-          <h2 class="section-title">Featured <span class="highlight-yellow">Analytics Projects</span></h2>
+          <h2 class="section-title">Featured <span class="highlight-yellow"><em class="serif-accent">Analytics Projects.</em></span></h2>
           <p class="section-desc">Real-world business intelligence dashboards, star-schema data models, and empirical data analysis.</p>
         </div>
 
-        <div class="projects-grid">
+        <!-- Projects Stacked Deck Carousel Viewport & Controls -->
+        <div class="cert-carousel-wrapper project-carousel-wrapper" id="project-carousel-container" aria-roledescription="carousel" aria-label="Featured Analytics Projects Showcase">
           
-          <!-- PROJECT 1: NYC AIRBNB -->
-          <article class="bento-card project-card featured-project">
-            <div class="project-media-wrapper">
-              <img 
-                src="Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg" 
-                alt="NYC Airbnb Business Intelligence Dashboard Overview" 
-                class="project-img" 
-                loading="lazy"
-                onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence - Overview')"
-              >
-              <div class="project-overlay-hint">
-                <span class="hint-pill">🔍 Click to inspect dashboard</span>
+          <!-- Prev Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-prev" id="project-prev-btn" aria-label="Previous Project" title="Previous Project">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+
+          <!-- Main Track Viewport -->
+          <div class="cert-carousel-viewport" id="project-viewport">
+            <div class="cert-carousel-track" id="project-track">
+              
+              <!-- PROJECT 1: NYC AIRBNB -->
+              <div class="cert-card-slide" data-index="0">
+                <div class="bento-card cert-card-inner project-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">NYC Airbnb Intelligence</h3>
+                    <span class="cert-card-badge">Power BI + SQL</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence - Overview')" title="Click to inspect dashboard">
+                      <img src="Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg" alt="NYC Airbnb Business Intelligence Dashboard Overview" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to inspect</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="project-tags">
+                      <span class="tag">SQL</span>
+                      <span class="tag">Power BI</span>
+                      <span class="tag">DAX</span>
+                      <span class="tag">Power Query</span>
+                      <span class="tag">Hospitality BI</span>
+                    </div>
+
+                    <h4 class="cert-full-name">NYC Airbnb Hospitality Marketplace Intelligence</h4>
+                    <p class="cert-summary">
+                      Comprehensive market intelligence dashboard analyzing <strong>30,259 listings</strong> across <strong>16,441 hosts</strong> and <strong>980K+ customer reviews</strong>. Features interactive filters across 5 NYC boroughs, 4 room categories, and Superhost tiers.
+                    </p>
+
+                    <!-- Metric Badges Row -->
+                    <div class="project-kpi-row">
+                      <div class="kpi-block">
+                        <span class="kpi-val text-yellow">$389.3M</span>
+                        <span class="kpi-sub">Est. Revenue</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">52.4%</span>
+                        <span class="kpi-sub">Avg Occupancy</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">30.2K</span>
+                        <span class="kpi-sub">Listings</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">4.77</span>
+                        <span class="kpi-sub">Avg Rating</span>
+                      </div>
+                    </div>
+
+                    <!-- Extra Dashboard Thumbnails -->
+                    <div class="project-thumbnails">
+                      <span class="thumb-label">Explore Views:</span>
+                      <div class="thumb-group">
+                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 2 - Room.jpg', 'image', 'NYC Airbnb - Room Type Analysis')">Room Types</button>
+                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 3 -Host.jpg', 'image', 'NYC Airbnb - Host Performance')">Host Analysis</button>
+                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 4 - Rating.jpg', 'image', 'NYC Airbnb - Rating Distribution')">Ratings</button>
+                      </div>
+                    </div>
+
+                    <div class="project-action-bar cert-actions">
+                      <a href="https://github.com/TCWaghmare/NYC-Airbnb-Marketplace-Intelligence-Dashboard" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                        <span>GitHub</span>
+                      </a>
+                      <button class="btn btn-secondary-pill btn-sm" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence Dashboard')">
+                        <span>Enlarge</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- PROJECT 2: BAKERY PROFITABILITY & WASTE -->
+              <div class="cert-card-slide" data-index="1">
+                <div class="bento-card cert-card-inner project-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Bakery Sales Analytics</h3>
+                    <span class="cert-card-badge">Excel Power Pivot</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png', 'image', 'Bakery Sales, Profitability & Waste Analytics')" title="Click to inspect dashboard">
+                      <img src="Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png" alt="Bakery Sales and Profitability Dashboard" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to inspect</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="project-tags">
+                      <span class="tag">Excel Power Pivot</span>
+                      <span class="tag">Pivot Tables</span>
+                      <span class="tag">Star Schema</span>
+                      <span class="tag">Waste Optimization</span>
+                    </div>
+
+                    <h4 class="cert-full-name">Bakery Sales, Profitability & Waste Analytics</h4>
+                    <p class="cert-summary">
+                      Conducted deep-dive financial analysis on <strong>16,569 bakery transactions (2023&ndash;2024)</strong> across 3 store locations. Uncovered that waste cost accounted for <strong>40% of revenue</strong> and unchecked discounting caused a -6.7% operational loss.
+                    </p>
+
+                    <div class="project-kpi-row">
+                      <div class="kpi-block">
+                        <span class="kpi-val text-yellow">16.5K</span>
+                        <span class="kpi-sub">Transactions</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">&#8377;3.44M</span>
+                        <span class="kpi-sub">Revenue</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val text-yellow">&#8377;1.39M</span>
+                        <span class="kpi-sub">Waste Cost</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">-6.7%</span>
+                        <span class="kpi-sub">Profit Margin</span>
+                      </div>
+                    </div>
+
+                    <div class="project-thumbnails">
+                      <span class="thumb-label">Views & Demo:</span>
+                      <div class="thumb-group">
+                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery_Transaction_dashboard.png', 'image', 'Bakery Transactions Dashboard')">Transactions</button>
+                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Data analysis Insights.png', 'image', 'Bakery Analytical Insights')">Insights</button>
+                        <button class="thumb-btn btn-highlight" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Walkthrough Video')">&#9654; Video</button>
+                      </div>
+                    </div>
+
+                    <div class="project-action-bar cert-actions">
+                      <a href="https://github.com/TCWaghmare/Bakery_Data_Analysis_Project_by_Excel" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                        <span>GitHub</span>
+                      </a>
+                      <button class="btn btn-secondary-pill btn-sm" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Demonstration')">
+                        <span>Watch Video</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PROJECT 3: AMAZON SALES PERFORMANCE -->
+              <div class="cert-card-slide" data-index="2">
+                <div class="bento-card cert-card-inner project-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Amazon Global Sales</h3>
+                    <span class="cert-card-badge">Executive BI</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/amazon_sales_dashboard.jpg', 'image', 'Amazon Global Sales Performance Dashboard')" title="Click to inspect dashboard">
+                      <img src="Asset/amazon_sales_dashboard.jpg" alt="Amazon Global Sales Performance Dashboard" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to inspect</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="project-tags">
+                      <span class="tag">Power BI</span>
+                      <span class="tag">DAX Measures</span>
+                      <span class="tag">Geo-Mapping</span>
+                      <span class="tag">E-Commerce BI</span>
+                    </div>
+
+                    <h4 class="cert-full-name">Amazon Global Sales Performance Dashboard</h4>
+                    <p class="cert-summary">
+                      Architected a multi-page interactive executive dashboard tracking <strong>50,000+ orders</strong> and <strong>$32.8M in revenue</strong> across 6 product categories and 5 global territories. Delivered category-level profitability insights.
+                    </p>
+
+                    <div class="project-kpi-row">
+                      <div class="kpi-block">
+                        <span class="kpi-val text-yellow">$32.8M</span>
+                        <span class="kpi-sub">Total Revenue</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">50,000+</span>
+                        <span class="kpi-sub">Orders Processed</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">6 Categories</span>
+                        <span class="kpi-sub">Segmented</span>
+                      </div>
+                      <div class="kpi-block">
+                        <span class="kpi-val">5 Regions</span>
+                        <span class="kpi-sub">Geo Mapped</span>
+                      </div>
+                    </div>
+
+                    <div class="project-action-bar cert-actions">
+                      <a href="https://github.com/TCWaghmare" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                        <span>GitHub</span>
+                      </a>
+                      <button class="btn btn-secondary-pill btn-sm" onclick="openLightbox('Asset/amazon_sales_dashboard.jpg', 'image', 'Amazon Global Sales Performance Dashboard')">
+                        <span>Enlarge</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
+          </div>
 
-            <div class="project-info">
-              <div class="project-tags">
-                <span class="tag">SQL</span>
-                <span class="tag">Power BI</span>
-                <span class="tag">DAX</span>
-                <span class="tag">Power Query</span>
-                <span class="tag">Hospitality BI</span>
-              </div>
-              
-              <h3 class="project-title">NYC Airbnb Hospitality Marketplace Intelligence</h3>
-              
-              <p class="project-desc">
-                Comprehensive market intelligence dashboard analyzing <strong>30,259 listings</strong> across <strong>16,441 hosts</strong> and <strong>980K+ customer reviews</strong>. Features interactive filters across 5 NYC boroughs, 4 room categories, and Superhost performance tiers.
-              </p>
+          <!-- Next Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-next" id="project-next-btn" aria-label="Next Project" title="Next Project">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
 
-              <!-- Metric Badges Row -->
-              <div class="project-kpi-row">
-                <div class="kpi-block">
-                  <span class="kpi-val text-yellow">$389.3M</span>
-                  <span class="kpi-sub">Est. Revenue</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">52.4%</span>
-                  <span class="kpi-sub">Avg Occupancy</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">30.2K</span>
-                  <span class="kpi-sub">Listings Mapped</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">4.77</span>
-                  <span class="kpi-sub">Avg Rating</span>
-                </div>
-              </div>
-
-              <!-- Extra Dashboard Thumbnails -->
-              <div class="project-thumbnails">
-                <span class="thumb-label">Explore Views:</span>
-                <div class="thumb-group">
-                  <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 2 - Room.jpg', 'image', 'NYC Airbnb - Room Type Analysis')">
-                    Room Types
-                  </button>
-                  <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 3 -Host.jpg', 'image', 'NYC Airbnb - Host Performance')">
-                    Host Analysis
-                  </button>
-                  <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 4 - Rating.jpg', 'image', 'NYC Airbnb - Rating Distribution')">
-                    Ratings & Reviews
-                  </button>
-                </div>
-              </div>
-
-              <div class="project-action-bar">
-                <a href="https://github.com/TCWaghmare/NYC-Airbnb-Marketplace-Intelligence-Dashboard" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                  <span>GitHub Repository</span>
-                </a>
-                <button class="btn btn-secondary-pill" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence Dashboard')">
-                  <span>Enlarge Dashboard</span>
-                </button>
-              </div>
-
-            </div>
-          </article>
-
-          <!-- PROJECT 2: BAKERY PROFITABILITY & WASTE -->
-          <article class="bento-card project-card">
-            <div class="project-media-wrapper">
-              <img 
-                src="Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png" 
-                alt="Bakery Sales and Profitability Dashboard" 
-                class="project-img" 
-                loading="lazy"
-                onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png', 'image', 'Bakery Sales, Profitability & Waste Analytics')"
-              >
-              <div class="project-overlay-hint">
-                <span class="hint-pill">🔍 Click to inspect dashboard</span>
-              </div>
-            </div>
-
-            <div class="project-info">
-              <div class="project-tags">
-                <span class="tag">Excel Power Pivot</span>
-                <span class="tag">Pivot Tables</span>
-                <span class="tag">Star Schema</span>
-                <span class="tag">Waste Optimization</span>
-              </div>
-              
-              <h3 class="project-title">Bakery Sales, Profitability & Waste Analytics</h3>
-              
-              <p class="project-desc">
-                Conducted deep-dive financial analysis on <strong>16,569 bakery transactions (2023–2024)</strong> across 3 store locations. Uncovered that waste cost accounted for <strong>40% of revenue</strong> and unchecked discounting resulted in a -6.7% operational loss.
-              </p>
-
-              <div class="project-kpi-row">
-                <div class="kpi-block">
-                  <span class="kpi-val text-yellow">16.5K</span>
-                  <span class="kpi-sub">Transactions</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">₹3.44M</span>
-                  <span class="kpi-sub">Total Revenue</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val text-yellow">₹1.39M</span>
-                  <span class="kpi-sub">Waste Cost Found</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">-6.7%</span>
-                  <span class="kpi-sub">Profit Margin</span>
-                </div>
-              </div>
-
-              <div class="project-thumbnails">
-                <span class="thumb-label">Views & Demo:</span>
-                <div class="thumb-group">
-                  <button class="thumb-btn" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery_Transaction_dashboard.png', 'image', 'Bakery Transactions Dashboard')">
-                    Transactions
-                  </button>
-                  <button class="thumb-btn" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Data analysis Insights.png', 'image', 'Bakery Analytical Insights')">
-                    Insights Summary
-                  </button>
-                  <button class="thumb-btn btn-highlight" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Walkthrough Video')">
-                    ▶ Video Walkthrough
-                  </button>
-                </div>
-              </div>
-
-              <div class="project-action-bar">
-                <a href="https://github.com/TCWaghmare/Bakery_Data_Analysis_Project_by_Excel" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                  <span>GitHub Repository</span>
-                </a>
-                <button class="btn btn-secondary-pill" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Demonstration')">
-                  <span>Watch Video</span>
-                </button>
-              </div>
-
-            </div>
-          </article>
-
-          <!-- PROJECT 3: AMAZON SALES PERFORMANCE -->
-          <article class="bento-card project-card">
-            <div class="project-info full-width-info">
-              <div class="project-tags">
-                <span class="tag">Power BI</span>
-                <span class="tag">DAX Measures</span>
-                <span class="tag">Geo-Mapping</span>
-                <span class="tag">E-Commerce BI</span>
-              </div>
-              
-              <h3 class="project-title">Amazon Global Sales Performance Dashboard</h3>
-              
-              <p class="project-desc">
-                Architected a multi-page interactive executive dashboard tracking <strong>50,000+ orders</strong> and <strong>$32.8M in revenue</strong> across 6 product categories and 5 global territories. Delivered category-level profitability insights, highlighting Beauty as the prime margin generator and pinpointing uniform discount leakage.
-              </p>
-
-              <div class="project-kpi-row">
-                <div class="kpi-block">
-                  <span class="kpi-val text-yellow">$32.8M</span>
-                  <span class="kpi-sub">Total Revenue</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">50,000+</span>
-                  <span class="kpi-sub">Orders Processed</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">6 Categories</span>
-                  <span class="kpi-sub">Segmented</span>
-                </div>
-                <div class="kpi-block">
-                  <span class="kpi-val">5 Regions</span>
-                  <span class="kpi-sub">Geo Mapped</span>
-                </div>
-              </div>
-
-              <div class="project-action-bar">
-                <a href="https://github.com/TCWaghmare" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                  <span>Explore on GitHub</span>
-                </a>
-              </div>
-            </div>
-          </article>
-
+          <!-- Centered Dynamic Pagination Bar (Dots + Active Orange Pill) -->
+          <div class="cert-pagination-bar" id="project-dots" aria-label="Projects Carousel Navigation">
+            <button class="cert-dot active" data-slide="0" aria-label="Go to project 1"></button>
+            <button class="cert-dot" data-slide="1" aria-label="Go to project 2"></button>
+            <button class="cert-dot" data-slide="2" aria-label="Go to project 3"></button>
+          </div>
         </div>
 
       </div>
@@ -607,7 +1198,7 @@
         
         <div class="section-header">
           <div class="section-tag"><span class="tag-dot"></span> TECHNICAL ARSENAL</div>
-          <h2 class="section-title">Core <span class="highlight-yellow">Competencies</span></h2>
+          <h2 class="section-title">Core <span class="highlight-yellow"><em class="serif-accent">Competencies.</em></span></h2>
           <p class="section-desc">Tools, programming languages, and analytical frameworks applied to enterprise data.</p>
         </div>
 
@@ -616,7 +1207,7 @@
           <!-- Category 1: BI & Visualization -->
           <div class="bento-card skill-cat-card">
             <div class="cat-header">
-              <div class="cat-icon-badge">📊</div>
+              <div class="cat-icon-badge">&#128202;</div>
               <div>
                 <h3 class="cat-title">BI & Data Visualization</h3>
                 <span class="cat-subtitle">Executive Reporting & Dashboards</span>
@@ -636,7 +1227,7 @@
           <!-- Category 2: Data & Analytics -->
           <div class="bento-card skill-cat-card">
             <div class="cat-header">
-              <div class="cat-icon-badge">📈</div>
+              <div class="cat-icon-badge">&#128200;</div>
               <div>
                 <h3 class="cat-title">Data Modeling & Analytics</h3>
                 <span class="cat-subtitle">Spreadsheet & Semantic Modeling</span>
@@ -656,7 +1247,7 @@
           <!-- Category 3: Programming & Querying -->
           <div class="bento-card skill-cat-card">
             <div class="cat-header">
-              <div class="cat-icon-badge">💻</div>
+              <div class="cat-icon-badge">&#128187;</div>
               <div>
                 <h3 class="cat-title">Programming & SQL</h3>
                 <span class="cat-subtitle">Query Engineering & Scripts</span>
@@ -675,7 +1266,7 @@
           <!-- Category 4: Modern Data Stack & Cloud -->
           <div class="bento-card skill-cat-card">
             <div class="cat-header">
-              <div class="cat-icon-badge">☁️</div>
+              <div class="cat-icon-badge">&#9729;&#65039;</div>
               <div>
                 <h3 class="cat-title">Enterprise Ecosystem</h3>
                 <span class="cat-subtitle">Microsoft Fabric & ERP Data</span>
@@ -704,70 +1295,157 @@
         
         <div class="section-header">
           <div class="section-tag"><span class="tag-dot"></span> RECOGNITIONS</div>
-          <h2 class="section-title">Verified <span class="highlight-yellow">Digital Badges</span></h2>
+          <h2 class="section-title">Verified <span class="highlight-yellow"><em class="serif-accent">Digital Badges.</em></span></h2>
           <p class="section-desc">Microsoft certified credentials verified via Credly registry.</p>
         </div>
 
-        <div class="badges-grid">
+        <!-- Badges Stacked Deck Carousel Viewport & Controls -->
+        <div class="cert-carousel-wrapper badge-carousel-wrapper" id="badge-carousel-container" aria-roledescription="carousel" aria-label="Verified Digital Badges Showcase">
           
-          <!-- Badge 1: PL-300 -->
-          <div class="bento-card badge-card">
-            <div class="badge-img-frame">
-              <img src="Badges/pl 300.png" alt="Microsoft Certified: Power BI Data Analyst Associate (PL-300) Badge" class="badge-asset-img">
-            </div>
-            <div class="badge-content">
-              <span class="badge-org">MICROSOFT CERTIFIED</span>
-              <h3 class="badge-title">Power BI Data Analyst Associate</h3>
-              <p class="badge-code">Certification Code: PL-300</p>
-              <p class="badge-desc">
-                Validates technical skills in data preparation, modeling, visualization, DAX measures, and asset management in Power BI service.
-              </p>
-              <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="badge-verify-link">
-                <span>Verify on Credly</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-              </a>
+          <!-- Prev Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-prev" id="badge-prev-btn" aria-label="Previous Badge" title="Previous Badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+
+          <!-- Main Track Viewport -->
+          <div class="cert-carousel-viewport" id="badge-viewport">
+            <div class="cert-carousel-track" id="badge-track">
+              
+              <!-- Badge 1: PL-300 -->
+              <div class="cert-card-slide" data-index="0">
+                <div class="bento-card cert-card-inner badge-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Power BI Data Analyst</h3>
+                    <span class="cert-card-badge">PL-300</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+                  
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/pl 300.png', 'image', 'Microsoft Certified: Power BI Data Analyst Associate (PL-300)')" title="Click to inspect badge">
+                      <div class="badge-deck-img-wrap">
+                        <img src="Badges/pl 300.png" alt="Microsoft Certified: Power BI Data Analyst Associate (PL-300) Badge" class="badge-deck-img" loading="lazy">
+                      </div>
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <span class="cert-issuer">MICROSOFT CERTIFIED</span>
+                    <h4 class="cert-full-name">Power BI Data Analyst Associate</h4>
+                    <span class="badge-code-tag">Certification Code: PL-300</span>
+                    <p class="cert-summary">
+                      Validates technical skills in data preparation, modeling, visualization, DAX measures, and asset management in Power BI service.
+                    </p>
+                    <div class="cert-actions">
+                      <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <span>Verify on Credly</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Badge 2: DP-600 -->
+              <div class="cert-card-slide" data-index="1">
+                <div class="bento-card cert-card-inner badge-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Fabric Analytics Engineer</h3>
+                    <span class="cert-card-badge">DP-600</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+                  
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/dp 600.png', 'image', 'Microsoft Certified: Fabric Analytics Engineer Associate (DP-600)')" title="Click to inspect badge">
+                      <div class="badge-deck-img-wrap">
+                        <img src="Badges/dp 600.png" alt="Microsoft Certified: Fabric Analytics Engineer Associate (DP-600) Badge" class="badge-deck-img" loading="lazy">
+                      </div>
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <span class="cert-issuer">MICROSOFT CERTIFIED</span>
+                    <h4 class="cert-full-name">Fabric Analytics Engineer Associate</h4>
+                    <span class="badge-code-tag">Certification Code: DP-600</span>
+                    <p class="cert-summary">
+                      Demonstrates proficiency in designing, creating, and maintaining analytics solutions in Microsoft Fabric, including lakehouses and data warehouses.
+                    </p>
+                    <div class="cert-actions">
+                      <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <span>Verify on Credly</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Badge 3: DP-700 -->
+              <div class="cert-card-slide" data-index="2">
+                <div class="bento-card cert-card-inner badge-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Fabric Data Engineer</h3>
+                    <span class="cert-card-badge">DP-700</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+                  
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/dp 700.png', 'image', 'Microsoft Certified: Fabric Data Engineer Associate (DP-700)')" title="Click to inspect badge">
+                      <div class="badge-deck-img-wrap">
+                        <img src="Badges/dp 700.png" alt="Microsoft Certified: Fabric Data Engineer Associate (DP-700) Badge" class="badge-deck-img" loading="lazy">
+                      </div>
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <span class="cert-issuer">MICROSOFT CERTIFIED</span>
+                    <h4 class="cert-full-name">Fabric Data Engineer Associate</h4>
+                    <span class="badge-code-tag">Certification Code: DP-700</span>
+                    <p class="cert-summary">
+                      Validates enterprise skills in planning, implementing, and securing end-to-end data transformation pipelines within Microsoft Fabric architectures.
+                    </p>
+                    <div class="cert-actions">
+                      <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <span>Verify on Credly</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- Badge 2: DP-600 -->
-          <div class="bento-card badge-card">
-            <div class="badge-img-frame">
-              <img src="Badges/dp 600.png" alt="Microsoft Certified: Fabric Analytics Engineer Associate (DP-600) Badge" class="badge-asset-img">
-            </div>
-            <div class="badge-content">
-              <span class="badge-org">MICROSOFT CERTIFIED</span>
-              <h3 class="badge-title">Fabric Analytics Engineer Associate</h3>
-              <p class="badge-code">Certification Code: DP-600</p>
-              <p class="badge-desc">
-                Demonstrates proficiency in designing, creating, and maintaining analytics solutions in Microsoft Fabric, including lakehouses and data warehouses.
-              </p>
-              <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="badge-verify-link">
-                <span>Verify on Credly</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Badge 3: DP-700 -->
-          <div class="bento-card badge-card">
-            <div class="badge-img-frame">
-              <img src="Badges/dp 700.png" alt="Microsoft Certified: Fabric Data Engineer Associate (DP-700) Badge" class="badge-asset-img">
-            </div>
-            <div class="badge-content">
-              <span class="badge-org">MICROSOFT CERTIFIED</span>
-              <h3 class="badge-title">Fabric Data Engineer Associate</h3>
-              <p class="badge-code">Certification Code: DP-700</p>
-              <p class="badge-desc">
-                Validates enterprise skills in planning, implementing, and securing end-to-end data transformation pipelines within Microsoft Fabric architectures.
-              </p>
-              <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="badge-verify-link">
-                <span>Verify on Credly</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-              </a>
-            </div>
-          </div>
+          <!-- Next Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-next" id="badge-next-btn" aria-label="Next Badge" title="Next Badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
 
         </div>
+
+        <!-- Pagination Bar (Yellow Status Indicator Pill) -->
+        <div class="cert-pagination-bar" id="badge-dots" role="tablist" aria-label="Digital Badges pagination"></div>
 
       </div>
     </section>
@@ -780,99 +1458,190 @@
         
         <div class="section-header">
           <div class="section-tag"><span class="tag-dot"></span> QUALIFICATIONS</div>
-          <h2 class="section-title">Official <span class="highlight-yellow">Certifications</span></h2>
+          <h2 class="section-title">Official <span class="highlight-yellow"><em class="serif-accent">Certifications.</em></span></h2>
           <p class="section-desc">Verified credentials and proofs of completion with direct verification links.</p>
         </div>
 
-        <div class="certificates-grid">
+        <!-- Stacked Deck Carousel Viewport & Controls -->
+        <div class="cert-carousel-wrapper" id="cert-carousel-container" aria-roledescription="carousel" aria-label="Official Certifications Showcase">
           
-          <!-- Cert 1: PL-300 -->
-          <div class="bento-card certificate-card">
-            <div class="cert-preview-wrapper" onclick="openLightbox('Certificates/PowerBi pl300 certificates.jpg', 'image', 'Power BI Data Analyst Associate (PL-300)')">
-              <img src="Certificates/PowerBi pl300 certificates.jpg" alt="Power BI PL-300 Certificate Proof" class="cert-img" loading="lazy">
-              <div class="cert-zoom-overlay">
-                <span class="hint-pill">🔍 Click to zoom</span>
+          <!-- Prev Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-prev" id="cert-prev-btn" aria-label="Previous Certificate" title="Previous Certificate">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+
+          <!-- Main Track Viewport -->
+          <div class="cert-carousel-viewport" id="cert-viewport">
+            <div class="cert-carousel-track" id="cert-track">
+              
+              <!-- Card 1: PL-300 -->
+              <div class="cert-card-slide" data-index="0">
+                <div class="bento-card cert-card-inner">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Power BI Data Analyst</h3>
+                    <span class="cert-card-badge">PL-300</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+                  
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Certificates/PowerBi pl300 certificates.jpg', 'image', 'Power BI Data Analyst Associate (PL-300)')" title="Click to inspect certificate">
+                      <img src="Certificates/PowerBi pl300 certificates.jpg" alt="Power BI PL-300 Certificate Proof" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <span class="cert-issuer">Microsoft Learn</span>
+                    <h4 class="cert-full-name">Power BI Data Analyst Associate (PL-300)</h4>
+                    <p class="cert-summary">
+                      Certified in data modeling, DAX measure creation, high-impact dashboard architecture, and report workspace deployment.
+                    </p>
+                    <div class="cert-actions">
+                      <a href="https://learn.microsoft.com/en-us/users/tejaswaghmare-6035/credentials/100f220a9cc6e75?ref=https%3A%2F%2Fwww.linkedin.com%2F" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <span>Verify Credential</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <div class="cert-details">
-              <span class="cert-issuer">Microsoft Learn</span>
-              <h3 class="cert-name">Power BI Data Analyst Associate (PL-300)</h3>
-              <p class="cert-summary">
-                Certified in data modeling, DAX measure creation, high-impact dashboard architecture, and report workspace deployment.
-              </p>
-              <div class="cert-actions">
-                <a href="https://learn.microsoft.com/en-us/users/tejaswaghmare-6035/credentials/100f220a9cc6e75?ref=https%3A%2F%2Fwww.linkedin.com%2F" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
-                  <span>Verify Credential</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                </a>
+
+              <!-- Card 2: DP-600 -->
+              <div class="cert-card-slide" data-index="1">
+                <div class="bento-card cert-card-inner">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Fabric Analytics Engineer</h3>
+                    <span class="cert-card-badge">DP-600</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+                  
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Certificates/Microsoft Certified Fabric Analytics Engineer Associate DP 600.jpg', 'image', 'Fabric Analytics Engineer Associate (DP-600)')" title="Click to inspect certificate">
+                      <img src="Certificates/Microsoft Certified Fabric Analytics Engineer Associate DP 600.jpg" alt="Fabric Analytics Engineer DP-600 Certificate Proof" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <span class="cert-issuer">Microsoft Learn</span>
+                    <h4 class="cert-full-name">Fabric Analytics Engineer Associate (DP-600)</h4>
+                    <p class="cert-summary">
+                      Certified in lakehouse analytics, semantic models, data pipelines, and transforming enterprise data using Microsoft Fabric.
+                    </p>
+                    <div class="cert-actions">
+                      <a href="https://learn.microsoft.com/en-us/users/tejaswaghmare-5042/credentials/certification/fabric-analytics-engineer-associate?tab=credentials-tab" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <span>Verify Credential</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- Card 3: DP-700 -->
+              <div class="cert-card-slide" data-index="2">
+                <div class="bento-card cert-card-inner">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Fabric Data Engineer</h3>
+                    <span class="cert-card-badge">DP-700</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+                  
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Certificates/Microsoft\'s certification for the Microsoft Certified Fabric Data Engineer Associate credentia.png', 'image', 'Fabric Data Engineer Associate (DP-700)')" title="Click to inspect certificate">
+                      <img src="Certificates/Microsoft's certification for the Microsoft Certified Fabric Data Engineer Associate credentia.png" alt="Fabric Data Engineer DP-700 Certificate Proof" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <span class="cert-issuer">Microsoft Learn</span>
+                    <h4 class="cert-full-name">Fabric Data Engineer Associate (DP-700)</h4>
+                    <p class="cert-summary">
+                      Certified in enterprise data ingestion, pipeline security, data warehouse schemas, and scalable Fabric data lake environments.
+                    </p>
+                    <div class="cert-actions">
+                      <a href="https://learn.microsoft.com/en-us/users/tejaswaghmare-6035/credentials/bafddba94ecd9732?ref=https%3A%2F%2Fwww.linkedin.com%2F" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                        <span>Verify Credential</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 4: Python for Data Science -->
+              <div class="cert-card-slide" data-index="3">
+                <div class="bento-card cert-card-inner">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Python for Data Science</h3>
+                    <span class="cert-card-badge">Data Science & ML</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+                  
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Certificates/Udemy Python for Data Science Certificate.jpg', 'image', 'Python for Data Science and Machine Learning Bootcamp')" title="Click to inspect certificate">
+                      <img src="Certificates/Udemy Python for Data Science Certificate.jpg" alt="Python for Data Science Certificate Proof" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <span class="cert-issuer">Udemy Academy</span>
+                    <h4 class="cert-full-name">Python for Data Science and Machine Learning</h4>
+                    <p class="cert-summary">
+                      Hands-on training in Pandas, NumPy, Matplotlib, exploratory data analysis, and predictive statistical modeling techniques.
+                    </p>
+                    <div class="cert-actions">
+                      <button class="btn btn-primary-yellow btn-sm" onclick="openLightbox('Certificates/Udemy Python for Data Science Certificate.jpg', 'image', 'Python for Data Science and Machine Learning Bootcamp')">
+                        <span>View Certificate</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      </button>
+                      <span class="status-verified-badge">&#10003; Certified Completion</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- Cert 2: DP-600 -->
-          <div class="bento-card certificate-card">
-            <div class="cert-preview-wrapper" onclick="openLightbox('Certificates/Microsoft Certified Fabric Analytics Engineer Associate DP 600.jpg', 'image', 'Fabric Analytics Engineer Associate (DP-600)')">
-              <img src="Certificates/Microsoft Certified Fabric Analytics Engineer Associate DP 600.jpg" alt="Fabric Analytics Engineer DP-600 Certificate Proof" class="cert-img" loading="lazy">
-              <div class="cert-zoom-overlay">
-                <span class="hint-pill">🔍 Click to zoom</span>
-              </div>
-            </div>
-            
-            <div class="cert-details">
-              <span class="cert-issuer">Microsoft Learn</span>
-              <h3 class="cert-name">Fabric Analytics Engineer Associate (DP-600)</h3>
-              <p class="cert-summary">
-                Certified in lakehouse analytics, semantic models, data pipelines, and transforming enterprise data using Microsoft Fabric.
-              </p>
-              <div class="cert-actions">
-                <a href="https://learn.microsoft.com/en-us/users/tejaswaghmare-5042/credentials/certification/fabric-analytics-engineer-associate?tab=credentials-tab" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
-                  <span>Verify Credential</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                </a>
-              </div>
-            </div>
-          </div>
+          <!-- Next Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-next" id="cert-next-btn" aria-label="Next Certificate" title="Next Certificate">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
 
-          <!-- Cert 3: DP-700 -->
-          <div class="bento-card certificate-card">
-            <div class="cert-preview-wrapper" onclick="openLightbox('Certificates/Microsoft\'s certification for the Microsoft Certified Fabric Data Engineer Associate credentia.png', 'image', 'Fabric Data Engineer Associate (DP-700)')">
-              <img src="Certificates/Microsoft's certification for the Microsoft Certified Fabric Data Engineer Associate credentia.png" alt="Fabric Data Engineer DP-700 Certificate Proof" class="cert-img" loading="lazy">
-              <div class="cert-zoom-overlay">
-                <span class="hint-pill">🔍 Click to zoom</span>
-              </div>
-            </div>
-            
-            <div class="cert-details">
-              <span class="cert-issuer">Microsoft Learn</span>
-              <h3 class="cert-name">Fabric Data Engineer Associate (DP-700)</h3>
-              <p class="cert-summary">
-                Certified in enterprise data ingestion, pipeline security, data warehouse schemas, and scalable Fabric data lake environments.
-              </p>
-              <div class="cert-actions">
-                <a href="https://learn.microsoft.com/en-us/users/tejaswaghmare-6035/credentials/bafddba94ecd9732?ref=https%3A%2F%2Fwww.linkedin.com%2F" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
-                  <span>Verify Credential</span>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                </a>
-              </div>
-            </div>
+          <!-- Centered Dynamic Pagination Bar (Dots + Active Orange Pill) -->
+          <div class="cert-pagination-bar" id="cert-dots" aria-label="Certificates Carousel Navigation">
+            <button class="cert-dot active" data-slide="0" aria-label="Go to slide 1"></button>
+            <button class="cert-dot" data-slide="1" aria-label="Go to slide 2"></button>
+            <button class="cert-dot" data-slide="2" aria-label="Go to slide 3"></button>
+            <button class="cert-dot" data-slide="3" aria-label="Go to slide 4"></button>
           </div>
-
-          <!-- Cert 4: Python for Data Science -->
-          <div class="bento-card certificate-card udemy-cert">
-            <div class="cert-content-card">
-              <div class="cert-badge-icon">🐍</div>
-              <span class="cert-issuer">Udemy Academy</span>
-              <h3 class="cert-name">Python for Data Science and Machine Learning</h3>
-              <p class="cert-summary">
-                Hands-on training in Pandas, NumPy, Matplotlib, exploratory data analysis, and predictive statistical modeling techniques.
-              </p>
-              <div class="cert-actions">
-                <span class="status-verified-badge">✓ Certified Completion</span>
-              </div>
-            </div>
-          </div>
-
         </div>
 
       </div>
@@ -885,55 +1654,368 @@
       <div class="section-container">
         
         <div class="section-header">
-          <div class="section-tag"><span class="tag-dot"></span> ACADEMIC ROOTS</div>
-          <h2 class="section-title">Educational <span class="highlight-yellow">Background</span></h2>
-          <p class="section-desc">Academic degrees and qualifications forming my analytical and engineering problem-solving foundation.</p>
+          <div class="section-tag"><span class="tag-dot"></span> ACADEMIC JOURNEY &amp; MILESTONES</div>
+          <h2 class="section-title">Educational <span class="highlight-yellow"><em class="serif-accent">Timeline.</em></span></h2>
+          <p class="section-desc">A chronological progression of academic qualifications, numerical modeling, and engineering foundations that formed my quantitative and analytical mindset.</p>
+
+          <!-- Interactive Stepper / Milestone Filter Tabs -->
+          <div class="edu-stepper-nav" role="tablist" aria-label="Education Milestones">
+            <button type="button" class="edu-step-tab active" data-target="all" role="tab" aria-selected="true">
+              <span class="step-num">00</span>
+              <span class="step-label">All Milestones</span>
+            </button>
+            <button type="button" class="edu-step-tab" data-target="btech" role="tab" aria-selected="false">
+              <span class="step-icon">🎓</span>
+              <span class="step-label">B.Tech Engineering <span class="step-yr">2020&ndash;2024</span></span>
+            </button>
+            <button type="button" class="edu-step-tab" data-target="hsc" role="tab" aria-selected="false">
+              <span class="step-icon">💻</span>
+              <span class="step-label">HSC (IT Stream) <span class="step-yr">2018&ndash;2020</span></span>
+            </button>
+            <button type="button" class="edu-step-tab" data-target="ssc" role="tab" aria-selected="false">
+              <span class="step-icon">📜</span>
+              <span class="step-label">SSC Distinction <span class="step-yr">2018</span></span>
+            </button>
+          </div>
         </div>
 
-        <div class="education-bento-grid">
+        <!-- Timeline Container with Animated Center Spine -->
+        <div class="edu-timeline-wrapper">
           
-          <!-- B.Tech Degree Card -->
-          <div class="bento-card education-main-card">
-            <div class="edu-badge">DEGREE</div>
-            <div class="edu-meta-row">
-              <h3 class="edu-degree">Bachelor of Technology (B.Tech) — Mechanical Engineering</h3>
-              <span class="edu-score-pill">CGPA: 8.04 / 10</span>
-            </div>
-            <div class="edu-institution">
-              <span class="inst-name">Bajaj Institute of Technology, Wardha</span>
-              <span class="inst-years">2020 – 2024</span>
-            </div>
-            <p class="edu-desc">
-              Strong focus on numerical analysis, mathematical modeling, thermodynamics, computational methods, and system optimization. Graduated with first-class honors.
-            </p>
+          <!-- Animated Spine Line & Dynamic Progress Track -->
+          <div class="edu-timeline-spine">
+            <div class="edu-spine-track"></div>
+            <div class="edu-spine-progress" id="edu-timeline-progress"></div>
           </div>
 
-          <!-- HSC Card -->
-          <div class="bento-card education-sub-card">
-            <div class="edu-badge">HSC</div>
-            <div class="edu-meta-row">
-              <h4 class="edu-degree">Higher Secondary Certificate (Information Technology)</h4>
-              <span class="edu-score-pill">Score: 66.62%</span>
-            </div>
-            <div class="edu-institution">
-              <span class="inst-name">Maharashtra State Board</span>
-              <span class="inst-years">2018 – 2020</span>
-            </div>
-            <p class="edu-desc">Specialized stream focusing on Information Technology, computer principles, and science foundations.</p>
-          </div>
+          <!-- Milestones List -->
+          <div class="edu-timeline-list">
 
-          <!-- SSC Card -->
-          <div class="bento-card education-sub-card">
-            <div class="edu-badge">SSC</div>
-            <div class="edu-meta-row">
-              <h4 class="edu-degree">Secondary School Certificate</h4>
-              <span class="edu-score-pill">Score: 81.80%</span>
+            <!-- MILESTONE 1: B.Tech (2020 - 2024) -->
+            <div class="edu-timeline-item" id="edu-milestone-btech" data-milestone="btech">
+              
+              <!-- Timeline Node Marker with Pulse -->
+              <div class="edu-node-wrap">
+                <div class="edu-node-marker">
+                  <span class="node-icon">🎓</span>
+                  <div class="node-pulse-ring"></div>
+                </div>
+                <div class="edu-node-year">2020 &ndash; 2024</div>
+              </div>
+
+              <!-- Interactive Milestone Card -->
+              <div class="bento-card edu-card is-active-milestone">
+                <div class="edu-card-glow"></div>
+                
+                <!-- Card Header -->
+                <div class="edu-card-header">
+                  <div class="edu-badge-row">
+                    <span class="edu-badge"><span class="badge-dot"></span> UNDERGRADUATE DEGREE</span>
+                    <span class="edu-period-pill">4 Years &bull; Full-time</span>
+                  </div>
+                  
+                  <div class="edu-score-container">
+                    <div class="edu-score-circle" data-score="80.4">
+                      <svg viewBox="0 0 36 36" class="circular-chart yellow">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="80.4, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      </svg>
+                      <div class="score-circle-text">
+                        <span class="score-val">8.04</span>
+                        <span class="score-max">/10</span>
+                      </div>
+                    </div>
+                    <div class="score-meta">
+                      <span class="score-label">CUMULATIVE CGPA</span>
+                      <span class="score-status">First-Class Honors</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Degree Title & Institution -->
+                <div class="edu-content-block">
+                  <h3 class="edu-degree">
+                    Bachelor of Technology (B.Tech)
+                    <span class="edu-major">&mdash; Mechanical Engineering</span>
+                  </h3>
+                  
+                  <div class="edu-institution-line">
+                    <div class="inst-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                    </div>
+                    <span class="inst-name">Bajaj Institute of Technology (BIT), Wardha</span>
+                    <span class="inst-sep">&bull;</span>
+                    <span class="inst-loc">Dr. Babasaheb Ambedkar Technological University (DBATU)</span>
+                  </div>
+
+                  <p class="edu-desc">
+                    Comprehensive 4-year engineering curriculum with rigorous emphasis on numerical mathematics, computational analysis, physical system dynamics, and data-driven optimization. Cultivated advanced quantitative logic and structural discipline applied directly to modern business intelligence pipelines and high-volume relational modeling.
+                  </p>
+
+                  <!-- Coursework & Competency Tags -->
+                  <div class="edu-skills-group">
+                    <span class="skills-label">KEY COURSEWORK &amp; COMPETENCIES:</span>
+                    <div class="edu-tags-row">
+                      <span class="edu-tag">Numerical Analysis</span>
+                      <span class="edu-tag">Engineering Mathematics</span>
+                      <span class="edu-tag">Applied Statistics</span>
+                      <span class="edu-tag">Computational Modeling</span>
+                      <span class="edu-tag">Thermodynamics &amp; Heat Transfer</span>
+                      <span class="edu-tag">System Optimization</span>
+                      <span class="edu-tag">CAD / CAE Simulation</span>
+                    </div>
+                  </div>
+
+                  <!-- Expandable Analytical Relevance & Highlights -->
+                  <div class="edu-expandable-section" id="edu-expand-btech">
+                    <button type="button" class="edu-toggle-btn" onclick="toggleEduDetails('btech')" aria-expanded="false" aria-controls="edu-details-btech">
+                      <span class="toggle-text">Analytical Takeaways &amp; Capstone Highlights</span>
+                      <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    
+                    <div class="edu-details-panel" id="edu-details-btech">
+                      <div class="details-grid">
+                        <div class="detail-item">
+                          <div class="detail-icon">📐</div>
+                          <div class="detail-text">
+                            <strong>Mathematical Rigor for Data Analytics</strong>
+                            <p>Extensive study in differential equations, multivariate calculus, and linear algebra that formed the mathematical framework for statistical modeling, algorithmic indexing, and forecasting.</p>
+                          </div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-icon">⚙️</div>
+                          <div class="detail-text">
+                            <strong>Systems Thinking &amp; Optimization</strong>
+                            <p>Analyzed multi-variable constraints and complex mechanical systems &mdash; directly transferable to designing 3NF/Star-Schema dimensional data warehouses and optimizing high-load SQL queries.</p>
+                          </div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-icon">🏆</div>
+                          <div class="detail-text">
+                            <strong>First-Class Distinction (8.04 CGPA)</strong>
+                            <p>Maintained consistent top-tier academic merit across all 8 semesters, collaborating on interdisciplinary technical symposiums and numerical computing labs.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
             </div>
-            <div class="edu-institution">
-              <span class="inst-name">Maharashtra State Board</span>
-              <span class="inst-years">2018</span>
+
+            <!-- MILESTONE 2: HSC (2018 - 2020) -->
+            <div class="edu-timeline-item" id="edu-milestone-hsc" data-milestone="hsc">
+              
+              <!-- Timeline Node Marker with Pulse -->
+              <div class="edu-node-wrap">
+                <div class="edu-node-marker">
+                  <span class="node-icon">💻</span>
+                  <div class="node-pulse-ring"></div>
+                </div>
+                <div class="edu-node-year">2018 &ndash; 2020</div>
+              </div>
+
+              <!-- Interactive Milestone Card -->
+              <div class="bento-card edu-card">
+                <div class="edu-card-glow"></div>
+                
+                <!-- Card Header -->
+                <div class="edu-card-header">
+                  <div class="edu-badge-row">
+                    <span class="edu-badge"><span class="badge-dot"></span> HIGHER SECONDARY</span>
+                    <span class="edu-period-pill">2 Years &bull; Science &amp; IT</span>
+                  </div>
+                  
+                  <div class="edu-score-container">
+                    <div class="edu-score-circle" data-score="66.6">
+                      <svg viewBox="0 0 36 36" class="circular-chart yellow">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="66.6, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      </svg>
+                      <div class="score-circle-text">
+                        <span class="score-val">66.6%</span>
+                        <span class="score-max">Score</span>
+                      </div>
+                    </div>
+                    <div class="score-meta">
+                      <span class="score-label">BOARD PERCENTAGE</span>
+                      <span class="score-status">IT Stream Focus</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Degree Title & Institution -->
+                <div class="edu-content-block">
+                  <h3 class="edu-degree">
+                    Higher Secondary Certificate (HSC)
+                    <span class="edu-major">&mdash; Information Technology Specialization</span>
+                  </h3>
+                  
+                  <div class="edu-institution-line">
+                    <div class="inst-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </div>
+                    <span class="inst-name">Maharashtra State Board of Secondary &amp; Higher Secondary Education</span>
+                    <span class="inst-sep">&bull;</span>
+                    <span class="inst-loc">Science Stream</span>
+                  </div>
+
+                  <p class="edu-desc">
+                    Specialized higher secondary track fusing core physical sciences with elective Information Technology. Introduced fundamental computing principles, logic gates, binary representations, algorithmic flowcharts, and procedural programming basics that sparked my passion for software and data systems.
+                  </p>
+
+                  <!-- Coursework & Competency Tags -->
+                  <div class="edu-skills-group">
+                    <span class="skills-label">KEY COURSEWORK &amp; COMPETENCIES:</span>
+                    <div class="edu-tags-row">
+                      <span class="edu-tag">Information Technology</span>
+                      <span class="edu-tag">Boolean Algebra &amp; Logic</span>
+                      <span class="edu-tag">Computer Fundamentals</span>
+                      <span class="edu-tag">Data Representation</span>
+                      <span class="edu-tag">Applied Physics</span>
+                      <span class="edu-tag">Advanced Calculus</span>
+                    </div>
+                  </div>
+
+                  <!-- Expandable Section -->
+                  <div class="edu-expandable-section" id="edu-expand-hsc">
+                    <button type="button" class="edu-toggle-btn" onclick="toggleEduDetails('hsc')" aria-expanded="false" aria-controls="edu-details-hsc">
+                      <span class="toggle-text">Analytical Takeaways &amp; Computing Genesis</span>
+                      <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    
+                    <div class="edu-details-panel" id="edu-details-hsc">
+                      <div class="details-grid">
+                        <div class="detail-item">
+                          <div class="detail-icon">💻</div>
+                          <div class="detail-text">
+                            <strong>Early Computing &amp; IT Foundations</strong>
+                            <p>Hands-on lab work in networking basics, operating system mechanisms, and structured digital workflows.</p>
+                          </div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-icon">🔬</div>
+                          <div class="detail-text">
+                            <strong>Physical &amp; Analytical Sciences</strong>
+                            <p>Developed rigorous hypothesis testing, empirical data recording, and quantitative laboratory analysis.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
             </div>
-            <p class="edu-desc">High academic distinction across Mathematics, Sciences, and Language studies.</p>
+
+            <!-- MILESTONE 3: SSC (2018) -->
+            <div class="edu-timeline-item" id="edu-milestone-ssc" data-milestone="ssc">
+              
+              <!-- Timeline Node Marker with Pulse -->
+              <div class="edu-node-wrap">
+                <div class="edu-node-marker">
+                  <span class="node-icon">📜</span>
+                  <div class="node-pulse-ring"></div>
+                </div>
+                <div class="edu-node-year">2018</div>
+              </div>
+
+              <!-- Interactive Milestone Card -->
+              <div class="bento-card edu-card">
+                <div class="edu-card-glow"></div>
+                
+                <!-- Card Header -->
+                <div class="edu-card-header">
+                  <div class="edu-badge-row">
+                    <span class="edu-badge"><span class="badge-dot"></span> SECONDARY SCHOOL</span>
+                    <span class="edu-period-pill">Foundational</span>
+                  </div>
+                  
+                  <div class="edu-score-container">
+                    <div class="edu-score-circle" data-score="81.8">
+                      <svg viewBox="0 0 36 36" class="circular-chart yellow">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke-dasharray="81.8, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      </svg>
+                      <div class="score-circle-text">
+                        <span class="score-val">81.8%</span>
+                        <span class="score-max">Score</span>
+                      </div>
+                    </div>
+                    <div class="score-meta">
+                      <span class="score-label">BOARD PERCENTAGE</span>
+                      <span class="score-status">High Distinction Grade</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Degree Title & Institution -->
+                <div class="edu-content-block">
+                  <h3 class="edu-degree">
+                    Secondary School Certificate (SSC)
+                    <span class="edu-major">&mdash; High Distinction</span>
+                  </h3>
+                  
+                  <div class="edu-institution-line">
+                    <div class="inst-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    </div>
+                    <span class="inst-name">Maharashtra State Board of Secondary &amp; Higher Secondary Education</span>
+                    <span class="inst-sep">&bull;</span>
+                    <span class="inst-loc">General Sciences &amp; Mathematics</span>
+                  </div>
+
+                  <p class="edu-desc">
+                    Graduated with distinguished honors (81.80%), demonstrating consistent academic excellence across core disciplines. Achieved top marks in Mathematics and Physical Sciences, laying the baseline analytical curiosity and systematic problem-solving approach.
+                  </p>
+
+                  <!-- Coursework & Competency Tags -->
+                  <div class="edu-skills-group">
+                    <span class="skills-label">KEY FOUNDATIONS:</span>
+                    <div class="edu-tags-row">
+                      <span class="edu-tag">Advanced Algebra</span>
+                      <span class="edu-tag">Geometry &amp; Spatial Logic</span>
+                      <span class="edu-tag">General Physical Sciences</span>
+                      <span class="edu-tag">Scientific Methodology</span>
+                      <span class="edu-tag">Quantitative Reasoning</span>
+                    </div>
+                  </div>
+
+                  <!-- Expandable Section -->
+                  <div class="edu-expandable-section" id="edu-expand-ssc">
+                    <button type="button" class="edu-toggle-btn" onclick="toggleEduDetails('ssc')" aria-expanded="false" aria-controls="edu-details-ssc">
+                      <span class="toggle-text">Academic Distinction &amp; Early Strengths</span>
+                      <svg class="toggle-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    
+                    <div class="edu-details-panel" id="edu-details-ssc">
+                      <div class="details-grid">
+                        <div class="detail-item">
+                          <div class="detail-icon">⭐</div>
+                          <div class="detail-text">
+                            <strong>Distinction Merit Award</strong>
+                            <p>Scored above 80th percentile across the state board, awarded first-class with distinction honors.</p>
+                          </div>
+                        </div>
+                        <div class="detail-item">
+                          <div class="detail-icon">🔢</div>
+                          <div class="detail-text">
+                            <strong>Mathematics Aptitude</strong>
+                            <p>Consistently scored highest marks in algebraic manipulations, mathematical proofs, and quantitative problem sets.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
           </div>
 
         </div>
@@ -949,165 +2031,480 @@
         
         <div class="section-header">
           <div class="section-tag"><span class="tag-dot"></span> BEYOND THE SPREADSHEETS</div>
-          <h2 class="section-title">Personal <span class="highlight-yellow">Interests & Hobbies</span></h2>
+          <h2 class="section-title">Personal <span class="highlight-yellow"><em class="serif-accent">Interests &amp; Hobbies.</em></span></h2>
           <p class="section-desc">The passions that fuel my creativity, strategic curiosity, and continuous learning.</p>
         </div>
 
-        <div class="hobbies-bento-grid">
+        <!-- Hobbies Stacked Deck Carousel Viewport & Controls -->
+        <div class="cert-carousel-wrapper hobbies-carousel-wrapper" id="hobbies-carousel-container" aria-roledescription="carousel" aria-label="Personal Interests and Hobbies Showcase">
           
-          <div class="bento-card hobby-card">
-            <div class="hobby-emoji">📊</div>
-            <h3 class="hobby-title">Data Storytelling & Kaggle</h3>
-            <p class="hobby-desc">
-              Exploring open-source datasets, participating in Kaggle challenges, and prototyping infographics to visualize unusual human trends.
-            </p>
+          <!-- Prev Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-prev" id="hobbies-prev-btn" aria-label="Previous Hobby" title="Previous Hobby">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+
+          <!-- Main Track Viewport -->
+          <div class="cert-carousel-viewport" id="hobbies-viewport">
+            <div class="cert-carousel-track" id="hobbies-track">
+              
+              <!-- HOBBY 1: ANALYTICAL THINKING -->
+              <div class="cert-card-slide" data-index="0">
+                <div class="bento-card cert-card-inner hobby-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Analytical Thinking</h3>
+                    <span class="cert-card-badge">Data & Patterns</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/hobby_analytical.jpg', 'image', 'Analytical Thinking &ndash; Looking beyond the surface of the data.')" title="Click to inspect visual">
+                      <img src="Asset/hobby_analytical.jpg" alt="Analytical Thinking - Looking beyond the surface of the data" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="hobby-header-sub">
+                      <span class="hobby-emoji">&#129504;</span>
+                      <span class="hobby-tagline-badge">Curiosity & Inquiry</span>
+                    </div>
+                    <h4 class="cert-full-name hobby-tagline">&ldquo;Looking beyond the surface of the data.&rdquo;</h4>
+                    <p class="cert-summary">
+                      I enjoy exploring patterns, asking &ldquo;why,&rdquo; and checking assumptions before drawing conclusions. This curiosity drives my approach to every analysis.
+                    </p>
+                    <div class="cert-actions hobby-actions">
+                      <span class="skill-chip active"><span class="chip-dot"></span> Pattern Exploration</span>
+                      <span class="skill-chip"><span class="chip-dot"></span> Hypothesis Testing</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOBBY 2: PROBLEM SOLVING -->
+              <div class="cert-card-slide" data-index="1">
+                <div class="bento-card cert-card-inner hobby-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Problem Solving</h3>
+                    <span class="cert-card-badge">Logic & Strategy</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/hobby_problem_solving.jpg', 'image', 'Problem Solving &ndash; Breaking big problems into simple steps.')" title="Click to inspect visual">
+                      <img src="Asset/hobby_problem_solving.jpg" alt="Problem Solving - Breaking big problems into simple steps" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="hobby-header-sub">
+                      <span class="hobby-emoji">&#129513;</span>
+                      <span class="hobby-tagline-badge">Root-Cause & Strategy</span>
+                    </div>
+                    <h4 class="cert-full-name hobby-tagline">&ldquo;Breaking big problems into simple steps.&rdquo;</h4>
+                    <p class="cert-summary">
+                      I like tackling puzzles and tricky challenges. I start by understanding the problem, then test ideas step by step until I find a solution that works.
+                    </p>
+                    <div class="cert-actions hobby-actions">
+                      <span class="skill-chip active"><span class="chip-dot"></span> Deconstruction</span>
+                      <span class="skill-chip"><span class="chip-dot"></span> Iterative Testing</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOBBY 3: STORYTELLING -->
+              <div class="cert-card-slide" data-index="2">
+                <div class="bento-card cert-card-inner hobby-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Storytelling</h3>
+                    <span class="cert-card-badge">Data Narratives</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/hobby_storytelling.jpg', 'image', 'Storytelling &ndash; Turning numbers into narratives.')" title="Click to inspect visual">
+                      <img src="Asset/hobby_storytelling.jpg" alt="Storytelling - Turning numbers into narratives" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="hobby-header-sub">
+                      <span class="hobby-emoji">&#128202;</span>
+                      <span class="hobby-tagline-badge">Narrative Insights</span>
+                    </div>
+                    <h4 class="cert-full-name hobby-tagline">&ldquo;Turning numbers into narratives.&rdquo;</h4>
+                    <p class="cert-summary">
+                      I enjoy telling stories, whether in writing or in conversation. It helps me explain data insights in a way that is clear, memorable, and useful for decision-makers.
+                    </p>
+                    <div class="cert-actions hobby-actions">
+                      <span class="skill-chip active"><span class="chip-dot"></span> Executive Insights</span>
+                      <span class="skill-chip"><span class="chip-dot"></span> Clear Narrative</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOBBY 4: DESIGN -->
+              <div class="cert-card-slide" data-index="3">
+                <div class="bento-card cert-card-inner hobby-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Design</h3>
+                    <span class="cert-card-badge">Visual Systems</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/hobby_design.jpg', 'image', 'Design &ndash; Clear visuals, better decisions.')" title="Click to inspect visual">
+                      <img src="Asset/hobby_design.jpg" alt="Design - Clear visuals, better decisions" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="hobby-header-sub">
+                      <span class="hobby-emoji">&#127912;</span>
+                      <span class="hobby-tagline-badge">UI & Visual Layouts</span>
+                    </div>
+                    <h4 class="cert-full-name hobby-tagline">&ldquo;Clear visuals, better decisions.&rdquo;</h4>
+                    <p class="cert-summary">
+                      I enjoy design and visual layouts. It shapes how I build dashboards and charts, so they look clean and are easy to understand at a glance.
+                    </p>
+                    <div class="cert-actions hobby-actions">
+                      <span class="skill-chip active"><span class="chip-dot"></span> Dashboard UX</span>
+                      <span class="skill-chip"><span class="chip-dot"></span> Visual Hierarchy</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOBBY 5: TRAVELLING -->
+              <div class="cert-card-slide" data-index="4">
+                <div class="bento-card cert-card-inner hobby-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Travelling</h3>
+                    <span class="cert-card-badge">Global Perspective</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/hobby_travelling.jpg', 'image', 'Travelling &ndash; New places, new perspectives.')" title="Click to inspect visual">
+                      <img src="Asset/hobby_travelling.jpg" alt="Travelling - New places, new perspectives" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="hobby-header-sub">
+                      <span class="hobby-emoji">&#9992;&#65039;</span>
+                      <span class="hobby-tagline-badge">Culture & Mindset</span>
+                    </div>
+                    <h4 class="cert-full-name hobby-tagline">&ldquo;New places, new perspectives.&rdquo;</h4>
+                    <p class="cert-summary">
+                      Travelling exposes me to different cultures and ways of thinking. It makes me more adaptable, open-minded, and comfortable working with diverse people and ideas.
+                    </p>
+                    <div class="cert-actions hobby-actions">
+                      <span class="skill-chip active"><span class="chip-dot"></span> Cultural Adaptability</span>
+                      <span class="skill-chip"><span class="chip-dot"></span> Open Mindset</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOBBY 6: COOKING -->
+              <div class="cert-card-slide" data-index="5">
+                <div class="bento-card cert-card-inner hobby-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Cooking</h3>
+                    <span class="cert-card-badge">Culinary Craft</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/hobby_cooking.jpg', 'image', 'Cooking &ndash; Experimenting with recipes and flavors.')" title="Click to inspect visual">
+                      <img src="Asset/hobby_cooking.jpg" alt="Cooking - Experimenting with recipes and flavors" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="hobby-header-sub">
+                      <span class="hobby-emoji">&#127859;</span>
+                      <span class="hobby-tagline-badge">Creative Process</span>
+                    </div>
+                    <h4 class="cert-full-name hobby-tagline">&ldquo;Experimenting with recipes and flavors.&rdquo;</h4>
+                    <p class="cert-summary">
+                      Cooking is my creative outlet. Like analysis, it needs the right ingredients, good process, and testing and tweaking until the result is just right.
+                    </p>
+                    <div class="cert-actions hobby-actions">
+                      <span class="skill-chip active"><span class="chip-dot"></span> Recipe Iteration</span>
+                      <span class="skill-chip"><span class="chip-dot"></span> Balance & Tweaking</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- HOBBY 7: MUSIC -->
+              <div class="cert-card-slide" data-index="6">
+                <div class="bento-card cert-card-inner hobby-card-deck">
+                  <div class="cert-card-header">
+                    <h3 class="cert-card-title">Music</h3>
+                    <span class="cert-card-badge">Rhythm & Flow</span>
+                  </div>
+                  <div class="cert-card-divider"></div>
+
+                  <!-- Stacked Card Deck Visual -->
+                  <div class="deck-container">
+                    <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
+                    <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
+                    <div class="deck-front-card" onclick="openLightbox('Asset/hobby_music.jpg', 'image', 'Music &ndash; Finding rhythm and focus.')" title="Click to inspect visual">
+                      <img src="Asset/hobby_music.jpg" alt="Music - Finding rhythm and focus" class="cert-deck-img" loading="lazy">
+                      <div class="cert-deck-overlay">
+                        <span class="hint-pill">&#128269; Click to zoom</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Details & Metadata -->
+                  <div class="cert-card-details">
+                    <div class="hobby-header-sub">
+                      <span class="hobby-emoji">&#127911;</span>
+                      <span class="hobby-tagline-badge">Acoustic Focus</span>
+                    </div>
+                    <h4 class="cert-full-name hobby-tagline">&ldquo;Finding rhythm and focus.&rdquo;</h4>
+                    <p class="cert-summary">
+                      Music helps me relax, recharge, and focus. I enjoy discovering new genres and noticing patterns in rhythm, which is not unlike spotting patterns in data.
+                    </p>
+                    <div class="cert-actions hobby-actions">
+                      <span class="skill-chip active"><span class="chip-dot"></span> Pattern Recognition</span>
+                      <span class="skill-chip"><span class="chip-dot"></span> Deep Focus</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
 
-          <div class="bento-card hobby-card">
-            <div class="hobby-emoji">🏎️</div>
-            <h3 class="hobby-title">Automotive Telemetry & IoT</h3>
-            <p class="hobby-desc">
-              Fascinated by high-frequency vehicular telemetry, Formula 1 race strategies, and battery optimization in modern electric vehicles.
-            </p>
-          </div>
+          <!-- Next Nav Arrow -->
+          <button class="cert-nav-arrow cert-nav-next" id="hobbies-next-btn" aria-label="Next Hobby" title="Next Hobby">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
 
-          <div class="bento-card hobby-card">
-            <div class="hobby-emoji">♟️</div>
-            <h3 class="hobby-title">Chess & Strategic Puzzles</h3>
-            <p class="hobby-desc">
-              Playing tactical chess to train pattern recognition, scenario forecasting, and patience under complex board conditions.
-            </p>
+          <!-- Centered Dynamic Pagination Bar (Dots + Active Orange Pill) -->
+          <div class="cert-pagination-bar" id="hobbies-dots" aria-label="Hobbies Carousel Navigation">
+            <button class="cert-dot active" data-slide="0" aria-label="Go to Analytical Thinking"></button>
+            <button class="cert-dot" data-slide="1" aria-label="Go to Problem Solving"></button>
+            <button class="cert-dot" data-slide="2" aria-label="Go to Storytelling"></button>
+            <button class="cert-dot" data-slide="3" aria-label="Go to Design"></button>
+            <button class="cert-dot" data-slide="4" aria-label="Go to Travelling"></button>
+            <button class="cert-dot" data-slide="5" aria-label="Go to Cooking"></button>
+            <button class="cert-dot" data-slide="6" aria-label="Go to Music"></button>
           </div>
-
-          <div class="bento-card hobby-card">
-            <div class="hobby-emoji">📚</div>
-            <h3 class="hobby-title">AI & Tech Innovation</h3>
-            <p class="hobby-desc">
-              Reading research on modern generative AI, agentic systems, enterprise cloud architectures, and modern data platforms.
-            </p>
-          </div>
-
         </div>
 
       </div>
     </section>
 
     <!-- =======================================================================
-         9. CONTACT SECTION
+         9. LET'S BUILD SOMETHING SECTION (#contact)
+         Clicking "Let's build something" opens the "Let's talk" Contact Modal (kova.me style)
+         Split Layout: Heading, Subtitle & Interactive CTA on Left | Image Showcase on Right
+         Below of all: Direct Channels, Location & Socials Strip (from uploaded reference image)
          ======================================================================= -->
-    <section id="contact" class="section contact-section">
+    <section id="contact" class="section contact-section kova-talk-section">
       <div class="section-container">
         
-        <div class="section-header">
-          <div class="section-tag"><span class="tag-dot"></span> GET IN TOUCH</div>
-          <h2 class="section-title">Let's Build Something <span class="highlight-yellow">Impactful</span></h2>
-          <p class="section-desc">Have a role, consulting opportunity, or dataset challenge? I'd love to connect.</p>
+        <!-- Two-Column Split: Left Side (Heading & CTA) | Right Side (Image Showcase) -->
+        <div class="kova-build-grid">
+          
+          <!-- LEFT COLUMN: "Let's build something." Interactive Headline & CTA Card -->
+          <div class="kova-build-left">
+            <div class="kova-talk-container bento-card kova-card lets-build-card">
+              
+              <!-- Eyebrow Badge -->
+              <div class="kova-talk-badge">
+                <span class="hello-dot"></span>
+                <span>START A PROJECT</span>
+              </div>
+
+              <!-- Giant Interactive Clickable Headline (kova.me style) -->
+              <h2 class="lets-build-title footer-cta display-text">
+                <a href="#contact" id="lets-build-trigger" class="lets-build-link" onclick="openContactModal(event)" aria-label="Open Let's talk contact form">
+                  Let's build<br>
+                  <span class="serif-accent highlight-yellow">something.</span>
+                </a>
+              </h2>
+
+              <p class="lets-build-subtitle">
+                Have an analytics project, business intelligence challenge, or an opportunity? Click the heading above or tap below to open the contact form and start a conversation.
+              </p>
+
+              <!-- Action Button & Quick Status -->
+              <div class="lets-build-action">
+                <button type="button" class="btn btn-primary-yellow lets-talk-open-btn" onclick="openContactModal(event)" aria-label="Open Let's talk contact modal">
+                  <span>Let's talk</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+                <div class="lets-build-hint">
+                  <span class="kova-pulse-dot"></span>
+                  <span>Usually responds within a few hours</span>
+                </div>
+              </div>
+
+              <!-- Quick Focus Capabilities -->
+              <div class="lets-build-topics">
+                <span class="topic-tag">Executive BI Dashboards</span>
+                <span class="topic-tag">End-to-End SQL Pipelines</span>
+                <span class="topic-tag">Star-Schema Modeling</span>
+                <span class="topic-tag">Microsoft Fabric &amp; Cloud</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: Image Showcase (tejas_portrait.jpg with elegant bento framing) -->
+          <div class="kova-build-right">
+            <div class="bento-card kova-image-card">
+              
+              <div class="kova-image-wrapper">
+                <img 
+                  src="Asset/tejas_portrait.jpg" 
+                  alt="Tejas C. Waghmare - Data Analyst & BI Specialist" 
+                  class="kova-portrait-img" 
+                  loading="lazy"
+                />
+                
+                <!-- Overlay Badges / Highlights -->
+                <div class="kova-image-overlay">
+                  <div class="kova-image-badge-top">
+                    <span class="hello-dot"></span>
+                    <span>AVAILABLE FOR ROLES</span>
+                  </div>
+                  
+                  <div class="kova-image-caption">
+                    <h3 class="kova-caption-name">Tejas C. Waghmare</h3>
+                    <p class="kova-caption-role">Data Analyst &amp; BI Specialist</p>
+                    <div class="kova-caption-tags">
+                      <span class="kova-tag-pill">Microsoft Certified</span>
+                      <span class="kova-tag-pill">Power BI &bull; SQL &bull; Fabric</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
-        <div class="contact-bento-grid">
-          
-          <!-- Contact Info & Socials Card -->
-          <div class="bento-card contact-info-card">
-            <div class="card-pill">DIRECT CHANNELS</div>
+        <!-- BELOW OF ALL: Direct Channels, Location & Socials Strip (from uploaded reference image) -->
+        <div class="kova-contact-footer bento-card kova-contact-footer-standalone">
+          <div class="kova-footer-row">
             
-            <h3 class="contact-card-title">Connect with Tejas</h3>
-            <p class="contact-card-sub">
-              Available for full-time Data Analyst roles, BI engineering opportunities, and technical collaborations.
-            </p>
+            <!-- Direct Channels -->
+            <div class="kova-footer-block">
+              <div class="kova-footer-label">DIRECT CHANNELS</div>
+              <div class="kova-contact-links">
+                <div class="kova-contact-link-row">
+                  <a href="mailto:tejaswaghmare900@gmail.com" class="kova-contact-link">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <span>tejaswaghmare900@gmail.com</span>
+                  </a>
+                  <button type="button" class="kova-copy-btn" onclick="copyContactEmail(this)" title="Copy email address" aria-label="Copy email address">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <span class="copy-text">Copy</span>
+                  </button>
+                </div>
 
-            <div class="contact-links-list">
-              
-              <a href="mailto:tejaswaghmare900@gmail.com" class="contact-item">
-                <div class="contact-icon-frame">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                </div>
-                <div class="contact-text">
-                  <span class="contact-type">Email Address</span>
-                  <span class="contact-val">tejaswaghmare900@gmail.com</span>
-                </div>
-              </a>
-
-              <a href="tel:+918378869006" class="contact-item">
-                <div class="contact-icon-frame">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                </div>
-                <div class="contact-text">
-                  <span class="contact-type">Phone / WhatsApp</span>
-                  <span class="contact-val">+91 83788 69006</span>
-                </div>
-              </a>
-
-              <div class="contact-item">
-                <div class="contact-icon-frame">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                </div>
-                <div class="contact-text">
-                  <span class="contact-type">Location</span>
-                  <span class="contact-val">Wardha / Pune, Maharashtra, India</span>
-                </div>
+                <a href="https://wa.me/918378869006" target="_blank" rel="noopener noreferrer" class="kova-contact-link">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  <span>+91 83788 69006</span>
+                </a>
               </div>
-
             </div>
 
-            <!-- Social Links Grid -->
-            <div class="social-links-grid">
-              <a href="https://www.linkedin.com/in/tejascwaghmare" target="_blank" rel="noopener noreferrer" class="social-pill">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                <span>LinkedIn</span>
-              </a>
-
-              <a href="https://github.com/TCWaghmare" target="_blank" rel="noopener noreferrer" class="social-pill">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                <span>GitHub</span>
-              </a>
-
-              <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="social-pill">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                <span>Credly</span>
-              </a>
+            <!-- Location & Time Zone -->
+            <div class="kova-footer-block">
+              <div class="kova-footer-label">LOCATION &amp; LOCAL TIME</div>
+              <div class="kova-location-card">
+                <div class="kova-location-line">
+                  <span class="kova-loc-pin">📍</span>
+                  <span class="kova-loc-city">Pune, Maharashtra, India</span>
+                </div>
+                <div class="kova-time-badge">
+                  <span class="kova-pulse-dot"></span>
+                  <span id="kova-pune-clock">05:30 PM IST</span>
+                  <span class="kova-time-sep">&bull;</span>
+                  <span class="kova-status-text">Available for roles</span>
+                </div>
+              </div>
             </div>
+
+            <!-- Social Profiles -->
+            <div class="kova-footer-block">
+              <div class="kova-footer-label">CONNECT ACROSS THE WEB</div>
+              <div class="kova-social-pills">
+                <a href="https://www.linkedin.com/in/tejascwaghmare" target="_blank" rel="noopener noreferrer" class="kova-social-pill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                  <span>LinkedIn</span>
+                </a>
+
+                <a href="https://github.com/TCWaghmare" target="_blank" rel="noopener noreferrer" class="kova-social-pill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                  <span>GitHub</span>
+                </a>
+
+                <a href="https://www.credly.com/users/tejas-waghmare./badges/credly" target="_blank" rel="noopener noreferrer" class="kova-social-pill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                  <span>Credly</span>
+                </a>
+              </div>
+            </div>
+
           </div>
-
-          <!-- Interactive Contact Form Card -->
-          <div class="bento-card contact-form-card">
-            <div class="card-pill">SEND A MESSAGE</div>
-            <h3 class="form-title">Start a Conversation</h3>
-            
-            <form id="portfolio-contact-form" class="contact-form" onsubmit="handleContactSubmit(event)">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="contact-name">Your Name</label>
-                  <input type="text" id="contact-name" name="name" placeholder="e.g. John Doe" required>
-                </div>
-                <div class="form-group">
-                  <label for="contact-email">Email Address</label>
-                  <input type="email" id="contact-email" name="email" placeholder="e.g. john@company.com" required>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="contact-subject">Inquiry Subject</label>
-                <input type="text" id="contact-subject" name="subject" placeholder="e.g. Data Analyst Role / Business Intelligence Project" required>
-              </div>
-
-              <div class="form-group">
-                <label for="contact-message">Message</label>
-                <textarea id="contact-message" name="message" rows="4" placeholder="Tell me about your team, data challenges, or project goals..." required></textarea>
-              </div>
-
-              <button type="submit" class="btn btn-primary-yellow btn-full">
-                <span>Send Direct Inquiry</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-              </button>
-
-              <div id="form-feedback" class="form-feedback" aria-live="polite"></div>
-            </form>
-          </div>
-
         </div>
 
       </div>
     </section>
+
 
   </main>
 
@@ -1140,7 +2537,7 @@
     <div class="lightbox-panel">
       <div class="lightbox-header">
         <h3 id="lightbox-title" class="lightbox-title">Asset Preview</h3>
-        <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close preview">×</button>
+        <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close preview">&times;</button>
       </div>
       <div class="lightbox-body" id="lightbox-body">
         <!-- Injected via JavaScript -->
@@ -1148,6 +2545,140 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- =======================================================================
+       KOVA-STYLE "LET'S TALK" CONTACT MODAL (Opens when clicking "Let's build something")
+       ======================================================================= -->
+  <div id="kova-contact-modal" class="cm-overlay" role="dialog" aria-modal="true" aria-label="Contact form modal" aria-hidden="true">
+    <div class="cm-backdrop" onclick="closeContactModal()"></div>
+    
+    <button type="button" class="cm-close" onclick="closeContactModal()" aria-label="Close contact form" title="Close (Esc)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    
+    <div class="cm-inner">
+      <div class="cm-header">
+        <div class="kova-talk-badge">
+          <span class="hello-dot"></span>
+          <span>LET'S CONNECT</span>
+        </div>
+        <h2 class="cm-title display-text kova-talk-title">
+          Let's <span class="serif-accent highlight-yellow">talk.</span>
+        </h2>
+        <p class="kova-talk-subtitle">
+          Have an analytics project, business intelligence challenge, or an opportunity? Drop a message below and let's create high-ROI clarity together.
+        </p>
+      </div>
+
+      <!-- Kova Interactive Contact Form -->
+      <form id="portfolio-contact-form" class="kova-talk-form" onsubmit="handleContactSubmit(event)">
+        
+        <!-- Field 1: Name -->
+        <div class="kova-form-field">
+          <label class="kova-field-label" for="talk-name">
+            <span class="label-accent">01 //</span> FIRST THINGS FIRST &mdash; YOUR NAME
+          </label>
+          <input 
+            type="text" 
+            id="talk-name" 
+            name="name" 
+            class="kova-input" 
+            placeholder="Jane Doe" 
+            autocomplete="name"
+            required 
+          />
+        </div>
+
+        <!-- Field 2: Email -->
+        <div class="kova-form-field">
+          <label class="kova-field-label" for="talk-email">
+            <span class="label-accent">02 //</span> HOW CAN I REACH YOU? &mdash; YOUR EMAIL
+          </label>
+          <input 
+            type="email" 
+            id="talk-email" 
+            name="email" 
+            class="kova-input" 
+            placeholder="jane@company.com" 
+            autocomplete="email"
+            required 
+          />
+        </div>
+
+        <!-- Field 3: What brings you here? (Tags / Pills) -->
+        <div class="kova-form-field">
+          <label class="kova-field-label">
+            <span class="label-accent">03 //</span> WHAT BRINGS YOU HERE?
+          </label>
+          <div class="kova-pills-row" id="kova-pills-group" role="group" aria-label="What brings you here">
+            <button type="button" class="kova-pill active" data-topic="A project">A project</button>
+            <button type="button" class="kova-pill" data-topic="A friendly chat">A friendly chat</button>
+            <button type="button" class="kova-pill" data-topic="Employment">Employment</button>
+            <button type="button" class="kova-pill" data-topic="Help">Help</button>
+            <button type="button" class="kova-pill" data-topic="Something else">Something else</button>
+          </div>
+          <input type="hidden" id="talk-topic" name="subject" value="A project" />
+        </div>
+
+        <!-- Field 4: How urgent? (Interactive Slider) -->
+        <div class="kova-form-field kova-slider-field">
+          <div class="kova-slider-top">
+            <label class="kova-field-label" for="talk-urgency">
+              <span class="label-accent">04 //</span> HOW URGENT?
+            </label>
+            <span id="talk-urgency-val" class="kova-urgency-val">Sometime soon</span>
+          </div>
+          <div class="kova-range-container">
+            <input 
+              type="range" 
+              id="talk-urgency" 
+              name="urgency" 
+              min="0" 
+              max="100" 
+              value="40" 
+              class="kova-range" 
+              aria-label="How urgent slider" 
+            />
+            <div class="kova-range-ticks">
+              <span>WHENEVER</span>
+              <span>ASAP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Field 5: Anything else on your mind? (Textarea) -->
+        <div class="kova-form-field">
+          <label class="kova-field-label" for="talk-message">
+            <span class="label-accent">05 //</span> ANYTHING ELSE ON YOUR MIND?
+          </label>
+          <textarea 
+            id="talk-message" 
+            name="message" 
+            class="kova-input kova-textarea" 
+            placeholder="Tell me about your team, data challenges, or timeline..." 
+            rows="3"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Submit Button Row -->
+        <div class="kova-submit-row">
+          <button type="submit" class="kova-send-btn" id="talk-submit-btn">
+            <span>Send it &rarr;</span>
+          </button>
+          <div id="talk-form-feedback" class="form-feedback" aria-live="polite"></div>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Floating Cursor Tooltip for "Let's build something" (kova.me style) -->
+  <div class="footer-tip" id="footer-tip">Message me 💬</div>
+
+  <script src="script.js?v=20261023_theme"></script>
 </body>
 </html>

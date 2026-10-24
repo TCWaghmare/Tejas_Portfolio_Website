@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="copilot_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9E77ED"/>
+      <stop offset="50%" stop-color="#7F56D9"/>
+      <stop offset="100%" stop-color="#53389E"/>
+    </linearGradient>
+    <filter id="copilot_glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#7F56D9" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#copilot_glow)">
+    <!-- Copilot Head / Helmet -->
+    <path d="M48 24C48 20 45 16 39 15C36 14.5 32 14.5 32 14.5C32 14.5 28 14.5 25 15C19 16 16 20 16 24C16 26.5 17 29 18.5 31C14 33 11 37.5 11 43C11 49 16 51 22 51C23 51 24.5 50.8 26 50.5C28 51.5 30 52 32 52C34 52 36 51.5 38 50.5C39.5 50.8 41 51 42 51C48 51 53 49 53 43C53 37.5 50 33 45.5 31C47 29 48 26.5 48 24Z" fill="url(#copilot_grad)"/>
+
+    <!-- Copilot Visor / Eye Plates -->
+    <path d="M22 36C24.5 36 26.5 34 26.5 31.5C26.5 29 24.5 27 22 27C19.5 27 17.5 29 17.5 31.5C17.5 34 19.5 36 22 36Z" fill="#FFFFFF"/>
+    <path d="M42 36C44.5 36 46.5 34 46.5 31.5C46.5 29 44.5 27 42 27C39.5 27 37.5 29 37.5 31.5C37.5 34 39.5 36 42 36Z" fill="#FFFFFF"/>
+    
+    <!-- Visor Bridge -->
+    <path d="M26.5 30.5C28 29.5 30 29 32 29C34 29 36 29.5 37.5 30.5V32.5C36 31.5 34 31 32 31C30 31 28 31.5 26.5 32.5V30.5Z" fill="#FFFFFF"/>
+
+    <!-- Pilot Smile / Mouth Arc -->
+    <path d="M28 43C29 44.5 30.5 45 32 45C33.5 45 35 44.5 36 43" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

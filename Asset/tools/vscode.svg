@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="vsc_b1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0065A9"/>
+      <stop offset="100%" stop-color="#005088"/>
+    </linearGradient>
+    <linearGradient id="vsc_b2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#007ACC"/>
+      <stop offset="100%" stop-color="#1F9CF0"/>
+    </linearGradient>
+    <linearGradient id="vsc_b3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1F9CF0"/>
+      <stop offset="100%" stop-color="#007ACC"/>
+    </linearGradient>
+    <filter id="vsc_shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="-1" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#vsc_shadow)">
+    <!-- Back Wing Bottom Left -->
+    <path d="M44.5 9.5L18.5 29.5L12 24.5C10.8 23.5 9 24.4 9 26V38C9 39.6 10.8 40.5 12 39.5L18.5 34.5L44.5 54.5C46 55.6 48 54.5 48 52.8V11.2C48 9.5 46 8.4 44.5 9.5Z" fill="url(#vsc_b1)"/>
+
+    <!-- Bottom Front Fold -->
+    <path d="M44.5 54.5L18.5 34.5L34 46.5L44.5 54.5Z" fill="url(#vsc_b3)" opacity="0.6"/>
+
+    <!-- Top Front Wing Ribbon -->
+    <path d="M48 11.2L18.5 34.5L12 39.5L44.5 54.5C46 55.6 48 54.5 48 52.8V11.2Z" fill="url(#vsc_b2)"/>
+
+    <!-- Left Arrow Fold Accent -->
+    <path d="M12 24.5L18.5 29.5V34.5L12 39.5C10.8 40.5 9 39.6 9 38V26C9 24.4 10.8 23.5 12 24.5Z" fill="#0065A9"/>
+  </g>
+</svg>

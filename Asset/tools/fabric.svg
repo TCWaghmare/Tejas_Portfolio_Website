@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="fab_blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0078D4"/>
+      <stop offset="100%" stop-color="#005A9E"/>
+    </linearGradient>
+    <linearGradient id="fab_cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00BCF2"/>
+      <stop offset="100%" stop-color="#0078D4"/>
+    </linearGradient>
+    <linearGradient id="fab_yellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB900"/>
+      <stop offset="100%" stop-color="#D83B01"/>
+    </linearGradient>
+    <linearGradient id="fab_green" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#107C41"/>
+      <stop offset="100%" stop-color="#004E8C"/>
+    </linearGradient>
+    <filter id="fab_glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#fab_glow)">
+    <!-- Loop Bottom Left Green-Teal -->
+    <path d="M19 46C13.5 46 9 41.5 9 36C9 30.5 13.5 26 19 26C24 26 29 29.5 32 33.5C29 37.5 24 46 19 46Z" fill="url(#fab_green)"/>
+    
+    <!-- Loop Top Right Blue-Cyan -->
+    <path d="M45 18C50.5 18 55 22.5 55 28C55 33.5 50.5 38 45 38C40 38 35 34.5 32 30.5C35 26.5 40 18 45 18Z" fill="url(#fab_cyan)"/>
+
+    <!-- Crossing Ribbon Overlay - Top Left Blue -->
+    <path d="M19 18C25 18 31 23 35 28C32 32 26 36 21 36C15.5 36 11 31.5 11 26C11 21.5 14.5 18 19 18Z" fill="url(#fab_blue)" opacity="0.95"/>
+
+    <!-- Crossing Ribbon Overlay - Bottom Right Yellow-Amber -->
+    <path d="M45 46C39 46 33 41 29 36C32 32 38 28 43 28C48.5 28 53 32.5 53 38C53 42.5 49.5 46 45 46Z" fill="url(#fab_yellow)"/>
+  </g>
+</svg>

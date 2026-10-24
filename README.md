@@ -6,14 +6,20 @@ A cinematic, modern, high-contrast Data Analyst & Business Intelligence portfoli
 
 ## 🚀 Quick Start / Local Preview
 
-To launch the portfolio locally:
+You have three easy ways to view the website locally:
 
-```bash
-# In the project directory:
-python -m http.server 8080
+### Option 1: One-Click Launcher (Recommended)
+Double-click **`start_preview.bat`** in this folder. It automatically starts the server and opens **[http://localhost:8080](http://localhost:8080)** in your default browser.
+
+### Option 2: PowerShell Terminal
+Run the following in PowerShell within this project folder:
+```powershell
+Get-Content .\serve.ps1 -Raw | Invoke-Expression
 ```
+Then visit **[http://localhost:8080](http://localhost:8080)**.
 
-Then open your browser to **[http://localhost:8080](http://localhost:8080)**.
+### Option 3: Direct File Preview (Zero Server Required)
+Open **`index.html`** directly in Chrome, Edge, or Firefox (double-click `index.html` or drag it into your browser).
 
 ---
 
@@ -28,7 +34,7 @@ Then open your browser to **[http://localhost:8080](http://localhost:8080)**.
 
 ## 📁 Website Architecture (9 Sections)
 
-1. **Home (Hero)**: Headline, Microsoft certified trust pills, `$389.3M` hero metric, 4-stage analytics workflow stepper, and quick action buttons.
+1. **Home (Hero)**: 3-Column hero showcase featuring left-aligned headline with interactive 3D particle backdrop, centered portrait arch frame, and right-column stacked 3x Certified Microsoft Associate credentials & client testimonial.
 2. **About**: Professional summary, B.Tech mechanical engineering background (CGPA: 8.04), and experience timeline (Microsoft Elevate, Cybernetic India, Bajaj BEST).
 3. **Projects**:
    - **NYC Airbnb Marketplace Intelligence** (SQL, Power BI, DAX, Power Query) — Overview, Room, Host, Rating views + GitHub link.
@@ -38,7 +44,7 @@ Then open your browser to **[http://localhost:8080](http://localhost:8080)**.
 5. **Badges**: Official Microsoft badges for **PL-300**, **DP-600**, and **DP-700** with Credly verification links.
 6. **Certificates**: Proof images with click-to-zoom lightbox modals and official Microsoft Learn credential URLs.
 7. **Education**: B.Tech Mechanical Engineering from Bajaj Institute of Technology (CGPA 8.04), HSC (IT), SSC.
-8. **Hobbies**: Data Storytelling & Kaggle, Automotive Telemetry & IoT, Chess & Strategy, Next-Gen AI.
+8. **Hobbies**: Analytical Thinking, Problem Solving, Storytelling, Design, Travelling, Cooking, Music.
 9. **Contact**: Direct contact channels (Email, WhatsApp/Phone, Location), social profile pills (LinkedIn, GitHub, Credly), and an interactive contact form with instant email client trigger.
 
 ---

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="pg_blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#336791"/>
+      <stop offset="100%" stop-color="#244966"/>
+    </linearGradient>
+    <linearGradient id="pg_ear" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4B86B4"/>
+      <stop offset="100%" stop-color="#336791"/>
+    </linearGradient>
+  </defs>
+  <!-- Slonik Elephant Head Outline -->
+  <path d="M31.8 10C24 10 18.2 14.8 17.5 21.2C16.8 22.8 15.6 24.2 14.2 25.4C11.5 27.6 9 31.2 9 36C9 41.5 13 46 19 46.5C19.2 46.5 19.5 46.5 19.8 46.5C21.2 50.8 24.6 54 29 54C34.5 54 39.2 49.5 40.5 43.5C41.2 43.8 42 44 42.8 44C47.2 44 51 39.8 51 34.5C51 33.2 50.6 32 50 31C52.5 28.5 54 25 54 21C54 14.9 44.1 10 31.8 10Z" fill="url(#pg_blue)"/>
+  
+  <!-- Forehead highlight -->
+  <path d="M26 14C33 13 42 15 45 20C47 23 46 27 43 29C41 30 38 29 36 28C34 26 31 24 28 23C26 22 25 18 26 14Z" fill="#5D9BC7" opacity="0.4"/>
+  
+  <!-- Trunk Curve -->
+  <path d="M40.5 43.5C39.5 48.5 35 52 29.5 52C25.5 52 22.5 49 21.5 45.5C23.5 45.8 26 45 28 43C30.5 40.5 31.5 36 32 31.5C33 22 41 22 44 26C45.5 28 44 33 42 37C41 39 40.8 41.5 40.5 43.5Z" fill="#244966"/>
+  
+  <!-- Ear flap -->
+  <path d="M19.5 21C18 23 15 26 14.5 30C14 34 16 38 19 40C20 40.5 20.5 38 20.5 35C20.5 29 20 25 19.5 21Z" fill="url(#pg_ear)"/>
+  
+  <!-- White Tusk -->
+  <path d="M37 42C39 43.5 42 43 43.5 41C42 40 40 39 37 39.5V42Z" fill="#FFFFFF"/>
+  
+  <!-- Eye -->
+  <circle cx="37" cy="24" r="2.5" fill="#FFFFFF"/>
+  <circle cx="37.5" cy="24" r="1.2" fill="#1A2D3F"/>
+</svg>

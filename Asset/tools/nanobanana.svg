@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="banana_gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE81F"/>
+      <stop offset="50%" stop-color="#F5B700"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="banana_spark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+    <filter id="banana_glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#F5B700" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#banana_glow)">
+    <!-- Stylized Modern Cyber Banana Curve -->
+    <path d="M48 10C48 10 44 14 43 18C39 27 34 38 21 44C16 46 11 46 8 45C7.2 44.7 7 43.6 7.6 43C12 39 19 33 22 24C24 17 26 12 28 9C28.5 8.2 29.5 8.2 30 8.8C34 14 42 18 48 10Z" fill="url(#banana_gold)"/>
+    
+    <!-- Banana Stem Tip -->
+    <path d="M48 10C49 8.5 50.5 8 52 8.5C52.8 8.8 52.8 10 52 10.5C50 11.5 48.5 11 48 10Z" fill="#78350F"/>
+    
+    <!-- Banana Inner Peel Highlight Curve -->
+    <path d="M43 18C39 26 33 34 23 40C18 43 13 44 10 44C14 40 21 33 24 25C26 19 28 15 30 12C34 16 39 18 43 18Z" fill="#FFFBEB" opacity="0.35"/>
+
+    <!-- AI Generative Spark Star 1 (Top Left) -->
+    <path d="M16 14C16 17 13 18 10 18C13 18 16 19 16 22C16 19 19 18 22 18C19 18 16 17 16 14Z" fill="url(#banana_spark)"/>
+
+    <!-- AI Generative Spark Star 2 (Bottom Right) -->
+    <path d="M46 36C46 38.5 43.5 39.5 41 39.5C43.5 39.5 46 40.5 46 43C46 40.5 48.5 39.5 51 39.5C48.5 39.5 46 38.5 46 36Z" fill="#38BDF8"/>
+    
+    <!-- Micro Sparkle Star 3 -->
+    <circle cx="34" cy="48" r="2.5" fill="#C084FC"/>
+  </g>
+</svg>

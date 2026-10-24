@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="sql_red_top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E53935"/>
+      <stop offset="100%" stop-color="#B71C1C"/>
+    </linearGradient>
+    <linearGradient id="sql_red_mid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C62828"/>
+      <stop offset="100%" stop-color="#8E0000"/>
+    </linearGradient>
+    <linearGradient id="sql_plate" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EF5350"/>
+      <stop offset="50%" stop-color="#FFCDD2"/>
+      <stop offset="100%" stop-color="#E53935"/>
+    </linearGradient>
+    <filter id="sql_shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Cylinder 3 (Bottom) -->
+  <g filter="url(#sql_shadow)">
+    <path d="M14 41 C14 36 22 34 32 34 C42 34 50 36 50 41 V47 C50 52 42 55 32 55 C22 55 14 52 14 47 Z" fill="url(#sql_red_mid)"/>
+    <ellipse cx="32" cy="41" rx="18" ry="6" fill="url(#sql_plate)"/>
+    <ellipse cx="32" cy="47" rx="18" ry="6" fill="none" stroke="#FF8A80" stroke-width="0.75" opacity="0.6"/>
+  </g>
+
+  <!-- Cylinder 2 (Middle) -->
+  <g filter="url(#sql_shadow)">
+    <path d="M14 27 C14 22 22 20 32 20 C42 20 50 22 50 27 V33 C50 38 42 41 32 41 C22 41 14 38 14 33 Z" fill="url(#sql_red_mid)"/>
+    <ellipse cx="32" cy="27" rx="18" ry="6" fill="url(#sql_plate)"/>
+    <ellipse cx="32" cy="33" rx="18" ry="6" fill="none" stroke="#FF8A80" stroke-width="0.75" opacity="0.6"/>
+  </g>
+
+  <!-- Cylinder 1 (Top) -->
+  <g filter="url(#sql_shadow)">
+    <path d="M14 13 C14 8 22 6 32 6 C42 6 50 8 50 13 V19 C50 24 42 27 32 27 C22 27 14 24 14 19 Z" fill="url(#sql_red_top)"/>
+    <ellipse cx="32" cy="13" rx="18" ry="6" fill="url(#sql_plate)"/>
+    <ellipse cx="32" cy="13" rx="12" ry="4" fill="#B71C1C" opacity="0.4"/>
+  </g>
+
+  <!-- Left Accent / Reflection Stripe -->
+  <path d="M18 14 V47 C18 48 19 49 20 50 V17 C19 16 18 15 18 14 Z" fill="#FFFFFF" opacity="0.25"/>
+</svg>

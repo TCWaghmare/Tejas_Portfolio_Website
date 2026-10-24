@@ -4,3 +4,14 @@ Asset/Portfolio_Video_Frames_Original_Quality.zip
 # OS and temporary files
 Thumbs.db
 .DS_Store
+
+# Temporary scratch and debug scripts
+apply_*.ps1
+clean_mojibake_perfect.ps1
+debug_line*.ps1
+fix_mojibake.ps1
+scan_chars.ps1
+scratch_*.*
+test_spline.html
+.agents/
+Asset/spline-3d-skill.zip

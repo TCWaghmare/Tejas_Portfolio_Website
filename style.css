@@ -1177,11 +1177,13 @@ img {
 /* ==========================================================================
    3D Data Analytics Tools Floating Orbs (Power BI, Fabric, SQL, Excel, Python)
    ========================================================================== */
+/* ==========================================================================
+   3D Data Analytics Tools Floating Orbs (Power BI, Fabric, SQL, Excel, Python)
+   Dispersed in open area near profile image with interactive cursor physics
+   ========================================================================== */
 .hero-floating-tools-layer {
   position: absolute;
-  inset: -15px;
-  width: calc(100% + 30px);
-  height: calc(100% + 30px);
+  inset: -45px -65px -55px -75px;
   pointer-events: none;
   z-index: 6;
 }
@@ -1189,37 +1191,53 @@ img {
 .hero-tool-orb {
   position: absolute;
   pointer-events: auto;
-  cursor: pointer;
+  cursor: grab;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 62px;
-  height: 62px;
+  width: 66px;
+  height: 66px;
   user-select: none;
+  -webkit-user-select: none;
   perspective: 900px;
   transform-style: preserve-3d;
+  touch-action: none;
   transition: filter 0.3s ease;
   will-change: transform;
+}
+
+.hero-tool-orb.is-dragging {
+  cursor: grabbing !important;
+  z-index: 25 !important;
+}
+
+.hero-tool-orb.is-dragging .orb-glass {
+  transform: scale(1.18);
+  box-shadow: 
+    0 26px 55px rgba(0, 0, 0, 0.85),
+    0 0 35px rgba(245, 224, 37, 0.55),
+    inset 0 1px 2px rgba(255, 255, 255, 0.6);
+  border-color: #FFDF01;
 }
 
 .hero-tool-orb .orb-glass {
   position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background: rgba(18, 20, 28, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(18, 20, 28, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 
-    0 14px 28px rgba(0, 0, 0, 0.65),
+    0 16px 32px rgba(0, 0, 0, 0.65),
     inset 0 1px 2px rgba(255, 255, 255, 0.35);
   overflow: hidden;
-  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .hero-tool-orb .orb-sheen {
@@ -1230,24 +1248,37 @@ img {
   height: 180%;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.06) 42%,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0.08) 42%,
     transparent 62%
   );
   pointer-events: none;
-  border-radius: 50%;
+  border-radius: 18px;
+  z-index: 2;
 }
 
-.hero-tool-orb .orb-icon {
-  width: 33px;
-  height: 33px;
+.hero-tool-orb .orb-icon-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-tool-orb .orb-icon-contain {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  display: block;
+  padding: 10px;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.hero-tool-orb:hover .orb-icon {
-  transform: scale(1.12);
+.hero-tool-orb:hover .orb-icon-cover,
+.hero-tool-orb:hover .orb-icon-contain {
+  transform: scale(1.1);
 }
 
 /* Tooltip Badge on Hover */
@@ -1282,69 +1313,69 @@ img {
 /* Individual Tool Color Signatures on Hover */
 .orb-excel:hover .orb-glass {
   border-color: #21A366;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(33, 163, 102, 0.5);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(33, 163, 102, 0.55);
 }
 
 .orb-powerbi:hover .orb-glass {
   border-color: #F2C811;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(242, 200, 17, 0.55);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(242, 200, 17, 0.6);
 }
 
 .orb-python:hover .orb-glass {
   border-color: #387EB8;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 126, 184, 0.55);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(56, 126, 184, 0.55);
 }
 
 .orb-sql:hover .orb-glass {
   border-color: #E53935;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(229, 57, 53, 0.55);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(229, 57, 53, 0.55);
 }
 
 .orb-fabric:hover .orb-glass {
   border-color: #00BCF2;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 188, 242, 0.55);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(0, 188, 242, 0.55);
 }
 
-/* Base Position & Ambient Continuous Floating Keyframes */
+/* Dispersed Layout: Placed in open space near profile image, NOT touching rim */
 .orb-excel {
-  top: -16px;
-  left: 50%;
-  animation: toolFloatExcel 7.2s ease-in-out infinite;
+  top: -25px;
+  right: 90px;
+  animation: toolFloatExcel 7.6s ease-in-out infinite;
 }
 
 .orb-powerbi {
-  top: 14%;
-  right: -20px;
-  animation: toolFloatPowerBI 5.8s ease-in-out infinite;
+  top: 40px;
+  right: -25px;
+  animation: toolFloatPowerBI 6.8s ease-in-out infinite;
 }
 
 .orb-python {
-  bottom: 12%;
-  right: -16px;
-  animation: toolFloatPython 7.6s ease-in-out infinite;
+  bottom: 35px;
+  right: -25px;
+  animation: toolFloatPython 6.2s ease-in-out infinite;
 }
 
 .orb-sql {
-  bottom: 15%;
-  left: -14px;
-  animation: toolFloatSQL 6.4s ease-in-out infinite;
+  bottom: 75px;
+  left: -40px;
+  animation: toolFloatSQL 7.1s ease-in-out infinite;
 }
 
 .orb-fabric {
-  top: 18%;
-  left: -22px;
-  animation: toolFloatFabric 8.2s ease-in-out infinite;
+  top: 75px;
+  left: -50px;
+  animation: toolFloatFabric 8.4s ease-in-out infinite;
 }
 
 @keyframes toolFloatExcel {
   0%, 100% {
-    transform: translateX(-50%) translate3d(0, 0, 0) rotate(0deg);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
   33% {
-    transform: translateX(-50%) translate3d(10px, -14px, 12px) rotate(4deg);
+    transform: translate3d(10px, -12px, 12px) rotate(4deg);
   }
   66% {
-    transform: translateX(-50%) translate3d(-12px, -6px, -8px) rotate(-3deg);
+    transform: translate3d(-10px, -6px, -8px) rotate(-3deg);
   }
 }
 
@@ -1365,10 +1396,10 @@ img {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
   35% {
-    transform: translate3d(12px, 10px, -14px) rotate(4deg);
+    transform: translate3d(10px, 10px, -14px) rotate(4deg);
   }
   70% {
-    transform: translate3d(-14px, -12px, 14px) rotate(-4deg);
+    transform: translate3d(-12px, -12px, 14px) rotate(-4deg);
   }
 }
 
@@ -1377,7 +1408,7 @@ img {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
   45% {
-    transform: translate3d(-12px, 14px, 10px) rotate(5deg);
+    transform: translate3d(-12px, 12px, 10px) rotate(5deg);
   }
   80% {
     transform: translate3d(10px, -10px, -12px) rotate(-3deg);
@@ -1389,10 +1420,10 @@ img {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
   30% {
-    transform: translate3d(-14px, -10px, -12px) rotate(-4deg);
+    transform: translate3d(-12px, -10px, -12px) rotate(-4deg);
   }
   70% {
-    transform: translate3d(12px, 16px, 14px) rotate(5deg);
+    transform: translate3d(12px, 14px, 14px) rotate(5deg);
   }
 }
 
@@ -6598,38 +6629,50 @@ img {
     height: min(420px, 92vw);
   }
 
-  .hero-tool-orb {
-    width: 50px;
-    height: 50px;
+  .hero-floating-tools-layer {
+    inset: -25px -25px -35px -25px;
   }
 
-  .hero-tool-orb .orb-icon {
-    width: 26px;
-    height: 26px;
+  .hero-tool-orb {
+    width: 52px;
+    height: 52px;
+  }
+
+  .hero-tool-orb .orb-glass {
+    border-radius: 14px;
+  }
+
+  .hero-tool-orb .orb-icon-cover {
+    border-radius: 12px;
+  }
+
+  .hero-tool-orb .orb-icon-contain {
+    padding: 8px;
   }
 
   .orb-excel {
-    top: -12px;
+    top: -15px;
+    right: 50px;
   }
 
   .orb-powerbi {
-    top: 13%;
-    right: -12px;
+    top: 30px;
+    right: 0px;
   }
 
   .orb-python {
-    bottom: 12%;
-    right: -10px;
+    bottom: 25px;
+    right: 0px;
   }
 
   .orb-sql {
-    bottom: 14%;
-    left: -10px;
+    bottom: 50px;
+    left: -5px;
   }
 
   .orb-fabric {
-    top: 17%;
-    left: -14px;
+    top: 55px;
+    left: -10px;
   }
 
   .hero-badges-row {
@@ -6776,44 +6819,56 @@ img {
     height: min(320px, 88vw);
   }
 
+  .hero-floating-tools-layer {
+    inset: -15px -15px -25px -15px;
+  }
+
   .hero-tool-orb {
     width: 44px;
     height: 44px;
   }
 
-  .hero-tool-orb .orb-icon {
-    width: 22px;
-    height: 22px;
+  .hero-tool-orb .orb-glass {
+    border-radius: 12px;
+  }
+
+  .hero-tool-orb .orb-icon-cover {
+    border-radius: 10px;
+  }
+
+  .hero-tool-orb .orb-icon-contain {
+    padding: 6px;
   }
 
   .hero-tool-orb .orb-tag {
-    font-size: 9.5px;
-    padding: 1px 7px;
-    bottom: -20px;
+    font-size: 9px;
+    padding: 1px 6px;
+    bottom: -18px;
   }
 
   .orb-excel {
-    top: -8px;
+    top: -10px;
+    right: 40px;
   }
 
   .orb-powerbi {
-    top: 15%;
-    right: -6px;
+    top: 25px;
+    right: 5px;
   }
 
   .orb-python {
-    bottom: 14%;
-    right: -4px;
+    bottom: 20px;
+    right: 5px;
   }
 
   .orb-sql {
-    bottom: 15%;
-    left: -4px;
+    bottom: 40px;
+    left: 2px;
   }
 
   .orb-fabric {
-    top: 18%;
-    left: -6px;
+    top: 45px;
+    left: 2px;
   }
 
   .kova-image-caption {

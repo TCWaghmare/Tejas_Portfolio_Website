@@ -1191,87 +1191,210 @@
     }
   }
 
-  // --- Floating 3D Data Analytics Tool Orbs: Interactive Random Physics ---
+  // --- Floating 3D Data Analytics Tool Orbs: Interactive Cursor Tracking & Drag Physics ---
   function initFloatingTools() {
+    const heroSection = document.getElementById('home') || document.querySelector('.hero-section');
     const orbs = document.querySelectorAll('.hero-tool-orb');
-    if (!orbs.length) return;
+    if (!heroSection || !orbs.length) return;
 
-    orbs.forEach((orb) => {
-      let intervalId = null;
-      let isHovered = false;
+    // Orb physics state objects
+    const orbStates = Array.from(orbs).map((orb) => {
+      const depth = parseFloat(orb.getAttribute('data-depth')) || 25;
+      return {
+        el: orb,
+        depth: depth,
+        currX: 0,
+        currY: 0,
+        targetX: 0,
+        targetY: 0,
+        currRotX: 0,
+        currRotY: 0,
+        currRotZ: 0,
+        targetRotX: 0,
+        targetRotY: 0,
+        targetRotZ: 0,
+        scale: 1,
+        targetScale: 1,
+        isDragging: false,
+        dragStartX: 0,
+        dragStartY: 0,
+        dragOffsetX: 0,
+        dragOffsetY: 0
+      };
+    });
 
-      // Function to apply an unpredictable 3D floating impulse
-      function randomizeFloat() {
-        if (!isHovered) return;
+    const pointer = {
+      x: window.innerWidth * 0.7,
+      y: window.innerHeight * 0.5,
+      normX: 0,
+      normY: 0,
+      isActive: false
+    };
 
-        // Generate unpredictable 3D displacement vectors
-        const dx = (Math.random() - 0.5) * 56; // -28px to +28px
-        const dy = (Math.random() - 0.5) * 56; // -28px to +28px
-        const dz = Math.random() * 32 + 10;    // 10px to 42px toward screen
-        const rotX = (Math.random() - 0.5) * 34; // -17deg to +17deg
-        const rotY = (Math.random() - 0.5) * 34; // -17deg to +17deg
-        const rotZ = (Math.random() - 0.5) * 26; // -13deg to +13deg
-        const scale = 1.18 + Math.random() * 0.12; // 1.18x to 1.30x
+    let activeDragState = null;
+    let animFrameId = null;
+    let lastTime = performance.now();
 
-        // Check if orb has centering transform (like Excel with translateX(-50%))
-        const isCentered = orb.classList.contains('orb-excel');
-        const baseTranslate = isCentered ? 'translateX(-50%) ' : '';
-
-        orb.style.transition = 'transform 0.32s cubic-bezier(0.25, 1, 0.5, 1)';
-        orb.style.transform = `${baseTranslate}translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, ${dz.toFixed(1)}px) rotateX(${rotX.toFixed(1)}deg) rotateY(${rotY.toFixed(1)}deg) rotateZ(${rotZ.toFixed(1)}deg) scale(${scale.toFixed(2)})`;
+    // 1. Mouse & Pointer Tracking on the Hero Section
+    function onPointerMove(e) {
+      const rect = heroSection.getBoundingClientRect();
+      if (e.clientY < rect.top - 120 || e.clientY > rect.bottom + 120) {
+        pointer.isActive = false;
+        return;
       }
 
-      function startRandomFloat() {
-        if (isHovered) return;
-        isHovered = true;
-        orb.style.animationPlayState = 'paused';
-        randomizeFloat();
+      pointer.isActive = true;
+      pointer.x = e.clientX;
+      pointer.y = e.clientY;
 
-        // While cursor remains hovered over the orb, continuously dance and float randomly
-        clearInterval(intervalId);
-        intervalId = setInterval(randomizeFloat, 300);
+      // Normalized coordinates (-1 to +1) relative to hero portrait center
+      const heroCenterX = rect.left + rect.width * 0.65;
+      const heroCenterY = rect.top + rect.height * 0.5;
+      pointer.normX = Math.max(-1.5, Math.min(1.5, (e.clientX - heroCenterX) / (rect.width * 0.4)));
+      pointer.normY = Math.max(-1.5, Math.min(1.5, (e.clientY - heroCenterY) / (rect.height * 0.4)));
+
+      // If user is actively dragging an orb, follow cursor directly
+      if (activeDragState) {
+        activeDragState.dragOffsetX = e.clientX - activeDragState.dragStartX;
+        activeDragState.dragOffsetY = e.clientY - activeDragState.dragStartY;
+      }
+    }
+
+    heroSection.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+
+    heroSection.addEventListener('pointerleave', () => {
+      if (!activeDragState) {
+        pointer.isActive = false;
+      }
+    });
+
+    // 2. Drag & Drop / Cursor Manipulation for each tool
+    orbStates.forEach((state) => {
+      const orb = state.el;
+
+      function onDragStart(clientX, clientY) {
+        activeDragState = state;
+        state.isDragging = true;
+        state.dragStartX = clientX - state.currX;
+        state.dragStartY = clientY - state.currY;
+        orb.classList.add('is-dragging');
+        orb.style.animation = 'none';
       }
 
-      function stopRandomFloat() {
-        isHovered = false;
-        clearInterval(intervalId);
-        intervalId = null;
-
-        const isCentered = orb.classList.contains('orb-excel');
-        const baseTranslate = isCentered ? 'translateX(-50%) ' : '';
-
-        // Smoothly glide back to resting state
-        orb.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        orb.style.transform = `${baseTranslate}translate3d(0, 0, 0) scale(1)`;
-
-        setTimeout(() => {
-          if (!isHovered) {
-            orb.style.transition = '';
-            orb.style.transform = '';
-            orb.style.animationPlayState = 'running';
-          }
-        }, 450);
-      }
-
-      // Pointer / Mouse events
-      orb.addEventListener('pointerenter', startRandomFloat);
-      orb.addEventListener('pointerleave', stopRandomFloat);
-      orb.addEventListener('mouseenter', startRandomFloat);
-      orb.addEventListener('mouseleave', stopRandomFloat);
-
-      // On mousemove within orb, add an immediate random micro-wobble
-      orb.addEventListener('mousemove', () => {
-        if (isHovered && Math.random() > 0.45) {
-          randomizeFloat();
+      function onDragEnd() {
+        if (state.isDragging) {
+          state.isDragging = false;
+          orb.classList.remove('is-dragging');
+          if (activeDragState === state) activeDragState = null;
         }
+      }
+
+      orb.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        onDragStart(e.clientX, e.clientY);
       });
 
-      // Mobile Touch Support: Tap triggers a 1.2s playful random float dance
-      orb.addEventListener('touchstart', () => {
-        startRandomFloat();
-        setTimeout(stopRandomFloat, 1200);
-      }, { passive: true });
+      orb.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      // Disable conflicting native animation when interacting
+      orb.style.animation = 'none';
     });
+
+    window.addEventListener('pointerup', () => {
+      if (activeDragState) {
+        activeDragState.el.classList.remove('is-dragging');
+        activeDragState.isDragging = false;
+        activeDragState = null;
+      }
+    });
+
+    window.addEventListener('touchend', () => {
+      if (activeDragState) {
+        activeDragState.el.classList.remove('is-dragging');
+        activeDragState.isDragging = false;
+        activeDragState = null;
+      }
+    });
+
+    // 3. 60FPS Physics Engine: Moves along cursor in hero section + proximity follow + gentle float
+    function updatePhysics(now) {
+      animFrameId = requestAnimationFrame(updatePhysics);
+
+      const dt = Math.min((now - lastTime) / 1000, 0.08);
+      lastTime = now;
+      const t = now * 0.0016;
+
+      orbStates.forEach((state, i) => {
+        const orb = state.el;
+
+        if (state.isDragging) {
+          // Follow cursor directly while grabbed
+          state.targetX = state.dragOffsetX;
+          state.targetY = state.dragOffsetY;
+          state.targetScale = 1.22;
+          state.targetRotZ = (state.targetX - state.currX) * 0.35;
+        } else {
+          // Calculate distance from cursor to orb
+          const rect = orb.getBoundingClientRect();
+          const orbCenterX = rect.left + rect.width / 2;
+          const orbCenterY = rect.top + rect.height / 2;
+          const distMouseX = pointer.x - orbCenterX;
+          const distMouseY = pointer.y - orbCenterY;
+          const dist = Math.hypot(distMouseX, distMouseY);
+
+          // Subtle natural organic wave floating
+          const floatX = Math.sin(t + i * 1.4) * 8;
+          const floatY = Math.cos(t * 0.85 + i * 1.3) * 10;
+
+          // Hero cursor movement parallax: moves along with cursor in hero section
+          const cursorParallaxX = pointer.normX * state.depth;
+          const cursorParallaxY = pointer.normY * state.depth;
+
+          // Proximity magnet follow: when cursor comes close to move them
+          let magnetX = 0;
+          let magnetY = 0;
+          let tiltRotX = 0;
+          let tiltRotY = 0;
+
+          if (pointer.isActive && dist < 240 && dist > 0) {
+            const pull = Math.pow(1 - dist / 240, 1.3);
+            // Move along the cursor as the cursor tries to push/move them
+            magnetX = distMouseX * pull * 0.44;
+            magnetY = distMouseY * pull * 0.44;
+            tiltRotX = -distMouseY * 0.07 * pull;
+            tiltRotY = distMouseX * 0.07 * pull;
+            state.targetScale = 1.15;
+          } else {
+            state.targetScale = 1;
+          }
+
+          state.targetX = cursorParallaxX + magnetX + floatX;
+          state.targetY = cursorParallaxY + magnetY + floatY;
+          state.targetRotX = tiltRotX;
+          state.targetRotY = tiltRotY;
+          state.targetRotZ = (state.targetX - state.currX) * 0.18;
+        }
+
+        // Smooth spring interpolation (LERP)
+        const ease = state.isDragging ? 0.35 : 0.12;
+        state.currX += (state.targetX - state.currX) * ease;
+        state.currY += (state.targetY - state.currY) * ease;
+        state.currRotX += (state.targetRotX - state.currRotX) * ease;
+        state.currRotY += (state.targetRotY - state.currRotY) * ease;
+        state.currRotZ += (state.targetRotZ - state.currRotZ) * ease;
+        state.scale += (state.targetScale - state.scale) * ease;
+
+        // Apply 3D matrix transform
+        orb.style.transform = `translate3d(${state.currX.toFixed(1)}px, ${state.currY.toFixed(1)}px, 0px) rotateX(${state.currRotX.toFixed(1)}deg) rotateY(${state.currRotY.toFixed(1)}deg) rotateZ(${state.currRotZ.toFixed(1)}deg) scale(${state.scale.toFixed(2)})`;
+      });
+    }
+
+    animFrameId = requestAnimationFrame(updatePhysics);
   }
 
   // --- Tools I Use For My Work: Interactive Marquee & Tooltips ---

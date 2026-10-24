@@ -967,15 +967,15 @@ img {
    ========================================================================== */
 .hero-stage {
   width: 100%;
-  max-width: 1320px;
+  max-width: 1380px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(380px, 1fr) minmax(420px, 1fr);
+  grid-template-columns: minmax(360px, 1fr) minmax(460px, 1.15fr);
   align-items: center;
   justify-content: space-between;
-  gap: 52px;
+  gap: 48px;
   position: relative;
-  min-height: 640px;
+  min-height: 660px;
 }
 
 /* 1. Left Column: Headline, Bio, CTAs & 3x Certified Microsoft Badges */
@@ -1043,7 +1043,7 @@ img {
   pointer-events: auto;
 }
 
-/* 2. Right Column: Big Profile Image Covering Half the Hero Page */
+/* 2. Right Column: Big Sculptural Cathedral Arch Profile Image with Ambient Aura & Interactive Effects */
 .hero-stage-col-portrait {
   position: relative;
   display: flex;
@@ -1051,46 +1051,146 @@ img {
   align-items: center;
   justify-content: center;
   height: 100%;
-  min-height: 640px;
+  min-height: 660px;
   z-index: 2;
   animation: heroFromRight 1s var(--ease-out-expo) 0.2s both;
 }
 
+/* Ambient Golden Aura glowing behind the arch portal */
+.hero-portrait-glow-aura {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(620px, 94%);
+  height: min(660px, 95%);
+  background: radial-gradient(circle at 50% 40%, rgba(245, 224, 37, 0.16) 0%, rgba(245, 180, 20, 0.08) 45%, transparent 72%);
+  filter: blur(52px);
+  border-radius: 280px 280px 60px 60px;
+  z-index: 0;
+  pointer-events: none;
+  animation: heroAuraPulse 5.5s ease-in-out infinite alternate;
+}
+
+@keyframes heroAuraPulse {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  100% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+
+/* Main Architectural Cathedral Arch Stage */
 .hero-portrait-stage {
   position: relative;
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   height: 100%;
-  min-height: 620px;
+  min-height: 650px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   /* Solid Shield: completely blocks #animation-canvas scroll frames so they are never seen through/on the profile image */
-  background: radial-gradient(circle at 50% 45%, rgba(32, 34, 42, 0.98) 0%, rgba(19, 20, 23, 1) 80%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 36px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(245, 224, 37, 0.08);
+  background: radial-gradient(circle at 50% 36%, rgba(32, 34, 42, 0.98) 0%, rgba(18, 19, 23, 1) 82%);
+  /* Sculptural Cathedral Dome Arch Shape */
+  border-radius: 260px 260px 48px 48px;
+  border: 1.5px solid rgba(245, 224, 37, 0.28);
+  box-shadow: 
+    0 28px 70px rgba(0, 0, 0, 0.8),
+    0 0 35px rgba(245, 224, 37, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.18);
   overflow: hidden;
-  padding: 16px;
+  padding: 18px 18px 24px;
   isolation: isolate;
+  animation: heroPortraitLevitate 6s ease-in-out infinite;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.45s ease, border-color 0.35s ease;
+}
+
+.hero-portrait-stage:hover {
+  border-color: rgba(245, 224, 37, 0.55);
+  box-shadow: 
+    0 34px 85px rgba(0, 0, 0, 0.88),
+    0 0 50px rgba(245, 224, 37, 0.25),
+    inset 0 1px 3px rgba(255, 255, 255, 0.28);
+}
+
+@keyframes heroPortraitLevitate {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(0.4deg);
+  }
 }
 
 [data-theme="light"] .hero-portrait-stage {
-  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.98) 0%, rgba(245, 246, 248, 1) 80%);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), 0 0 30px rgba(245, 224, 37, 0.12);
+  background: radial-gradient(circle at 50% 36%, rgba(255, 255, 255, 0.98) 0%, rgba(245, 246, 248, 1) 82%);
+  border: 1.5px solid rgba(202, 138, 4, 0.3);
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.1),
+    0 0 35px rgba(245, 224, 37, 0.18),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 .hero-portrait-shield {
   position: absolute;
   inset: 0;
   background: inherit;
+  border-radius: inherit;
   z-index: 0;
   pointer-events: none;
 }
 
-/* Image container: starts from upper edge down to lower edge */
+/* Luminous Animated Border Ring */
+.hero-portrait-border-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(245, 224, 37, 0.45) 0%, transparent 40%, rgba(245, 224, 37, 0.2) 70%, transparent 100%);
+  opacity: 0.65;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.hero-portrait-stage:hover .hero-portrait-border-glow {
+  opacity: 1;
+}
+
+/* Diagonal Glass Sheen Sweep */
+.hero-portrait-sheen-sweep {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 42%,
+    rgba(255, 255, 255, 0.08) 48%,
+    rgba(245, 224, 37, 0.14) 50%,
+    transparent 54%
+  );
+  transform: rotate(25deg);
+  z-index: 2;
+  pointer-events: none;
+  animation: heroSheenGlide 7.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes heroSheenGlide {
+  0%, 65% {
+    transform: translate(-100%, -100%) rotate(25deg);
+  }
+  85%, 100% {
+    transform: translate(100%, 100%) rotate(25deg);
+  }
+}
+
+/* Image container with Cathedral Arch Silhouette */
 .hero-portrait-img-box {
   position: relative;
   width: 100%;
@@ -1098,24 +1198,102 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  z-index: 3;
+  border-radius: inherit;
 }
 
 .hero-portrait-main-img {
   width: 100%;
-  max-width: 580px;
+  max-width: 620px;
   height: auto;
-  max-height: 620px;
+  max-height: 660px;
   object-fit: contain;
   object-position: center;
   display: block;
   opacity: 1 !important;
-  filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.65));
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 240px 240px 38px 38px;
+  filter: drop-shadow(0 20px 42px rgba(0, 0, 0, 0.75));
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.45s ease;
 }
 
 .hero-portrait-stage:hover .hero-portrait-main-img {
-  transform: scale(1.02) translateY(-2px);
+  transform: scale(1.035) translateY(-4px);
+  filter: drop-shadow(0 26px 52px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 24px rgba(245, 224, 37, 0.25));
+}
+
+/* Floating Interactive Tech Micro-Badges */
+.hero-float-chip {
+  position: absolute;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(22, 23, 28, 0.82);
+  border: 1px solid rgba(245, 224, 37, 0.35);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55), 0 0 15px rgba(245, 224, 37, 0.12);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--text-pure);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  pointer-events: auto;
+  user-select: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.3s ease;
+}
+
+.hero-float-chip:hover {
+  transform: translateY(-3px) scale(1.05);
+  border-color: var(--accent-yellow);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65), 0 0 22px rgba(245, 224, 37, 0.35);
+}
+
+.chip-top-right {
+  top: 40px;
+  right: -10px;
+  animation: chipFloatTop 5s ease-in-out infinite alternate;
+}
+
+.chip-bottom-left {
+  bottom: 28px;
+  left: -10px;
+  animation: chipFloatBottom 5.5s ease-in-out infinite alternate 0.5s;
+}
+
+@keyframes chipFloatTop {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes chipFloatBottom {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(8px); }
+}
+
+.chip-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-yellow);
+  box-shadow: 0 0 10px var(--accent-yellow);
+  animation: pulseDot 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.chip-icon {
+  color: var(--accent-yellow);
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .hero-float-chip {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(202, 138, 4, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08), 0 0 12px rgba(245, 224, 37, 0.18);
+  color: #0f172a;
 }
 
 .hero-left-3d-backdrop:active {
@@ -6276,8 +6454,9 @@ img {
 
   .hero-portrait-stage {
     min-height: auto;
-    border-radius: 28px;
+    border-radius: 180px 180px 32px 32px;
     padding: 12px;
+    max-width: 360px;
   }
 
   .hero-portrait-img-box {
@@ -6285,7 +6464,23 @@ img {
   }
 
   .hero-portrait-main-img {
-    max-height: 380px;
+    max-height: 420px;
+    border-radius: 165px 165px 24px 24px;
+  }
+
+  .hero-float-chip {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .chip-top-right {
+    top: 20px;
+    right: -4px;
+  }
+
+  .chip-bottom-left {
+    bottom: 14px;
+    left: -4px;
   }
 
   .hero-badges-row {

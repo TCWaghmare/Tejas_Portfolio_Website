@@ -990,6 +990,15 @@ img {
   opacity: 0.5;
 }
 
+.hero-bg-photo-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+}
+
 /* Profile Photo: centered, smooth radial vignette mask, luminous blend */
 .hero-bg-photo-img {
   position: absolute;
@@ -1002,9 +1011,8 @@ img {
   min-height: 640px;
   object-fit: cover;
   object-position: center 36%;
-  opacity: 0.18;
-  filter: grayscale(35%) contrast(1.18) brightness(0.85);
-  mix-blend-mode: luminosity;
+  opacity: 0.22;
+  filter: contrast(1.12) brightness(0.92);
   -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0.65) 55%, transparent 85%);
   mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0.65) 55%, transparent 85%);
   transition: opacity 0.4s ease, filter 0.4s ease;
@@ -1052,8 +1060,8 @@ img {
 
 /* Light Theme Mode Overrides */
 [data-theme="light"] .hero-bg-photo-img {
-  opacity: 0.09;
-  filter: grayscale(100%) contrast(1.12) brightness(0.92);
+  opacity: 0.12;
+  filter: contrast(1.1) brightness(0.95);
   mix-blend-mode: multiply;
   -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(0, 0, 0, 0.95) 20%, rgba(0, 0, 0, 0.5) 55%, transparent 85%);
   mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(0, 0, 0, 0.95) 20%, rgba(0, 0, 0, 0.5) 55%, transparent 85%);

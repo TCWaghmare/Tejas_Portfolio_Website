@@ -145,10 +145,13 @@
          1. HOME (HERO) SECTION
          ======================================================================= -->
     <section id="home" class="section hero-section">
-      <!-- Ambient Hero Background Photo (Tejas Profile Image) -->
+      <!-- Ambient Hero Background Photo (profile heroes image.png) -->
       <div class="hero-bg-photo-layer" aria-hidden="true">
         <div class="hero-bg-photo-mesh"></div>
-        <img src="Asset/tejas profile image.jpeg" alt="" class="hero-bg-photo-img" loading="eager" decoding="async">
+        <picture class="hero-bg-photo-picture">
+          <source srcset="Asset/hero_portrait_optimized.jpg" type="image/jpeg">
+          <img src="Asset/profile heroes image.png" alt="" class="hero-bg-photo-img" loading="eager" decoding="async">
+        </picture>
         <div class="hero-bg-photo-gradient-top"></div>
         <div class="hero-bg-photo-gradient-bottom"></div>
         <div class="hero-bg-photo-radial-glow"></div>
@@ -218,7 +221,10 @@
                 
                 <!-- Portrait Image Frame with Uploaded Photo -->
                 <div class="hero-portrait-frame">
-                  <img src="Asset/hero_portrait_optimized.jpg" alt="Tejas Waghmare - Data Analyst" class="hero-portrait-img" id="hero-portrait-img" fetchpriority="high" decoding="async">
+                  <picture>
+                    <source srcset="Asset/hero_portrait_optimized.jpg" type="image/jpeg">
+                    <img src="Asset/profile heroes image.png" alt="Tejas Waghmare - Data Analyst" class="hero-portrait-img" id="hero-portrait-img" fetchpriority="high" decoding="async">
+                  </picture>
                   <div class="portrait-sheen-sweep"></div>
                 </div>
 

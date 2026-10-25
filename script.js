@@ -1886,12 +1886,18 @@
       travelingAvatar.style.top = `${targetY}px`;
       travelingAvatar.classList.add('is-active');
 
-      // Illuminate nodes as progress passes them
-      items.forEach((item, idx) => {
-        if (targetY >= nodeYs[idx] - 8) {
-          item.classList.add('is-active-milestone');
+      // Manage node impressions: stamp impression when reached, remove when scrolling backward
+      markers.forEach((marker, idx) => {
+        const isReached = (idx === 0)
+          ? (focal >= mCenters[0] - 60)
+          : (targetY >= nodeYs[idx] - 8);
+
+        if (isReached) {
+          marker.classList.add('has-impression');
+          items[idx].classList.add('is-active-milestone');
         } else {
-          item.classList.remove('is-active-milestone');
+          marker.classList.remove('has-impression');
+          items[idx].classList.remove('is-active-milestone');
         }
       });
     }

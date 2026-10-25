@@ -35,8 +35,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   
-  <link rel="preload" href="style.css?v=20261025_contact" as="style">
-  <link rel="stylesheet" href="style.css?v=20261025_contact">
+  <link rel="preload" href="style.css?v=20261025_avatar" as="style">
+  <link rel="stylesheet" href="style.css?v=20261025_avatar">
 </head>
 <body>
 
@@ -45,12 +45,20 @@
     <div class="loader-backdrop"></div>
     <div class="loader-card">
       <div class="loader-gauge">
+        <!-- Circular Profile Hero Image in Ring Gauge -->
+        <div class="loader-avatar-frame">
+          <img src="Asset/profile heroes image.png" alt="Tejas C. Waghmare" class="loader-avatar-img" fetchpriority="high">
+        </div>
+
         <svg class="loader-svg" viewBox="0 0 120 120">
           <circle class="loader-track-circle" cx="60" cy="60" r="50"></circle>
           <circle id="loader-progress-circle" class="loader-fill-circle" cx="60" cy="60" r="50"></circle>
         </svg>
+
         <div class="loader-value-group">
-          <span id="loader-percent" class="loader-percent">0%</span>
+          <div class="loader-percent-badge">
+            <span id="loader-percent" class="loader-percent">0%</span>
+          </div>
           <span class="loader-sub">SYSTEM READY</span>
         </div>
       </div>
@@ -81,7 +89,9 @@
   <header class="site-header" id="site-header">
     <div class="nav-container">
       <a href="#home" class="nav-brand" aria-label="Tejas Waghmare Homepage">
-        <span class="brand-avatar">TW</span>
+        <span class="brand-avatar" title="Tejas C. Waghmare">
+          <img src="Asset/profile heroes image.png" alt="Tejas C. Waghmare" class="brand-avatar-img">
+        </span>
         <div class="brand-text">
           <span class="brand-name">Tejas C. Waghmare</span>
           <span class="brand-role"><span class="status-dot"></span> Available for Opportunities</span>
@@ -2550,7 +2560,9 @@
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-left">
-        <span class="footer-logo">TW</span>
+        <span class="footer-logo" title="Tejas C. Waghmare">
+          <img src="Asset/profile heroes image.png" alt="Tejas C. Waghmare" class="footer-logo-img">
+        </span>
         <p class="footer-copy">
           &copy; 2026 Tejas C. Waghmare. Crafted with high-performance Vanilla CSS & Canvas frame animation.
         </p>

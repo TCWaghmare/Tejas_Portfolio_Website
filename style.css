@@ -4247,13 +4247,15 @@ img {
   left: 36px;
   width: 3px;
   border-radius: 3px;
-  overflow: hidden;
+  z-index: 5;
 }
 
 .edu-spine-track {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
 }
 
 .edu-spine-progress {
@@ -4265,6 +4267,60 @@ img {
   background: linear-gradient(180deg, #F5E025 0%, #ffe600 80%, rgba(245, 224, 37, 0.2) 100%);
   box-shadow: 0 0 12px var(--accent-yellow, #F5E025);
   transition: height 0.2s ease-out;
+  border-radius: 3px;
+}
+
+/* Dynamic Traveling Avatar Head at End of Traveling Bar */
+.edu-traveling-avatar {
+  position: absolute;
+  left: 50%;
+  top: 0%;
+  transform: translate(-50%, -50%) scale(0.85);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #111216;
+  border: 2px solid var(--accent-yellow, #F5E025);
+  box-shadow: 0 0 18px var(--accent-yellow-glow, rgba(245, 224, 37, 0.65)), 0 4px 14px rgba(0, 0, 0, 0.65);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: top 0.2s ease-out, opacity 0.35s ease, transform 0.35s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)), visibility 0.35s ease;
+  user-select: none;
+}
+
+.edu-traveling-avatar.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.edu-traveling-avatar:hover {
+  transform: translate(-50%, -50%) scale(1.18);
+  box-shadow: 0 0 28px rgba(245, 224, 37, 0.95), 0 6px 20px rgba(0, 0, 0, 0.75);
+}
+
+.edu-traveling-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.edu-traveling-avatar .node-pulse-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-yellow, #F5E025);
+  opacity: 0.85;
+  pointer-events: none;
+  animation: nodeRadarPulse 2.4s infinite ease-out;
 }
 
 /* Milestones List */
@@ -4761,6 +4817,12 @@ img {
   background: rgba(0, 0, 0, 0.08);
 }
 
+[data-theme="light"] .edu-traveling-avatar {
+  background: #ffffff;
+  border-color: #d97706;
+  box-shadow: 0 0 18px rgba(245, 224, 37, 0.5), 0 4px 14px rgba(15, 23, 42, 0.15);
+}
+
 [data-theme="light"] .edu-node-marker {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.12);
@@ -4876,6 +4938,11 @@ img {
     width: 38px;
     height: 38px;
     font-size: 15px;
+  }
+  
+  .edu-traveling-avatar {
+    width: 32px;
+    height: 32px;
   }
   
   .edu-node-year {

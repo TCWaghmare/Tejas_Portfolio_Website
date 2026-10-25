@@ -1806,11 +1806,13 @@
             }
           });
         }
+        setTimeout(updateSpineProgress, 350);
       });
     });
 
-    // 2. Dynamic Scroll-Driven Timeline Spine Progress Line
+    // 2. Dynamic Scroll-Driven Timeline Spine Progress Line & Traveling Avatar
     const spineProgress = document.getElementById('edu-timeline-progress');
+    const travelingAvatar = document.getElementById('edu-traveling-avatar');
     const wrapper = section.querySelector('.edu-timeline-wrapper');
 
     function updateSpineProgress() {
@@ -1823,8 +1825,18 @@
       const totalHeight = rect.height;
       const currentScroll = start - rect.top;
       const progress = Math.min(Math.max(currentScroll / totalHeight, 0), 1);
+      const percentVal = (progress * 100).toFixed(1);
 
-      spineProgress.style.height = `${(progress * 100).toFixed(1)}%`;
+      spineProgress.style.height = `${percentVal}%`;
+
+      if (travelingAvatar) {
+        travelingAvatar.style.top = `${percentVal}%`;
+        if (progress > 0.005) {
+          travelingAvatar.classList.add('is-active');
+        } else {
+          travelingAvatar.classList.remove('is-active');
+        }
+      }
 
       // Illuminate nodes as progress passes them
       items.forEach(item => {
@@ -1838,6 +1850,7 @@
     }
 
     window.addEventListener('scroll', updateSpineProgress, { passive: true });
+    window.addEventListener('resize', updateSpineProgress, { passive: true });
     updateSpineProgress();
 
     // 3. Interactive Mouse Spotlight Glow on Cards

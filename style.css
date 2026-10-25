@@ -4242,8 +4242,8 @@ img {
 /* Vertical Timeline Spine */
 .edu-timeline-spine {
   position: absolute;
-  top: 10px;
-  bottom: 20px;
+  top: 46px;
+  bottom: 60px;
   left: 36px;
   width: 3px;
   border-radius: 3px;
@@ -4274,34 +4274,28 @@ img {
 .edu-traveling-avatar {
   position: absolute;
   left: 50%;
-  top: 0%;
-  transform: translate(-50%, -50%) scale(0.85);
-  width: 40px;
-  height: 40px;
+  top: 0px;
+  transform: translate(-50%, -50%) scale(1);
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #111216;
   border: 2px solid var(--accent-yellow, #F5E025);
-  box-shadow: 0 0 18px var(--accent-yellow-glow, rgba(245, 224, 37, 0.65)), 0 4px 14px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 0 20px var(--accent-yellow-glow, rgba(245, 224, 37, 0.75)), 0 4px 16px rgba(0, 0, 0, 0.65);
   z-index: 8;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   pointer-events: auto;
-  opacity: 0;
-  visibility: hidden;
-  transition: top 0.2s ease-out, opacity 0.35s ease, transform 0.35s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)), visibility 0.35s ease;
+  opacity: 1;
+  visibility: visible;
+  transition: top 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
   user-select: none;
 }
 
-.edu-traveling-avatar.is-active {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, -50%) scale(1);
-}
-
 .edu-traveling-avatar:hover {
-  transform: translate(-50%, -50%) scale(1.18);
+  transform: translate(-50%, -50%) scale(1.15);
   box-shadow: 0 0 28px rgba(245, 224, 37, 0.95), 0 6px 20px rgba(0, 0, 0, 0.75);
 }
 
@@ -4358,10 +4352,18 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
   transition: all 0.35s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
   cursor: pointer;
+}
+
+.edu-node-marker::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.35s ease;
 }
 
 .edu-timeline-item:hover .edu-node-marker,
@@ -4369,8 +4371,12 @@ img {
 .edu-timeline-item.is-active-milestone .edu-node-marker {
   border-color: var(--accent-yellow, #F5E025);
   background: #1a1b20;
-  transform: scale(1.15);
-  box-shadow: 0 0 24px var(--accent-yellow-glow, rgba(245, 224, 37, 0.5));
+  box-shadow: 0 0 20px var(--accent-yellow-glow, rgba(245, 224, 37, 0.45));
+}
+
+.edu-timeline-item.is-active-milestone .edu-node-marker::before {
+  background: var(--accent-yellow, #F5E025);
+  box-shadow: 0 0 10px var(--accent-yellow, #F5E025);
 }
 
 .node-pulse-ring {
@@ -4827,6 +4833,15 @@ img {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.12);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .edu-node-marker::before {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="light"] .edu-timeline-item.is-active-milestone .edu-node-marker::before {
+  background: #d97706;
+  box-shadow: 0 0 10px rgba(217, 119, 6, 0.4);
 }
 
 [data-theme="light"] .edu-timeline-item:hover .edu-node-marker,

@@ -1764,7 +1764,7 @@
 
     // 1. Milestone Stepper Filter & Quick-Jump
     const tabs = section.querySelectorAll('.edu-step-tab');
-    const items = section.querySelectorAll('.edu-timeline-item');
+    const items = Array.from(section.querySelectorAll('.edu-timeline-item'));
 
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
@@ -1811,37 +1811,84 @@
     });
 
     // 2. Dynamic Scroll-Driven Timeline Spine Progress Line & Traveling Avatar
+    const spine = section.querySelector('.edu-timeline-spine');
     const spineProgress = document.getElementById('edu-timeline-progress');
     const travelingAvatar = document.getElementById('edu-traveling-avatar');
     const wrapper = section.querySelector('.edu-timeline-wrapper');
+    const markers = items.map(item => item.querySelector('.edu-node-marker'));
+
+    let spineGeom = null;
+
+    function updateSpineLayout() {
+      if (!wrapper || !spine || !markers[0] || !markers[markers.length - 1]) return;
+      const wRect = wrapper.getBoundingClientRect();
+      const firstRect = markers[0].getBoundingClientRect();
+      const lastRect = markers[markers.length - 1].getBoundingClientRect();
+
+      const firstCenterY = (firstRect.top + firstRect.height / 2) - wRect.top;
+      const lastCenterY = (lastRect.top + lastRect.height / 2) - wRect.top;
+      const bottomInset = Math.max(wRect.height - lastCenterY, 0);
+
+      spine.style.top = `${firstCenterY}px`;
+      spine.style.bottom = `${bottomInset}px`;
+
+      const nodeYs = markers.map(m => {
+        const r = m.getBoundingClientRect();
+        return (r.top + r.height / 2) - (firstRect.top + firstRect.height / 2);
+      });
+
+      spineGeom = { nodeYs };
+    }
+
+    function smoothStep(t) {
+      const clamped = Math.max(0, Math.min(1, t));
+      return clamped * clamped * (3 - 2 * clamped);
+    }
 
     function updateSpineProgress() {
-      if (!spineProgress || !wrapper) return;
-      const rect = wrapper.getBoundingClientRect();
+      if (!spineProgress || !wrapper || !travelingAvatar) return;
+      if (!spineGeom) updateSpineLayout();
+      if (!spineGeom || !spineGeom.nodeYs || spineGeom.nodeYs.length < 2) return;
+
+      const nodeYs = spineGeom.nodeYs;
       const windowHeight = window.innerHeight;
+      const focal = windowHeight * 0.45; // Optical center of viewport
 
-      // Calculate progress between wrapper entering and leaving viewport center
-      const start = windowHeight * 0.75;
-      const totalHeight = rect.height;
-      const currentScroll = start - rect.top;
-      const progress = Math.min(Math.max(currentScroll / totalHeight, 0), 1);
-      const percentVal = (progress * 100).toFixed(1);
+      // Get current viewport vertical centers for each milestone marker
+      const mCenters = markers.map(m => {
+        const r = m.getBoundingClientRect();
+        return r.top + r.height / 2;
+      });
 
-      spineProgress.style.height = `${percentVal}%`;
+      let targetY = nodeYs[0];
 
-      if (travelingAvatar) {
-        travelingAvatar.style.top = `${percentVal}%`;
-        if (progress > 0.005) {
-          travelingAvatar.classList.add('is-active');
-        } else {
-          travelingAvatar.classList.remove('is-active');
+      if (focal <= mCenters[0]) {
+        // Above or at first milestone -> Stop at Node 0
+        targetY = nodeYs[0];
+      } else if (focal >= mCenters[mCenters.length - 1]) {
+        // At or past last milestone -> Stop at Node Last
+        targetY = nodeYs[nodeYs.length - 1];
+      } else {
+        // Travel between milestones
+        for (let i = 0; i < mCenters.length - 1; i++) {
+          if (focal >= mCenters[i] && focal <= mCenters[i + 1]) {
+            const span = mCenters[i + 1] - mCenters[i];
+            const t = span > 0 ? (focal - mCenters[i]) / span : 0;
+            targetY = nodeYs[i] + (nodeYs[i + 1] - nodeYs[i]) * smoothStep(t);
+            break;
+          }
         }
       }
 
+      targetY = Math.max(nodeYs[0], Math.min(targetY, nodeYs[nodeYs.length - 1]));
+
+      spineProgress.style.height = `${targetY}px`;
+      travelingAvatar.style.top = `${targetY}px`;
+      travelingAvatar.classList.add('is-active');
+
       // Illuminate nodes as progress passes them
-      items.forEach(item => {
-        const itemRect = item.getBoundingClientRect();
-        if (itemRect.top < windowHeight * 0.7) {
+      items.forEach((item, idx) => {
+        if (targetY >= nodeYs[idx] - 8) {
           item.classList.add('is-active-milestone');
         } else {
           item.classList.remove('is-active-milestone');
@@ -1850,8 +1897,21 @@
     }
 
     window.addEventListener('scroll', updateSpineProgress, { passive: true });
-    window.addEventListener('resize', updateSpineProgress, { passive: true });
+    window.addEventListener('resize', () => {
+      updateSpineLayout();
+      updateSpineProgress();
+    }, { passive: true });
+    window.addEventListener('load', () => {
+      updateSpineLayout();
+      updateSpineProgress();
+    });
+
+    updateSpineLayout();
     updateSpineProgress();
+    setTimeout(() => {
+      updateSpineLayout();
+      updateSpineProgress();
+    }, 400);
 
     // 3. Interactive Mouse Spotlight Glow on Cards
     const cards = section.querySelectorAll('.edu-card');

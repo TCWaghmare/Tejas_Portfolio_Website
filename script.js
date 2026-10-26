@@ -795,6 +795,19 @@
       track.appendChild(clone);
     }
 
+    // Ensure pagination dots match the original slides count
+    if (dotsContainer && dotsContainer.children.length !== totalOriginal) {
+      dotsContainer.innerHTML = '';
+      for (let i = 0; i < totalOriginal; i++) {
+        const dot = document.createElement('button');
+        dot.className = `cert-dot ${i === 0 ? 'active' : ''}`;
+        dot.setAttribute('data-slide', i);
+        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+        if (i === 0) dot.setAttribute('aria-current', 'true');
+        dotsContainer.appendChild(dot);
+      }
+    }
+
     let currentIndex = 0;
     let autoPlayTimer = null;
     let isTransitioning = false;

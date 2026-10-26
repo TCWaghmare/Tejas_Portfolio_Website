@@ -1816,28 +1816,30 @@
     const travelingAvatar = document.getElementById('edu-traveling-avatar');
     const wrapper = section.querySelector('.edu-timeline-wrapper');
     const markers = items.map(item => item.querySelector('.edu-node-marker'));
+    const nodeWraps = items.map(item => item.querySelector('.edu-node-wrap'));
 
     let spineGeom = null;
 
     function updateSpineLayout() {
-      if (!wrapper || !spine || !markers[0] || !markers[markers.length - 1]) return;
+      if (!wrapper || !spine || !nodeWraps[0] || !nodeWraps[nodeWraps.length - 1]) return;
       const wRect = wrapper.getBoundingClientRect();
-      const firstRect = markers[0].getBoundingClientRect();
-      const lastRect = markers[markers.length - 1].getBoundingClientRect();
+      const firstWrap = nodeWraps[0].getBoundingClientRect();
+      const lastWrap = nodeWraps[nodeWraps.length - 1].getBoundingClientRect();
+      const markerRadius = (markers[0] ? markers[0].offsetHeight / 2 : 24) || 24;
 
-      const firstCenterY = (firstRect.top + firstRect.height / 2) - wRect.top;
-      const lastCenterY = (lastRect.top + lastRect.height / 2) - wRect.top;
+      const firstCenterY = (firstWrap.top + markerRadius) - wRect.top;
+      const lastCenterY = (lastWrap.top + markerRadius) - wRect.top;
       const bottomInset = Math.max(wRect.height - lastCenterY, 0);
 
       spine.style.top = `${firstCenterY}px`;
       spine.style.bottom = `${bottomInset}px`;
 
-      const nodeYs = markers.map(m => {
-        const r = m.getBoundingClientRect();
-        return (r.top + r.height / 2) - (firstRect.top + firstRect.height / 2);
+      const nodeYs = nodeWraps.map(w => {
+        const r = w.getBoundingClientRect();
+        return (r.top + markerRadius) - (firstWrap.top + markerRadius);
       });
 
-      spineGeom = { nodeYs };
+      spineGeom = { nodeYs, markerRadius };
     }
 
     function smoothStep(t) {
@@ -1851,13 +1853,14 @@
       if (!spineGeom || !spineGeom.nodeYs || spineGeom.nodeYs.length < 2) return;
 
       const nodeYs = spineGeom.nodeYs;
+      const markerRadius = spineGeom.markerRadius || 24;
       const windowHeight = window.innerHeight;
       const focal = windowHeight * 0.45; // Optical center of viewport
 
-      // Get current viewport vertical centers for each milestone marker
-      const mCenters = markers.map(m => {
-        const r = m.getBoundingClientRect();
-        return r.top + r.height / 2;
+      // Get current viewport vertical centers for each milestone marker (anchor to static wrap)
+      const mCenters = nodeWraps.map(w => {
+        const r = w.getBoundingClientRect();
+        return r.top + markerRadius;
       });
 
       let targetY = nodeYs[0];
@@ -1886,18 +1889,18 @@
       travelingAvatar.style.top = `${targetY}px`;
       travelingAvatar.classList.add('is-active');
 
-      // Manage node impressions: stamp impression when reached, remove when scrolling backward
+      // Manage active milestones: activate golden aura when reached, remove when scrolling backward
       markers.forEach((marker, idx) => {
         const isReached = (idx === 0)
           ? (focal >= mCenters[0] - 60)
           : (targetY >= nodeYs[idx] - 8);
 
         if (isReached) {
-          marker.classList.add('has-impression');
           items[idx].classList.add('is-active-milestone');
+          if (marker) marker.classList.add('is-active-milestone');
         } else {
-          marker.classList.remove('has-impression');
           items[idx].classList.remove('is-active-milestone');
+          if (marker) marker.classList.remove('is-active-milestone');
         }
       });
     }

@@ -680,28 +680,33 @@
   };
 
   // --- Supabase Database Configuration for Contact Form Submissions ---
-  // To record all submissions in your Supabase table, paste your credentials below:
   const SUPABASE_CONFIG = {
-    url: '',       // e.g. 'https://your-project-id.supabase.co'
-    anonKey: '',   // e.g. 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    url: 'https://tkuggtlofzofaeltlzul.supabase.co',
+    anonKey: 'sb_publishable_6jfofP0ME0VE5IrkyxVQGg_miRbVX_0',
     table: 'portfolio_contacts'
   };
 
   // Helper to persist submission records directly into Supabase table
   async function saveToSupabase(payload) {
     if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-      return { skipped: true, reason: 'Supabase credentials not configured yet' };
+      return { skipped: true, reason: 'Supabase credentials not configured' };
     }
 
     const endpoint = `${SUPABASE_CONFIG.url.replace(/\/$/, '')}/rest/v1/${SUPABASE_CONFIG.table}`;
+    const headers = {
+      'apikey': SUPABASE_CONFIG.anonKey,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    };
+
+    // If key is in legacy JWT format (starts with eyJ), include Authorization header
+    if (SUPABASE_CONFIG.anonKey.startsWith('eyJ')) {
+      headers['Authorization'] = `Bearer ${SUPABASE_CONFIG.anonKey}`;
+    }
+
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'apikey': SUPABASE_CONFIG.anonKey,
-        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal'
-      },
+      headers: headers,
       body: JSON.stringify({
         name: payload.name,
         email: payload.email,

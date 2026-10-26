@@ -35,8 +35,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   
-  <link rel="preload" href="style.css?v=20261026_direct_send" as="style">
-  <link rel="stylesheet" href="style.css?v=20261026_direct_send">
+  <link rel="preload" href="style.css?v=20261026_contact_phone" as="style">
+  <link rel="stylesheet" href="style.css?v=20261026_contact_phone">
 </head>
 <body>
 
@@ -2752,10 +2752,61 @@
           />
         </div>
 
-        <!-- Field 3: What brings you here? (Tags / Pills) -->
+        <!-- Field 3: Contact Number (Optional, Strict Numeric Digits Only) -->
+        <div class="kova-form-field">
+          <div class="kova-label-row">
+            <label class="kova-field-label" for="talk-phone">
+              <span class="label-accent">03 //</span> DIRECT CONTACT NUMBER
+            </label>
+            <span class="kova-optional-pill">Optional</span>
+          </div>
+          <input 
+            type="tel" 
+            id="talk-phone" 
+            name="phone" 
+            class="kova-input" 
+            placeholder="e.g. 9876543210 (digits only)" 
+            inputmode="numeric"
+            pattern="[0-9]*"
+            autocomplete="tel"
+            maxlength="15"
+            aria-describedby="talk-phone-hint"
+          />
+          <div class="kova-field-hint" id="talk-phone-hint">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>Only numeric digits (0&ndash;9) allowed. No letters or symbols.</span>
+          </div>
+
+          <!-- Permission Checkbox for Call & WhatsApp -->
+          <div class="kova-permission-box">
+            <label class="kova-checkbox-label" for="talk-permission">
+              <input 
+                type="checkbox" 
+                id="talk-permission" 
+                name="permission_call_whatsapp" 
+                value="Yes"
+                class="kova-checkbox-input"
+              />
+              <span class="kova-custom-checkbox" aria-hidden="true">
+                <svg class="kova-check-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+              <span class="kova-checkbox-text">
+                I give permission to contact me via <strong class="highlight-yellow">Call</strong> and <strong class="highlight-yellow">WhatsApp</strong> regarding my inquiry.
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Field 4: What brings you here? (Tags / Pills) -->
         <div class="kova-form-field">
           <label class="kova-field-label">
-            <span class="label-accent">03 //</span> WHAT BRINGS YOU HERE?
+            <span class="label-accent">04 //</span> WHAT BRINGS YOU HERE?
           </label>
           <div class="kova-pills-row" id="kova-pills-group" role="group" aria-label="What brings you here">
             <button type="button" class="kova-pill active" data-topic="A project">A project</button>
@@ -2767,11 +2818,11 @@
           <input type="hidden" id="talk-topic" name="subject" value="A project" />
         </div>
 
-        <!-- Field 4: How urgent? (Interactive Slider) -->
+        <!-- Field 5: How urgent? (Interactive Slider) -->
         <div class="kova-form-field kova-slider-field">
           <div class="kova-slider-top">
             <label class="kova-field-label" for="talk-urgency">
-              <span class="label-accent">04 //</span> HOW URGENT?
+              <span class="label-accent">05 //</span> HOW URGENT?
             </label>
             <span id="talk-urgency-val" class="kova-urgency-val">Sometime soon</span>
           </div>
@@ -2793,10 +2844,10 @@
           </div>
         </div>
 
-        <!-- Field 5: Anything else on your mind? (Textarea) -->
+        <!-- Field 6: Anything else on your mind? (Textarea) -->
         <div class="kova-form-field">
           <label class="kova-field-label" for="talk-message">
-            <span class="label-accent">05 //</span> ANYTHING ELSE ON YOUR MIND?
+            <span class="label-accent">06 //</span> ANYTHING ELSE ON YOUR MIND?
           </label>
           <textarea 
             id="talk-message" 
@@ -2826,6 +2877,6 @@
 
   <!-- Spline 3D Viewer Runtime (Deferred Non-Blocking Module) -->
   <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
-  <script src="script.js?v=20261026_direct_send"></script>
+  <script src="script.js?v=20261026_contact_phone"></script>
 </body>
 </html>

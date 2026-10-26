@@ -480,7 +480,65 @@
       themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
-    // 3. Live Pune Clock (IST: UTC+5:30)
+    // 3. Contact Phone Number (Numeric Digits Only, Strict Filter)
+    const phoneInput = document.getElementById('talk-phone');
+    const phoneHint = document.getElementById('talk-phone-hint');
+    let phoneAlertTimer = null;
+
+    function triggerPhoneAlert() {
+      if (!phoneHint) return;
+      phoneHint.classList.add('hint-alert');
+      clearTimeout(phoneAlertTimer);
+      phoneAlertTimer = setTimeout(() => {
+        phoneHint.classList.remove('hint-alert');
+      }, 1200);
+    }
+
+    if (phoneInput) {
+      // Prevent non-numeric keystrokes from typing
+      phoneInput.addEventListener('keydown', (e) => {
+        const allowedKeys = [
+          'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+          'Tab', 'Home', 'End', 'Enter', 'Escape'
+        ];
+        if (allowedKeys.includes(e.key)) return;
+        // Allow standard modifier shortcuts (Ctrl/Cmd + A, C, V, X, Z)
+        if ((e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x', 'z'].includes(e.key.toLowerCase())) {
+          return;
+        }
+        // Block anything that is not a numeric digit 0-9
+        if (!/^[0-9]$/.test(e.key)) {
+          e.preventDefault();
+          triggerPhoneAlert();
+        }
+      });
+
+      // Filter on input (catches autofill, virtual keyboards, drag-drop)
+      phoneInput.addEventListener('input', () => {
+        const cleaned = phoneInput.value.replace(/\D/g, '');
+        if (phoneInput.value !== cleaned) {
+          phoneInput.value = cleaned;
+          triggerPhoneAlert();
+        }
+      });
+
+      // Filter on paste (strip non-digits, truncate to 15 digits)
+      phoneInput.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text') || '';
+        const digitsOnly = pastedText.replace(/\D/g, '');
+        const start = phoneInput.selectionStart || 0;
+        const end = phoneInput.selectionEnd || 0;
+        const curr = phoneInput.value;
+        const result = (curr.slice(0, start) + digitsOnly + curr.slice(end)).slice(0, 15);
+        phoneInput.value = result;
+        if (pastedText !== digitsOnly) {
+          triggerPhoneAlert();
+        }
+      });
+    }
+
+    // 4. Live Pune Clock (IST: UTC+5:30)
     const clockEl = document.getElementById('kova-pune-clock');
     function updatePuneClock() {
       if (!clockEl) return;
@@ -628,6 +686,10 @@
     const submitBtn = document.getElementById('talk-submit-btn') || form.querySelector('button[type="submit"]');
     const name = form.name ? form.name.value.trim() : '';
     const email = form.email ? form.email.value.trim() : '';
+    const phoneEl = document.getElementById('talk-phone') || form.phone;
+    const phone = phoneEl ? phoneEl.value.replace(/\D/g, '').trim() : '';
+    const permissionEl = document.getElementById('talk-permission') || form.permission_call_whatsapp;
+    const permissionGranted = permissionEl ? permissionEl.checked : false;
     const topic = form.subject ? form.subject.value.trim() : 'Project Inquiry';
     const urgencyVal = document.getElementById('talk-urgency-val');
     const urgency = urgencyVal ? urgencyVal.textContent : 'Normal';
@@ -669,6 +731,8 @@
         body: JSON.stringify({
           name: name,
           email: email,
+          phone: phone ? phone : 'Not provided',
+          call_whatsapp_permission: permissionGranted ? 'Granted (Permission for Call & WhatsApp)' : 'Not granted / Not provided',
           _subject: emailSubject,
           topic: topic,
           urgency: urgency,
@@ -687,6 +751,8 @@
           feedback.style.display = 'block';
         }
         form.reset();
+        if (phoneEl) phoneEl.value = '';
+        if (permissionEl) permissionEl.checked = false;
         // Reset topic pill & urgency slider
         const defaultPill = document.querySelector('.kova-pill[data-topic="A project"]');
         if (defaultPill) {
@@ -716,6 +782,8 @@
           feedback.style.display = 'block';
         }
         form.reset();
+        if (phoneEl) phoneEl.value = '';
+        if (permissionEl) permissionEl.checked = false;
         if (submitBtn) {
           submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
           setTimeout(() => {

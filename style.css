@@ -5502,6 +5502,181 @@ img {
   padding-bottom: 12px;
 }
 
+/* --- Contact Number & Optional Pill Styling --- */
+.kova-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.kova-label-row .kova-field-label {
+  margin-bottom: 0;
+}
+
+.kova-optional-pill {
+  font-family: var(--font-mono, 'JetBrains Mono'), monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.07);
+  color: #a4abb8;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  line-height: 1;
+}
+
+[data-theme="light"] .kova-optional-pill {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #616572;
+}
+
+/* Numeric Input Hint with Alert State */
+.kova-field-hint {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono, 'JetBrains Mono'), monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  transition: color 0.25s ease;
+}
+
+.kova-field-hint svg {
+  flex-shrink: 0;
+  color: var(--accent-yellow);
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.kova-field-hint.hint-alert {
+  color: #ff5252 !important;
+  animation: kovaHintPulse 0.35s ease;
+}
+
+.kova-field-hint.hint-alert svg {
+  color: #ff5252 !important;
+  transform: scale(1.18);
+}
+
+@keyframes kovaHintPulse {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+/* Permission Checkbox Box (Call & WhatsApp Consent) */
+.kova-permission-box {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.kova-permission-box:hover,
+.kova-permission-box:focus-within {
+  border-color: rgba(245, 224, 37, 0.4);
+  background: rgba(245, 224, 37, 0.035);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .kova-permission-box {
+  background: rgba(0, 0, 0, 0.025);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .kova-permission-box:hover,
+[data-theme="light"] .kova-permission-box:focus-within {
+  border-color: rgba(212, 160, 23, 0.45);
+  background: rgba(212, 160, 23, 0.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.kova-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--font-body), sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #c4c9d5;
+}
+
+[data-theme="light"] .kova-checkbox-label {
+  color: #3b4252;
+}
+
+.kova-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.kova-custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.24);
+  background: rgba(18, 19, 23, 0.85);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] .kova-custom-checkbox {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.26);
+}
+
+.kova-checkbox-input:focus-visible + .kova-custom-checkbox {
+  outline: 2px solid var(--accent-yellow);
+  outline-offset: 2px;
+}
+
+.kova-check-icon {
+  opacity: 0;
+  transform: scale(0.4);
+  stroke: #0d0e11;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kova-checkbox-input:checked + .kova-custom-checkbox {
+  background: var(--accent-yellow) !important;
+  border-color: var(--accent-yellow) !important;
+  box-shadow: 0 0 14px var(--accent-yellow-glow);
+}
+
+.kova-checkbox-input:checked + .kova-custom-checkbox .kova-check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.kova-checkbox-text {
+  flex: 1;
+}
+
+.kova-checkbox-text .highlight-yellow {
+  color: var(--accent-yellow);
+  font-weight: 600;
+}
+
 /* --- Tags / Pills ("WHAT BRINGS YOU HERE?") --- */
 .kova-pills-row {
   display: flex;

@@ -621,10 +621,11 @@
     }
   };
 
-  // 7. Contact Form Handler (Supports tags, urgency, clean feedback, and mailto)
-  window.handleContactSubmit = function (e) {
+  // 7. Contact Form Handler (Direct AJAX Transmission - No mailto or email client redirection)
+  window.handleContactSubmit = async function (e) {
     e.preventDefault();
     const form = e.target;
+    const submitBtn = document.getElementById('talk-submit-btn') || form.querySelector('button[type="submit"]');
     const name = form.name ? form.name.value.trim() : '';
     const email = form.email ? form.email.value.trim() : '';
     const topic = form.subject ? form.subject.value.trim() : 'Project Inquiry';
@@ -633,19 +634,112 @@
     const message = form.message ? form.message.value.trim() : '';
     const feedback = document.getElementById('talk-form-feedback') || document.getElementById('form-feedback');
 
+    if (!name || !email || !message) {
+      if (feedback) {
+        feedback.className = 'form-feedback error';
+        feedback.innerHTML = '<strong>Please complete all required fields</strong> (name, email, and message).';
+        feedback.style.display = 'block';
+      }
+      return;
+    }
+
+    // Set UI to loading state
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '<span>Send it &rarr;</span>';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('is-loading');
+      submitBtn.innerHTML = '<span>Sending message...</span>';
+    }
+
     if (feedback) {
-      feedback.className = 'form-feedback success';
-      feedback.innerHTML = `<strong>Nice one, ${name}!</strong> Your inquiry regarding <em>${topic}</em> (${urgency}) is prepared. Opening your email client to connect with <strong>tejaswaghmare900@gmail.com</strong>...`;
+      feedback.className = 'form-feedback loading';
+      feedback.innerHTML = '<span>Transmitting your message directly to Tejas...</span>';
       feedback.style.display = 'block';
     }
 
-    const emailSubject = `[Inquiry: ${topic}] from ${name} (${urgency})`;
-    const emailBody = `Hi Tejas,\n\nName: ${name}\nEmail: ${email}\nTopics: ${topic}\nTimeline / Urgency: ${urgency}\n\nMessage:\n${message}\n\n--\nSent via Portfolio Contact Form (kova.me style)`;
-    const mailtoUrl = `mailto:tejaswaghmare900@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-    
-    setTimeout(() => {
-      window.location.href = mailtoUrl;
-    }, 1200);
+    const emailSubject = `[Portfolio Inquiry] ${topic} from ${name} (${urgency})`;
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/tejaswaghmare900@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          _subject: emailSubject,
+          topic: topic,
+          urgency: urgency,
+          message: message,
+          _captcha: 'false',
+          _template: 'table'
+        })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok && (data.success === 'true' || data.success === true)) {
+        if (feedback) {
+          feedback.className = 'form-feedback success';
+          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly. I'll review your inquiry and reply to <em>${email}</em> soon!`;
+          feedback.style.display = 'block';
+        }
+        form.reset();
+        // Reset topic pill & urgency slider
+        const defaultPill = document.querySelector('.kova-pill[data-topic="A project"]');
+        if (defaultPill) {
+          document.querySelectorAll('.kova-pill').forEach(p => p.classList.remove('active'));
+          defaultPill.classList.add('active');
+          const topicInput = document.getElementById('talk-topic');
+          if (topicInput) topicInput.value = 'A project';
+        }
+        const urgencyInput = document.getElementById('talk-urgency');
+        if (urgencyInput) {
+          urgencyInput.value = '40';
+          if (urgencyVal) urgencyVal.textContent = 'Sometime soon';
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('is-loading');
+            submitBtn.innerHTML = originalBtnHtml;
+          }, 4500);
+        }
+      } else if (data.message && data.message.toLowerCase().includes('activation')) {
+        // FormSubmit first-time activation notification
+        if (feedback) {
+          feedback.className = 'form-feedback success';
+          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly! (Tejas will receive it as soon as the one-time inbox activation is verified).`;
+          feedback.style.display = 'block';
+        }
+        form.reset();
+        if (submitBtn) {
+          submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('is-loading');
+            submitBtn.innerHTML = originalBtnHtml;
+          }, 4500);
+        }
+      } else {
+        throw new Error(data.message || 'Direct transmission failed');
+      }
+    } catch (err) {
+      console.error('Direct submission error:', err);
+      if (feedback) {
+        feedback.className = 'form-feedback error';
+        feedback.innerHTML = `<strong>Message could not be sent automatically.</strong> Please verify your connection or write directly to <a href="mailto:tejaswaghmare900@gmail.com" class="highlight-yellow" style="text-decoration:underline;">tejaswaghmare900@gmail.com</a>.`;
+        feedback.style.display = 'block';
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('is-loading');
+        submitBtn.innerHTML = originalBtnHtml;
+      }
+    }
   };
 
 

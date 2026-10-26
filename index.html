@@ -35,8 +35,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   
-  <link rel="preload" href="style.css?v=20261026_pill_fit" as="style">
-  <link rel="stylesheet" href="style.css?v=20261026_pill_fit">
+  <link rel="preload" href="style.css?v=20261026_direct_send" as="style">
+  <link rel="stylesheet" href="style.css?v=20261026_direct_send">
 </head>
 <body>
 
@@ -2717,6 +2717,8 @@
 
       <!-- Kova Interactive Contact Form -->
       <form id="portfolio-contact-form" class="kova-talk-form" onsubmit="handleContactSubmit(event)">
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_template" value="table" />
         
         <!-- Field 1: Name -->
         <div class="kova-form-field">
@@ -2824,6 +2826,6 @@
 
   <!-- Spline 3D Viewer Runtime (Deferred Non-Blocking Module) -->
   <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
-  <script src="script.js?v=20261026_badges"></script>
+  <script src="script.js?v=20261026_direct_send"></script>
 </body>
 </html>

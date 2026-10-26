@@ -679,7 +679,49 @@
     }
   };
 
-  // 7. Contact Form Handler (Direct AJAX Transmission - No mailto or email client redirection)
+  // --- Supabase Database Configuration for Contact Form Submissions ---
+  // To record all submissions in your Supabase table, paste your credentials below:
+  const SUPABASE_CONFIG = {
+    url: '',       // e.g. 'https://your-project-id.supabase.co'
+    anonKey: '',   // e.g. 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    table: 'portfolio_contacts'
+  };
+
+  // Helper to persist submission records directly into Supabase table
+  async function saveToSupabase(payload) {
+    if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
+      return { skipped: true, reason: 'Supabase credentials not configured yet' };
+    }
+
+    const endpoint = `${SUPABASE_CONFIG.url.replace(/\/$/, '')}/rest/v1/${SUPABASE_CONFIG.table}`;
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone || null,
+        call_whatsapp_permission: payload.call_whatsapp_permission,
+        topic: payload.topic,
+        urgency: payload.urgency,
+        message: payload.message
+      })
+    });
+
+    if (!response.ok) {
+      const errDetail = await response.text().catch(() => '');
+      throw new Error(`Supabase insert error (${response.status}): ${errDetail}`);
+    }
+
+    return { success: true };
+  }
+
+  // 7. Contact Form Handler (Direct AJAX Transmission & Database Persistence)
   window.handleContactSubmit = async function (e) {
     e.preventDefault();
     const form = e.target;
@@ -722,7 +764,8 @@
     const emailSubject = `[Portfolio Inquiry] ${topic} from ${name} (${urgency})`;
 
     try {
-      const response = await fetch('https://formsubmit.co/ajax/tejaswaghmare900@gmail.com', {
+      // 1. Transmit email notification via FormSubmit
+      const emailPromise = fetch('https://formsubmit.co/ajax/tejaswaghmare900@gmail.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -742,6 +785,21 @@
         })
       });
 
+      // 2. Persist contact record in Supabase database table
+      const supabasePromise = saveToSupabase({
+        name,
+        email,
+        phone,
+        call_whatsapp_permission: permissionGranted,
+        topic,
+        urgency,
+        message
+      }).catch(err => {
+        console.warn('Supabase sync notice:', err);
+        return { error: err };
+      });
+
+      const [response, supaResult] = await Promise.all([emailPromise, supabasePromise]);
       const data = await response.json().catch(() => ({}));
 
       if (response.ok && (data.success === 'true' || data.success === true)) {

@@ -224,6 +224,25 @@ span.serif-accent,
   font-weight: 600;
 }
 
+/* Universal fit-content constraint: prevents unwanted horizontal stretching in all containers */
+.card-pill,
+.section-tag,
+.edu-badge,
+.edu-period-pill,
+.tools-header-badge,
+.cert-card-badge,
+.hobby-tagline-badge,
+.kova-talk-badge,
+.hero-hello-badge,
+.mini-highlight-badge,
+.badge-tag,
+.hint-pill {
+  width: fit-content !important;
+  max-width: max-content !important;
+  align-self: flex-start !important;
+  box-sizing: border-box !important;
+}
+
 /* Editorial Hobby & Story Quotes */
 .hobby-tagline {
   font-family: var(--font-serif) !important;
@@ -956,6 +975,11 @@ img {
   border-radius: var(--radius-pill);
   margin-bottom: 14px;
   font-weight: 600;
+  width: fit-content;
+  max-width: max-content;
+  align-self: flex-start;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .tag-dot {
@@ -1004,17 +1028,23 @@ img {
 }
 
 .card-pill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: max-content;
+  align-self: flex-start;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.1em;
   color: var(--accent-yellow);
   background: var(--accent-yellow-dark);
   border: 1px solid rgba(245, 224, 37, 0.2);
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-weight: 600;
   margin-bottom: 16px;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 /* --------------------------------------------------------------------------

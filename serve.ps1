@@ -31,70 +31,71 @@ if (-not $Root -or -not (Test-Path $Root)) {
 
 $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, $Port)
 $listener.Start()
+
 Write-Host "Server running at http://localhost:$Port/"
 Write-Host "Serving files from: $Root"
 
-while ($true) {
-    try {
+try {
+    while ($true) {
         $client = $listener.AcceptTcpClient()
         $stream = $client.GetStream()
-        $reader = [System.IO.StreamReader]::new($stream, [System.Text.Encoding]::ASCII)
+        $stream.ReadTimeout = 2000
+        $stream.WriteTimeout = 5000
 
-        $requestLine = $reader.ReadLine()
-        if ([string]::IsNullOrWhiteSpace($requestLine)) {
+        try {
+            $buffer = New-Object byte[] 8192
+            $bytesRead = $stream.Read($buffer, 0, $buffer.Length)
+            if ($bytesRead -gt 0) {
+                $reqStr = [System.Text.Encoding]::ASCII.GetString($buffer, 0, $bytesRead)
+                $firstLine = $reqStr.Split("`r`n")[0]
+                $parts = $firstLine.Split(" ")
+                $rawUrl = if ($parts.Length -gt 1) { $parts[1] } else { "/" }
+
+                $cleanPath = $rawUrl.Split("?")[0].Split("#")[0]
+                $unescaped = [System.Uri]::UnescapeDataString($cleanPath)
+                if ($unescaped -eq "/" -or $unescaped -eq "") {
+                    $unescaped = "/index.html"
+                }
+
+                $rel = $unescaped.TrimStart("/\").Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+                $fullPath = [System.IO.Path]::Combine($Root, $rel)
+
+                if (Test-Path $fullPath -PathType Leaf) {
+                    $ext = [System.IO.Path]::GetExtension($fullPath).ToLower()
+                    $mime = if ($mimeTypes.ContainsKey($ext)) { $mimeTypes[$ext] } else { "application/octet-stream" }
+                    $bytes = [System.IO.File]::ReadAllBytes($fullPath)
+
+                    $header = "HTTP/1.1 200 OK`r`n" +
+                              "Content-Type: $mime`r`n" +
+                              "Content-Length: $($bytes.Length)`r`n" +
+                              "Access-Control-Allow-Origin: *`r`n" +
+                              "Connection: close`r`n`r`n"
+
+                    $hBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
+                    $stream.Write($hBytes, 0, $hBytes.Length)
+                    $stream.Write($bytes, 0, $bytes.Length)
+                    $stream.Flush()
+                } else {
+                    $notFound = [System.Text.Encoding]::UTF8.GetBytes("<!DOCTYPE html><html><body><h1>404 Not Found</h1><p>File $unescaped not found.</p></body></html>")
+                    $header = "HTTP/1.1 404 Not Found`r`n" +
+                              "Content-Type: text/html; charset=utf-8`r`n" +
+                              "Content-Length: $($notFound.Length)`r`n" +
+                              "Access-Control-Allow-Origin: *`r`n" +
+                              "Connection: close`r`n`r`n"
+
+                    $hBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
+                    $stream.Write($hBytes, 0, $hBytes.Length)
+                    $stream.Write($notFound, 0, $notFound.Length)
+                    $stream.Flush()
+                }
+            }
+        } catch {
+            # Ignore socket read/write timeouts or disconnects
+        } finally {
+            $stream.Close()
             $client.Close()
-            continue
         }
-
-        $parts = $requestLine.Split(" ")
-        $rawUrl = if ($parts.Length -gt 1) { $parts[1] } else { "/" }
-
-        # Consume remaining header lines
-        while ($true) {
-            $h = $reader.ReadLine()
-            if ([string]::IsNullOrEmpty($h)) { break }
-        }
-
-        $cleanPath = $rawUrl.Split("?")[0].Split("#")[0]
-        $unescaped = [System.Uri]::UnescapeDataString($cleanPath)
-        if ($unescaped -eq "/" -or $unescaped -eq "") {
-            $unescaped = "/index.html"
-        }
-
-        $rel = $unescaped.TrimStart("/\").Replace("/", [System.IO.Path]::DirectorySeparatorChar)
-        $fullPath = [System.IO.Path]::Combine($Root, $rel)
-
-        if (Test-Path $fullPath -PathType Leaf) {
-            $ext = [System.IO.Path]::GetExtension($fullPath).ToLower()
-            $mime = if ($mimeTypes.ContainsKey($ext)) { $mimeTypes[$ext] } else { "application/octet-stream" }
-            $bytes = [System.IO.File]::ReadAllBytes($fullPath)
-
-            $header = "HTTP/1.1 200 OK`r`n" +
-                      "Content-Type: $mime`r`n" +
-                      "Content-Length: $($bytes.Length)`r`n" +
-                      "Access-Control-Allow-Origin: *`r`n" +
-                      "Connection: close`r`n`r`n"
-
-            $headerBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
-            $stream.Write($headerBytes, 0, $headerBytes.Length)
-            $stream.Write($bytes, 0, $bytes.Length)
-            $stream.Flush()
-        } else {
-            $notFound = [System.Text.Encoding]::UTF8.GetBytes("<!DOCTYPE html><html><body><h1>404 Not Found</h1><p>File $unescaped not found.</p></body></html>")
-            $header = "HTTP/1.1 404 Not Found`r`n" +
-                      "Content-Type: text/html; charset=utf-8`r`n" +
-                      "Content-Length: $($notFound.Length)`r`n" +
-                      "Connection: close`r`n`r`n"
-
-            $headerBytes = [System.Text.Encoding]::ASCII.GetBytes($header)
-            $stream.Write($headerBytes, 0, $headerBytes.Length)
-            $stream.Write($notFound, 0, $notFound.Length)
-            $stream.Flush()
-        }
-
-        $stream.Close()
-        $client.Close()
-    } catch {
-        # Keep alive on transient errors
     }
+} finally {
+    $listener.Stop()
 }

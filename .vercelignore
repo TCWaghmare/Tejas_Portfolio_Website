@@ -1,0 +1,30 @@
+# Ignore Git and Agent configurations
+.git
+.agents
+.gitignore
+
+# Ignore build/scratch/debug scripts
+*.ps1
+*.bat
+*.sql
+
+# Ignore test files and scratch assets
+scratch_*.*
+test_*.html
+preview_loader.html
+debug_line*.ps1
+clean_mojibake_perfect.ps1
+fix_mojibake.ps1
+scan_chars.ps1
+opt_hero.ps1
+inspect_hobbies.ps1
+process_hobby_images.ps1
+
+# Ignore large archives and backups
+*.zip
+Asset/Portfolio_Video_Frames_Original_Quality.zip
+Asset/spline-3d-skill.zip
+All Credential Links.zip
+
+# Ignore documentation
+README.md

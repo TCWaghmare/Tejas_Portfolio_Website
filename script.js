@@ -13,7 +13,7 @@
   // --- Configuration ---
   const CONFIG = {
     totalFrames: 240,
-    framePath: (index) => `Asset/frames/frame_${String(index).padStart(4, '0')}.png`,
+    framePath: (index) => `Asset/frames/frame_${String(index).padStart(4, '0')}.jpg`,
     lerpFactor: 0.20, // Quick, agile and silky smooth deceleration
     concurrency: isMobile ? 3 : 6, // Low-overhead parallel pool to prevent network throttling
     frameStride: isMobile ? 6 : 2, // Sample frames: on mobile ~40 frames, on desktop 120 keyframes

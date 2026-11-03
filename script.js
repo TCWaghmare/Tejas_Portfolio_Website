@@ -187,33 +187,21 @@
   function startPreloading() {
     resizeCanvas();
 
-    // Safety fallback: Never let the user wait longer than 850ms, even on slow network
-    const unlockTimeout = setTimeout(() => {
-      unlockInterface();
-    }, 850);
+    // Immediately unlock interface so hero content, typography and avatar render with zero delay
+    unlockInterface();
 
-    // 1. Immediately load Frame 1
+    // 1. Immediately load Frame 1 in background for canvas scrub
     const firstImg = new Image();
     firstImg.src = CONFIG.framePath(1);
     firstImg.onload = () => {
       images[1] = firstImg;
       loadedCount++;
       drawFrame(1);
-      
-      // Snappy, gratifying progress animation from 0% -> 100%
-      animateLoaderToFull(() => {
-        clearTimeout(unlockTimeout);
-        unlockInterface();
-      });
-
-      // Queue remaining background frames lazily
-      queueRemainingFrames();
+      deferBackgroundFrames();
     };
     firstImg.onerror = () => {
       console.warn('Initial frame load fallback.');
-      clearTimeout(unlockTimeout);
-      unlockInterface();
-      queueRemainingFrames();
+      deferBackgroundFrames();
     };
   }
 
@@ -231,6 +219,36 @@
       }
     }
     requestAnimationFrame(step);
+  }
+
+  let backgroundFramesScheduled = false;
+  function deferBackgroundFrames() {
+    if (backgroundFramesScheduled) return;
+
+    function startBuffering() {
+      if (backgroundFramesScheduled) return;
+      backgroundFramesScheduled = true;
+      window.removeEventListener('scroll', startBuffering);
+      window.removeEventListener('wheel', startBuffering);
+      window.removeEventListener('touchstart', startBuffering);
+      window.removeEventListener('keydown', startBuffering);
+      queueRemainingFrames();
+    }
+
+    // Start buffering on first user interaction
+    window.addEventListener('scroll', startBuffering, { once: true, passive: true });
+    window.addEventListener('wheel', startBuffering, { once: true, passive: true });
+    window.addEventListener('touchstart', startBuffering, { once: true, passive: true });
+    window.addEventListener('keydown', startBuffering, { once: true, passive: true });
+
+    // Or after 3.5s of idle time
+    setTimeout(() => {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(startBuffering, { timeout: 4000 });
+      } else {
+        startBuffering();
+      }
+    }, 3500);
   }
 
   function queueRemainingFrames() {
@@ -300,22 +318,20 @@
       el.classList.add('is-inview');
     });
 
-    setTimeout(() => {
-      if (loader) {
-        loader.classList.add('hidden');
-      }
+    if (loader) {
+      loader.classList.add('hidden');
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 220);
+    }
 
-      // Reveal elements currently in viewport
-      document.querySelectorAll('.fade-up, .reveal-text').forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight + 150 && rect.bottom > 0) {
-          el.classList.add('is-inview');
-        }
-      });
+    // Reveal elements currently in viewport
+    document.querySelectorAll('.fade-up, .reveal-text').forEach((el) => {
+      el.classList.add('is-inview');
+    });
 
-      // Asynchronously load the Spline viewer web component now that critical UI is interactive
-      loadSplineViewerScript();
-    }, 200);
+    // Schedule Spline viewer web component on user interaction or idle
+    scheduleSplineViewer();
   }
 
   function loadSplineViewerScript() {
@@ -325,6 +341,22 @@
     script.type = 'module';
     script.src = 'https://unpkg.com/@splinetool/viewer/build/spline-viewer.js';
     document.body.appendChild(script);
+  }
+
+  function scheduleSplineViewer() {
+    let triggered = false;
+    function trigger() {
+      if (triggered) return;
+      triggered = true;
+      window.removeEventListener('pointerdown', trigger);
+      window.removeEventListener('keydown', trigger);
+      window.removeEventListener('scroll', trigger);
+      loadSplineViewerScript();
+    }
+    window.addEventListener('pointerdown', trigger, { once: true, passive: true });
+    window.addEventListener('keydown', trigger, { once: true, passive: true });
+    window.addEventListener('scroll', trigger, { once: true, passive: true });
+    setTimeout(trigger, 6000);
   }
 
   // --- Mobile Navigation Toggle ---
@@ -1019,6 +1051,11 @@
     for (let i = 0; i < cloneCount; i++) {
       const clone = originalSlides[i].cloneNode(true);
       clone.setAttribute('aria-hidden', 'true');
+      clone.setAttribute('inert', '');
+      clone.querySelectorAll('a, button, input, textarea, select, [tabindex]').forEach(el => {
+        el.setAttribute('tabindex', '-1');
+        el.setAttribute('aria-hidden', 'true');
+      });
       clone.classList.add('cert-slide-clone');
       track.appendChild(clone);
     }

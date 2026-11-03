@@ -42,6 +42,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   
+  <link rel="preload" href="Asset/profile_hero.webp" as="image" type="image/webp" fetchpriority="high">
   <link rel="preload" href="style.css?v=20261026_contact_phone" as="style">
   <link rel="stylesheet" href="style.css?v=20261026_contact_phone">
 </head>
@@ -54,7 +55,7 @@
       <div class="loader-gauge">
         <!-- Circular Profile Hero Image in Ring Gauge -->
         <div class="loader-avatar-frame">
-          <img src="Asset/profile heroes image.png" alt="Tejas C. Waghmare" class="loader-avatar-img" fetchpriority="high">
+          <img src="Asset/profile_hero.webp" alt="Tejas C. Waghmare" class="loader-avatar-img" width="90" height="90">
         </div>
 
         <svg class="loader-svg" viewBox="0 0 120 120">
@@ -95,9 +96,9 @@
   <!-- Sticky Modern Navigation Header -->
   <header class="site-header" id="site-header">
     <div class="nav-container">
-      <a href="#home" class="nav-brand" aria-label="Tejas Waghmare Homepage">
+      <a href="#home" class="nav-brand" >
         <span class="brand-avatar" title="Tejas C. Waghmare">
-          <img src="Asset/profile heroes image.png" alt="Tejas C. Waghmare" class="brand-avatar-img">
+          <img src="Asset/profile_hero.webp" alt="Tejas C. Waghmare" class="brand-avatar-img" width="34" height="34" loading="eager">
         </span>
         <div class="brand-text">
           <span class="brand-name">Tejas C. Waghmare</span>
@@ -235,7 +236,7 @@
                   <div class="rating-stat-num">3x Certified</div>
                   <div class="rating-stat-label">Microsoft Associate</div>
 
-                  <div class="stars-list" aria-label="5 out of 5 stars">
+                  <div class="stars-list" role="img" aria-label="5 out of 5 stars">
                     <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     <svg class="star-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
@@ -305,7 +306,7 @@
 
                 <!-- Solid Yellow Circle Container (Completely blocks canvas frame bleed) -->
                 <div class="hero-solid-yellow-circle">
-                  <img src="Asset/profile heroes image.png" alt="Tejas Waghmare - 3x Certified Microsoft Associate" class="hero-circle-profile-img" fetchpriority="high" loading="eager" decoding="async">
+                  <img src="Asset/profile_hero.webp" alt="Tejas Waghmare - 3x Certified Microsoft Associate" class="hero-circle-profile-img" width="512" height="512" fetchpriority="high" loading="eager" decoding="sync">
                 </div>
               </div>
             </div>
@@ -333,6 +334,7 @@
         </div>
 
         <!-- Key Impact & Analytics Highlights Bento Row -->
+        <h2 class="sr-only">Key Impact & Analytics Highlights</h2>
         <div class="hero-impact-grid">
           <!-- Metric 1: NYC Airbnb -->
           <div class="bento-card hero-mini-card">
@@ -340,7 +342,7 @@
               <span class="mini-tag">PORTFOLIO IMPACT</span>
               <span class="mini-highlight-num">$389.3M</span>
             </div>
-            <h4 class="mini-card-title">Marketplace Revenue Analyzed</h4>
+            <h3 class="mini-card-title">Marketplace Revenue Analyzed</h3>
             <p class="mini-card-desc">Evaluated 30,259 NYC listings & 980K+ reviews across 5 boroughs using SQL & Power BI.</p>
             <a href="#projects" class="mini-card-link">View Case Study &rarr;</a>
           </div>
@@ -351,7 +353,7 @@
               <span class="mini-tag">METHODOLOGY</span>
               <span class="mini-highlight-badge">4-Stage Pipeline</span>
             </div>
-            <h4 class="mini-card-title">End-to-End Analytics Workflow</h4>
+            <h3 class="mini-card-title">End-to-End Analytics Workflow</h3>
             <div class="mini-workflow-steps">
               <span>ETL Ingestion</span> &bull; 
               <span>Star Schema</span> &bull; 
@@ -367,7 +369,7 @@
               <span class="mini-tag">REVENUE RECOVERY</span>
               <span class="mini-highlight-num text-yellow">+15%</span>
             </div>
-            <h4 class="mini-card-title">Waste & Profit Optimization</h4>
+            <h3 class="mini-card-title">Waste & Profit Optimization</h3>
             <p class="mini-card-desc">Diagnosed 16.5K transactions to pinpoint 40% waste cost leakages and restore gross margins.</p>
             <a href="#projects" class="mini-card-link">View Analysis &rarr;</a>
           </div>
@@ -1087,7 +1089,7 @@
                     <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
                     <div class="deck-front-card" data-analytics="project-inspect" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png', 'image', 'Bakery Sales, Profitability & Waste Analytics')" title="Click to inspect dashboard">
-                      <img src="Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png" alt="Bakery Sales and Profitability Dashboard" class="cert-deck-img" loading="lazy">
+                      <img src="Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.jpg" alt="Bakery Sales and Profitability Dashboard" class="cert-deck-img" loading="lazy">
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to inspect</span>
                       </div>
@@ -1371,7 +1373,7 @@
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
                     <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/pl 300.png', 'image', 'Microsoft Certified: Power BI Data Analyst Associate (PL-300)')" title="Click to inspect badge">
                       <div class="badge-deck-img-wrap">
-                        <img src="Badges/pl 300.png" alt="Microsoft Certified: Power BI Data Analyst Associate (PL-300) Badge" class="badge-deck-img" loading="lazy">
+                        <img src="Badges/pl 300.png" alt="Microsoft Certified: Power BI Data Analyst Associate (PL-300) Badge" class="badge-deck-img" width="130" height="130" loading="lazy">
                       </div>
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to zoom</span>
@@ -1412,7 +1414,7 @@
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
                     <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/dp 600.png', 'image', 'Microsoft Certified: Fabric Analytics Engineer Associate (DP-600)')" title="Click to inspect badge">
                       <div class="badge-deck-img-wrap">
-                        <img src="Badges/dp 600.png" alt="Microsoft Certified: Fabric Analytics Engineer Associate (DP-600) Badge" class="badge-deck-img" loading="lazy">
+                        <img src="Badges/dp 600.png" alt="Microsoft Certified: Fabric Analytics Engineer Associate (DP-600) Badge" class="badge-deck-img" width="130" height="130" loading="lazy">
                       </div>
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to zoom</span>
@@ -1453,7 +1455,7 @@
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
                     <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/dp 700.png', 'image', 'Microsoft Certified: Fabric Data Engineer Associate (DP-700)')" title="Click to inspect badge">
                       <div class="badge-deck-img-wrap">
-                        <img src="Badges/dp 700.png" alt="Microsoft Certified: Fabric Data Engineer Associate (DP-700) Badge" class="badge-deck-img" loading="lazy">
+                        <img src="Badges/dp 700.png" alt="Microsoft Certified: Fabric Data Engineer Associate (DP-700) Badge" class="badge-deck-img" width="130" height="130" loading="lazy">
                       </div>
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to zoom</span>
@@ -1494,7 +1496,7 @@
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
                     <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/ai-skills-fest-2026.png', 'image', 'Microsoft: AI Skills Fest 2026 Verified Credential')" title="Click to inspect badge">
                       <div class="badge-deck-img-wrap">
-                        <img src="Badges/ai-skills-fest-2026.png" alt="Microsoft: AI Skills Fest 2026 Badge" class="badge-deck-img" loading="lazy">
+                        <img src="Badges/ai-skills-fest-2026.png" alt="Microsoft: AI Skills Fest 2026 Badge" class="badge-deck-img" width="130" height="130" loading="lazy">
                       </div>
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to zoom</span>
@@ -1535,7 +1537,7 @@
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
                     <div class="deck-front-card badge-deck-front" onclick="openLightbox('Badges/mckinsey-org-forward-program.png', 'image', 'McKinsey.org: Forward Program Verified Credential')" title="Click to inspect badge">
                       <div class="badge-deck-img-wrap">
-                        <img src="Badges/mckinsey-org-forward-program.png" alt="McKinsey.org: Forward Program Badge" class="badge-deck-img" loading="lazy">
+                        <img src="Badges/mckinsey-org-forward-program.png" alt="McKinsey.org: Forward Program Badge" class="badge-deck-img" width="130" height="130" loading="lazy">
                       </div>
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to zoom</span>
@@ -1572,7 +1574,7 @@
         </div>
 
         <!-- Pagination Bar (Yellow Status Indicator Pill) -->
-        <div class="cert-pagination-bar" id="badge-dots" role="tablist" aria-label="Digital Badges pagination">
+        <div class="cert-pagination-bar" id="badge-dots" aria-label="Digital Badges pagination">
           <button class="cert-dot active" data-slide="0" aria-label="Go to slide 1" aria-current="true"></button>
           <button class="cert-dot" data-slide="1" aria-label="Go to slide 2"></button>
           <button class="cert-dot" data-slide="2" aria-label="Go to slide 3"></button>
@@ -1821,7 +1823,7 @@
             <div class="edu-spine-progress" id="edu-timeline-progress"></div>
             <!-- Dynamic Traveling Avatar Head at End of Bar -->
             <div class="edu-traveling-avatar" id="edu-traveling-avatar" title="Tejas C. Waghmare &bull; Educational Journey" aria-label="Current progress marker: Tejas C. Waghmare">
-              <img src="Asset/profile heroes image.png" alt="Tejas C. Waghmare" class="edu-traveling-avatar-img">
+              <img src="Asset/profile_hero.webp" alt="Tejas C. Waghmare" class="edu-traveling-avatar-img" width="44" height="44" loading="lazy">
               <div class="node-pulse-ring"></div>
             </div>
           </div>
@@ -1835,7 +1837,7 @@
               <!-- Timeline Node Marker with Pulse -->
               <div class="edu-node-wrap">
                 <div class="edu-node-marker edu-node-btech" title="Graduation &bull; Fully Grown Plant">
-                  <img src="Asset/plant_grad_mature.jpg" alt="Graduation - Fully Grown Plant" class="node-plant-img">
+                  <img src="Asset/plant_grad_mature.jpg" alt="Graduation - Fully Grown Plant" class="node-plant-img" loading="lazy" decoding="async" width="80" height="80">
                   <div class="node-pulse-ring"></div>
                 </div>
                 <div class="edu-node-year">2020 &ndash; 2024</div>
@@ -1949,7 +1951,7 @@
               <!-- Timeline Node Marker with Pulse -->
               <div class="edu-node-wrap">
                 <div class="edu-node-marker edu-node-hsc" title="HSC Education &bull; Adult Plant">
-                  <img src="Asset/plant_hsc_adult.jpg" alt="HSC Education - Adult Plant" class="node-plant-img">
+                  <img src="Asset/plant_hsc_adult.jpg" alt="HSC Education - Adult Plant" class="node-plant-img" loading="lazy" decoding="async" width="80" height="80">
                   <div class="node-pulse-ring"></div>
                 </div>
                 <div class="edu-node-year">2018 &ndash; 2020</div>
@@ -2055,7 +2057,7 @@
               <!-- Timeline Node Marker with Pulse -->
               <div class="edu-node-wrap">
                 <div class="edu-node-marker edu-node-ssc" title="SSC Education &bull; Child Plant">
-                  <img src="Asset/plant_ssc_child.jpg" alt="SSC Education - Child Plant" class="node-plant-img">
+                  <img src="Asset/plant_ssc_child.jpg" alt="SSC Education - Child Plant" class="node-plant-img" loading="lazy" decoding="async" width="80" height="80">
                   <div class="node-pulse-ring"></div>
                 </div>
                 <div class="edu-node-year">2018</div>
@@ -2548,7 +2550,7 @@
 
               <!-- Giant Interactive Clickable Headline (kova.me style) -->
               <h2 class="lets-build-title footer-cta display-text">
-                <a href="#contact" id="lets-build-trigger" class="lets-build-link" onclick="openContactModal(event)" aria-label="Open Let's talk contact form">
+                <a href="#contact" id="lets-build-trigger" class="lets-build-link" onclick="openContactModal(event)" >
                   Let's build<br>
                   <span class="serif-accent highlight-yellow">something.</span>
                 </a>
@@ -2661,7 +2663,7 @@
     <div class="footer-container">
       <div class="footer-left">
         <span class="footer-logo" title="Tejas C. Waghmare">
-          <img src="Asset/profile heroes image.png" alt="Tejas C. Waghmare" class="footer-logo-img">
+          <img src="Asset/profile_hero.webp" alt="Tejas C. Waghmare" class="footer-logo-img" width="30" height="30" loading="lazy">
         </span>
         <p class="footer-copy">
           &copy; 2026 Tejas C. Waghmare. Crafted with high-performance Vanilla CSS & Canvas frame animation.
@@ -2882,8 +2884,7 @@
   <!-- Floating Cursor Tooltip for "Let's build something" (kova.me style) -->
   <div class="footer-tip" id="footer-tip">Message me 💬</div>
 
-  <!-- Spline 3D Viewer Runtime (Deferred Non-Blocking Module) -->
-  <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
+
   <script src="analytics.js?v=20261103_v1"></script>
   <script src="script.js?v=20261026_supabase"></script>
 </body>

@@ -484,10 +484,18 @@
     initGA4();
     initPlausible();
 
+    const startObservers = () => {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(setupProjectTracking, { timeout: 2000 });
+      } else {
+        setTimeout(setupProjectTracking, 100);
+      }
+    };
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupProjectTracking);
+      document.addEventListener('DOMContentLoaded', startObservers);
     } else {
-      setupProjectTracking();
+      startObservers();
     }
 
     if (ANALYTICS_CONFIG.debug) {

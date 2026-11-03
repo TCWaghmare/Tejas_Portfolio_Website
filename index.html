@@ -1,9 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
+  <!-- =======================================================================
+       PORTFOLIO TELEMETRY & ANALYTICS (GA4 & Plausible)
+       Configure your Measurement ID or domain in analytics.js
+       ======================================================================= -->
+  <link rel="preconnect" href="https://www.googletagmanager.com">
+  <link rel="preconnect" href="https://plausible.io">
+
   <!-- Theme Initialization (Default Dark, Zero Flicker) -->
   <script>
     (function () {
@@ -132,7 +139,7 @@
           </svg>
         </button>
 
-        <a href="tejas resume.pdf" target="_blank" class="btn btn-secondary-pill nav-resume-btn" download>
+        <a href="tejas resume.pdf" target="_blank" class="btn btn-secondary-pill nav-resume-btn" download data-analytics="resume-download">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
           <span>Resume</span>
         </a>
@@ -988,7 +995,7 @@
             <div class="cert-carousel-track" id="project-track">
               
               <!-- PROJECT 1: NYC AIRBNB -->
-              <div class="cert-card-slide" data-index="0">
+              <div class="cert-card-slide" data-index="0" data-project-id="nyc-airbnb" data-project-name="NYC Airbnb Hospitality Marketplace Intelligence" data-project-category="Power BI + SQL">
                 <div class="bento-card cert-card-inner project-card-deck">
                   <div class="cert-card-header">
                     <h3 class="cert-card-title">NYC Airbnb Intelligence</h3>
@@ -1000,7 +1007,7 @@
                   <div class="deck-container">
                     <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
-                    <div class="deck-front-card" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence - Overview')" title="Click to inspect dashboard">
+                    <div class="deck-front-card" data-analytics="project-inspect" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence - Overview')" title="Click to inspect dashboard">
                       <img src="Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg" alt="NYC Airbnb Business Intelligence Dashboard Overview" class="cert-deck-img" loading="lazy">
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to inspect</span>
@@ -1047,18 +1054,18 @@
                     <div class="project-thumbnails">
                       <span class="thumb-label">Explore Views:</span>
                       <div class="thumb-group">
-                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 2 - Room.jpg', 'image', 'NYC Airbnb - Room Type Analysis')">Room Types</button>
-                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 3 -Host.jpg', 'image', 'NYC Airbnb - Host Performance')">Host Analysis</button>
-                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 4 - Rating.jpg', 'image', 'NYC Airbnb - Rating Distribution')">Ratings</button>
+                        <button class="thumb-btn" data-analytics="project-subview" data-subview="Room Types" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 2 - Room.jpg', 'image', 'NYC Airbnb - Room Type Analysis')">Room Types</button>
+                        <button class="thumb-btn" data-analytics="project-subview" data-subview="Host Analysis" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 3 -Host.jpg', 'image', 'NYC Airbnb - Host Performance')">Host Analysis</button>
+                        <button class="thumb-btn" data-analytics="project-subview" data-subview="Ratings" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 4 - Rating.jpg', 'image', 'NYC Airbnb - Rating Distribution')">Ratings</button>
                       </div>
                     </div>
 
                     <div class="project-action-bar cert-actions">
-                      <a href="https://github.com/TCWaghmare/NYC-Airbnb-Marketplace-Intelligence-Dashboard" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                      <a href="https://github.com/TCWaghmare/NYC-Airbnb-Marketplace-Intelligence-Dashboard" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm" data-analytics="project-github">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                         <span>GitHub</span>
                       </a>
-                      <button class="btn btn-secondary-pill btn-sm" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence Dashboard')">
+                      <button class="btn btn-secondary-pill btn-sm" data-analytics="project-inspect" onclick="openLightbox('Projects/Project 1 - NYC Airbnb Hospitality Data Analysis Project using SQL, PowerBi, DAX, Power Query/Dashboard 1 - Overview.jpg', 'image', 'NYC Airbnb Intelligence Dashboard')">
                         <span>Enlarge</span>
                       </button>
                     </div>
@@ -1067,7 +1074,7 @@
               </div>
 
               <!-- PROJECT 2: BAKERY PROFITABILITY & WASTE -->
-              <div class="cert-card-slide" data-index="1">
+              <div class="cert-card-slide" data-index="1" data-project-id="bakery-sales" data-project-name="Bakery Sales, Profitability & Waste Analytics" data-project-category="Excel Power Pivot">
                 <div class="bento-card cert-card-inner project-card-deck">
                   <div class="cert-card-header">
                     <h3 class="cert-card-title">Bakery Sales Analytics</h3>
@@ -1079,7 +1086,7 @@
                   <div class="deck-container">
                     <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
-                    <div class="deck-front-card" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png', 'image', 'Bakery Sales, Profitability & Waste Analytics')" title="Click to inspect dashboard">
+                    <div class="deck-front-card" data-analytics="project-inspect" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png', 'image', 'Bakery Sales, Profitability & Waste Analytics')" title="Click to inspect dashboard">
                       <img src="Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Sale Dashboard.png" alt="Bakery Sales and Profitability Dashboard" class="cert-deck-img" loading="lazy">
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to inspect</span>
@@ -1123,18 +1130,18 @@
                     <div class="project-thumbnails">
                       <span class="thumb-label">Views & Demo:</span>
                       <div class="thumb-group">
-                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery_Transaction_dashboard.png', 'image', 'Bakery Transactions Dashboard')">Transactions</button>
-                        <button class="thumb-btn" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Data analysis Insights.png', 'image', 'Bakery Analytical Insights')">Insights</button>
-                        <button class="thumb-btn btn-highlight" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Walkthrough Video')">&#9654; Video</button>
+                        <button class="thumb-btn" data-analytics="project-subview" data-subview="Transactions" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery_Transaction_dashboard.png', 'image', 'Bakery Transactions Dashboard')">Transactions</button>
+                        <button class="thumb-btn" data-analytics="project-subview" data-subview="Insights" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/Backery Data analysis Insights.png', 'image', 'Bakery Analytical Insights')">Insights</button>
+                        <button class="thumb-btn btn-highlight" data-analytics="project-subview" data-subview="Walkthrough Video" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Walkthrough Video')">&#9654; Video</button>
                       </div>
                     </div>
 
                     <div class="project-action-bar cert-actions">
-                      <a href="https://github.com/TCWaghmare/Bakery_Data_Analysis_Project_by_Excel" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                      <a href="https://github.com/TCWaghmare/Bakery_Data_Analysis_Project_by_Excel" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm" data-analytics="project-github">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                         <span>GitHub</span>
                       </a>
-                      <button class="btn btn-secondary-pill btn-sm" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Demonstration')">
+                      <button class="btn btn-secondary-pill btn-sm" data-analytics="project-inspect" onclick="openLightbox('Projects/Project 2 - Backery Data Analysis project using Excel pivot table/demonstration video/Backery _data_analysis_demonstration Compressed.mp4', 'video', 'Bakery Excel Dashboard Demonstration')">
                         <span>Watch Video</span>
                       </button>
                     </div>
@@ -1143,7 +1150,7 @@
               </div>
 
               <!-- PROJECT 3: AMAZON SALES PERFORMANCE -->
-              <div class="cert-card-slide" data-index="2">
+              <div class="cert-card-slide" data-index="2" data-project-id="amazon-sales" data-project-name="Amazon Global Sales Performance Dashboard" data-project-category="Power BI Executive BI">
                 <div class="bento-card cert-card-inner project-card-deck">
                   <div class="cert-card-header">
                     <h3 class="cert-card-title">Amazon Global Sales</h3>
@@ -1155,7 +1162,7 @@
                   <div class="deck-container">
                     <div class="deck-tab deck-tab-3" aria-hidden="true"></div>
                     <div class="deck-tab deck-tab-2" aria-hidden="true"></div>
-                    <div class="deck-front-card" onclick="openLightbox('Asset/amazon_sales_dashboard.jpg', 'image', 'Amazon Global Sales Performance Dashboard')" title="Click to inspect dashboard">
+                    <div class="deck-front-card" data-analytics="project-inspect" onclick="openLightbox('Asset/amazon_sales_dashboard.jpg', 'image', 'Amazon Global Sales Performance Dashboard')" title="Click to inspect dashboard">
                       <img src="Asset/amazon_sales_dashboard.jpg" alt="Amazon Global Sales Performance Dashboard" class="cert-deck-img" loading="lazy">
                       <div class="cert-deck-overlay">
                         <span class="hint-pill">&#128269; Click to inspect</span>
@@ -1197,11 +1204,11 @@
                     </div>
 
                     <div class="project-action-bar cert-actions">
-                      <a href="https://github.com/TCWaghmare" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm">
+                      <a href="https://github.com/TCWaghmare" target="_blank" rel="noopener noreferrer" class="btn btn-primary-yellow btn-sm" data-analytics="project-github">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
                         <span>GitHub</span>
                       </a>
-                      <button class="btn btn-secondary-pill btn-sm" onclick="openLightbox('Asset/amazon_sales_dashboard.jpg', 'image', 'Amazon Global Sales Performance Dashboard')">
+                      <button class="btn btn-secondary-pill btn-sm" data-analytics="project-inspect" onclick="openLightbox('Asset/amazon_sales_dashboard.jpg', 'image', 'Amazon Global Sales Performance Dashboard')">
                         <span>Enlarge</span>
                       </button>
                     </div>
@@ -2877,6 +2884,7 @@
 
   <!-- Spline 3D Viewer Runtime (Deferred Non-Blocking Module) -->
   <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
+  <script src="analytics.js?v=20261103_v1"></script>
   <script src="script.js?v=20261026_supabase"></script>
 </body>
 </html>

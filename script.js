@@ -365,7 +365,7 @@
 
   // --- Global Lightbox Modal Controller ---
   window.openLightbox = function (mediaSrc, mediaType, title) {
-    if (!lightboxModal || !lightboxBody) return;
+    if (!lightboxModal || !lightboxBody) return; try { window.dispatchEvent(new CustomEvent('portfolio:lightbox', { detail: { mediaSrc, mediaType, title } })); } catch (e) {}
 
     if (lightboxTitle) {
       lightboxTitle.textContent = title || 'Preview';
@@ -687,6 +687,7 @@
   };
 
   // Helper to persist submission records directly into Supabase table
+  window.SUPABASE_CONFIG = SUPABASE_CONFIG;
   async function saveToSupabase(payload) {
     if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
       return { skipped: true, reason: 'Supabase credentials not configured' };
@@ -831,6 +832,7 @@
         }
         if (submitBtn) {
           submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
+          try { if (window.PortfolioAnalytics) window.PortfolioAnalytics.track('contact_submit', { topic: topic, urgency: urgency }); } catch (e) {}
           setTimeout(() => {
             submitBtn.disabled = false;
             submitBtn.classList.remove('is-loading');
@@ -849,6 +851,7 @@
         if (permissionEl) permissionEl.checked = false;
         if (submitBtn) {
           submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
+          try { if (window.PortfolioAnalytics) window.PortfolioAnalytics.track('contact_submit', { topic: topic, urgency: urgency }); } catch (e) {}
           setTimeout(() => {
             submitBtn.disabled = false;
             submitBtn.classList.remove('is-loading');
@@ -1066,6 +1069,7 @@
 
     function updateDots() {
       const activeDotIndex = currentIndex % totalOriginal;
+      try { container.dispatchEvent(new CustomEvent('carousel:slide', { bubbles: true, detail: { activeIndex: activeDotIndex, containerId: containerId, totalSlides: totalOriginal } })); } catch (e) {}
 
       // Update active slide visual state during swipe
       const slides = track.querySelectorAll('.cert-card-slide');

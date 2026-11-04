@@ -16,13 +16,13 @@
  *    including the visitor's phone, email, and a 1-click direct reply button.
  * 
  * ------------------------------------------------------------------------------
- * HOW TO UPDATE IN GOOGLE APPS SCRIPT:
+ * HOW TO TEST & DEPLOY IN GOOGLE APPS SCRIPT:
  * 1. Open https://script.google.com and open your "Tejas Portfolio Auto-Responder" project.
- * 2. Replace all code in Code.gs with this file's code, and click Save (💾).
- * 3. Click the blue "Deploy" button (top right) ➔ "Manage deployments".
- * 4. Click the edit icon (✏️) next to your active deployment.
- * 5. Under "Version", choose "New version".
- * 6. Click "Deploy". Done!
+ * 2. In Code.gs, select all, delete everything, and paste this entire file. Click Save (💾).
+ * 3. 1-CLICK TEST: In the dropdown at the top (next to "Debug"), select "testSendAutoReply"
+ *    and click "Run". Authorize permissions if prompted. Check your Gmail inbox!
+ * 4. DEPLOY: Click the blue "Deploy" button (top right) ➔ "Manage deployments".
+ *    Click the Pencil icon (✏️ Edit) ➔ Version: select "New version" ➔ click "Deploy".
  * ==============================================================================
  */
 
@@ -77,6 +77,17 @@ function doPost(e) {
     //    (Contains Profile Picture, Warm Reassurance & Social Links — NO Contact Info)
     // --------------------------------------------------------------------------
     var autoReplySubject = '✨ Thank you for reaching out, ' + visitorName + '! — Tejas C. Waghmare';
+    var autoReplyPlain = 'Hi ' + visitorName + ',\n\n'
+      + 'Thank you for taking the time to explore my portfolio and reach out! I have received your message regarding ' + topic + '.\n\n'
+      + 'Your inquiry is safely in my inbox, and I will definitely get back to you as soon as possible.\n\n'
+      + 'Explore My Portfolio: ' + CONFIG.portfolioUrl + '\n'
+      + 'Connect on LinkedIn: ' + CONFIG.linkedinUrl + '\n'
+      + 'GitHub Projects: ' + CONFIG.githubUrl + '\n\n'
+      + 'Warm regards,\n'
+      + CONFIG.ownerName + '\n'
+      + CONFIG.title + '\n'
+      + CONFIG.location;
+
     var autoReplyHtml = buildVisitorEmailHtml({
       name: visitorName,
       email: visitorEmail,
@@ -85,7 +96,7 @@ function doPost(e) {
       message: message
     });
 
-    GmailApp.sendEmail(visitorEmail, autoReplySubject, '', {
+    GmailApp.sendEmail(visitorEmail, autoReplySubject, autoReplyPlain, {
       name: CONFIG.ownerName,
       htmlBody: autoReplyHtml,
       replyTo: CONFIG.ownerEmail
@@ -95,6 +106,14 @@ function doPost(e) {
     // 2. SEND INSTANT LEAD NOTIFICATION TO TEJAS (WITH VISITOR'S CONTACT DETAILS)
     // --------------------------------------------------------------------------
     var notifySubject = '⚡ [Portfolio Lead] ' + topic + ' from ' + visitorName + ' (' + urgency + ')';
+    var notifyPlain = 'New Portfolio Inquiry:\n'
+      + 'Name: ' + visitorName + '\n'
+      + 'Email: ' + visitorEmail + '\n'
+      + 'Phone: ' + visitorPhone + '\n'
+      + 'Topic: ' + topic + '\n'
+      + 'Urgency: ' + urgency + '\n'
+      + 'Message: ' + message;
+
     var notifyHtml = buildOwnerNotificationHtml({
       name: visitorName,
       email: visitorEmail,
@@ -105,7 +124,7 @@ function doPost(e) {
       message: message
     });
 
-    GmailApp.sendEmail(CONFIG.ownerEmail, notifySubject, '', {
+    GmailApp.sendEmail(CONFIG.ownerEmail, notifySubject, notifyPlain, {
       name: 'Portfolio Contact Engine',
       htmlBody: notifyHtml,
       replyTo: visitorEmail // Clicking "Reply" in your Gmail directly replies to the visitor!
@@ -160,6 +179,30 @@ function doGet(e) {
       owner: CONFIG.ownerName
     }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * 1-CLICK TEST FUNCTION:
+ * Run this directly inside Google Apps Script editor to test sending an email!
+ * Select "testSendAutoReply" from the function dropdown at the top, then click "Run".
+ * It will instantly send a test auto-reply email directly to tejaswaghmare900@gmail.com!
+ */
+function testSendAutoReply() {
+  var testPayload = {
+    postData: {
+      contents: JSON.stringify({
+        name: "Tejas (Test Run)",
+        email: CONFIG.ownerEmail,
+        phone: "+91 83788 69006",
+        call_whatsapp_permission: "Yes",
+        topic: "A project",
+        urgency: "ASAP",
+        message: "This is a live test to verify the auto-reply email delivery with profile image and social links."
+      })
+    }
+  };
+  var output = doPost(testPayload);
+  Logger.log("Test Result: " + output.getContent());
 }
 
 /**

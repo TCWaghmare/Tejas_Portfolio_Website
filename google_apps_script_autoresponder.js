@@ -5,16 +5,10 @@
  * ==============================================================================
  * 
  * 100% AUTOMATED — ZERO MANUAL WORK REQUIRED:
- * 1. As soon as any visitor submits the contact form on your portfolio website,
- *    Google Apps Script automatically and instantly sends this personalized
- *    confirmation email directly to their email address.
- * 2. It does NOT ask you for permission or approval each time. It runs 24/7 autonomously.
- * 3. Greets the visitor by name with a warm, gentle message thanking them for visiting
- *    your portfolio website and assuring them you will definitely reply ASAP.
- * 4. Displays your official profile image prominently at the top with a golden border.
- * 5. Includes your official links in order: Portfolio (1st), LinkedIn, and GitHub.
- * 6. Keeps your personal phone/WhatsApp contact info private.
- * 7. Simultaneously sends an alert to your Gmail (tejaswaghmare900@gmail.com) with the lead info.
+ * 1. When a visitor submits your form, Google Apps Script automatically sends
+ *    them the warm auto-reply email with your profile picture and social links.
+ * 2. It does NOT require you to click or reply to anything.
+ * 3. It also sends YOU a lead summary alert so you know someone reached out.
  * ==============================================================================
  */
 
@@ -67,7 +61,7 @@ function doPost(e) {
 
     // --------------------------------------------------------------------------
     // 1. SEND WARM, GENTLE AUTO-REPLY TO THE VISITOR'S GMAIL (100% AUTOMATIC)
-    //    (Contains Profile Picture, Warm Reassurance & Social Links — NO Contact Info)
+    //    Delivered directly to the visitor's email address entered in the form
     // --------------------------------------------------------------------------
     var autoReplySubject = '✨ Thank you for visiting my portfolio, ' + visitorName + '! — Tejas C. Waghmare';
     var autoReplyPlain = 'Hi ' + visitorName + ',\n\n'
@@ -89,14 +83,25 @@ function doPost(e) {
       message: message
     });
 
-    GmailApp.sendEmail(visitorEmail, autoReplySubject, autoReplyPlain, {
-      name: CONFIG.ownerName,
-      htmlBody: autoReplyHtml,
-      replyTo: CONFIG.ownerEmail
-    });
+    try {
+      MailApp.sendEmail({
+        to: visitorEmail,
+        subject: autoReplySubject,
+        body: autoReplyPlain,
+        htmlBody: autoReplyHtml,
+        name: CONFIG.ownerName,
+        replyTo: CONFIG.ownerEmail
+      });
+    } catch (mailErr) {
+      GmailApp.sendEmail(visitorEmail, autoReplySubject, autoReplyPlain, {
+        name: CONFIG.ownerName,
+        htmlBody: autoReplyHtml,
+        replyTo: CONFIG.ownerEmail
+      });
+    }
 
     // --------------------------------------------------------------------------
-    // 2. SEND INSTANT LEAD NOTIFICATION TO TEJAS (WITH VISITOR'S CONTACT DETAILS)
+    // 2. SEND LEAD NOTIFICATION ALERT TO TEJAS (YOUR ADMIN ALERT)
     // --------------------------------------------------------------------------
     var notifySubject = '⚡ [Portfolio Lead] ' + topic + ' from ' + visitorName + ' (' + urgency + ')';
     var notifyPlain = 'New Portfolio Inquiry:\n'
@@ -105,7 +110,8 @@ function doPost(e) {
       + 'Phone: ' + visitorPhone + '\n'
       + 'Topic: ' + topic + '\n'
       + 'Urgency: ' + urgency + '\n'
-      + 'Message: ' + message;
+      + 'Message: ' + message + '\n\n'
+      + '(The auto-reply email was already delivered to ' + visitorEmail + ' automatically)';
 
     var notifyHtml = buildOwnerNotificationHtml({
       name: visitorName,
@@ -117,11 +123,22 @@ function doPost(e) {
       message: message
     });
 
-    GmailApp.sendEmail(CONFIG.ownerEmail, notifySubject, notifyPlain, {
-      name: 'Portfolio Contact Engine',
-      htmlBody: notifyHtml,
-      replyTo: visitorEmail
-    });
+    try {
+      MailApp.sendEmail({
+        to: CONFIG.ownerEmail,
+        subject: notifySubject,
+        body: notifyPlain,
+        htmlBody: notifyHtml,
+        name: 'Portfolio Contact Engine',
+        replyTo: visitorEmail
+      });
+    } catch (mailErr2) {
+      GmailApp.sendEmail(CONFIG.ownerEmail, notifySubject, notifyPlain, {
+        name: 'Portfolio Contact Engine',
+        htmlBody: notifyHtml,
+        replyTo: visitorEmail
+      });
+    }
 
     // --------------------------------------------------------------------------
     // 3. (OPTIONAL) AUTO-LOG INTO LINKED GOOGLE SHEET IF SPREADSHEET EXISTS
@@ -353,7 +370,8 @@ function buildVisitorEmailHtml(data) {
 }
 
 /**
- * Builds the notification email delivered to Tejas with 1-click reply to visitor.
+ * Builds the notification alert email delivered to Tejas (Admin Alert).
+ * Clarifies that the auto-reply was ALREADY sent automatically.
  */
 function buildOwnerNotificationHtml(data) {
   var escapedName = escapeHtml(data.name);
@@ -369,8 +387,15 @@ function buildOwnerNotificationHtml(data) {
     + '<html>'
     + '<body style="font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; background: #0e1014; color: #e1e4ea; padding: 24px;">'
     + '  <div style="max-width: 580px; margin: 0 auto; background: #16181e; border: 1px solid #282c38; border-radius: 12px; padding: 28px;">'
+    + '    '
+    + '    <!-- Green Automated Status Badge -->'
+    + '    <div style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #4ade80; font-size: 13px; line-height: 1.5;">'
+    + '      ✅ <strong>AUTO-REPLY SENT AUTOMATICALLY:</strong><br>'
+    + '      Your confirmation email (with your profile picture and social links) was already delivered to <strong>' + escapedEmail + '</strong>. No action is required from you!'
+    + '    </div>'
+    + '    '
     + '    <div style="background: #F5E025; color: #000; display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 11px; letter-spacing: 1px; margin-bottom: 12px;">'
-    + '      NEW PORTFOLIO INQUIRY'
+    + '      NEW INQUIRY SUMMARY'
     + '    </div>'
     + '    <h2 style="margin: 0 0 16px 0; color: #fff; font-size: 20px;">'
     + '      ' + escapedName + ' sent you a message!'
@@ -385,17 +410,17 @@ function buildOwnerNotificationHtml(data) {
     + '      <tr><td style="padding: 6px 0; color: #8890a0;">Urgency:</td><td style="color: #fff;">' + escapedUrgency + '</td></tr>'
     + '    </table>'
     + '    '
-    + '    <div style="background: #0f1013; border: 1px solid #232630; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px;">'
+    + '    <div style="background: #0f1013; border: 1px solid #232630; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px;">'
     + '      <div style="font-size: 11px; text-transform: uppercase; color: #788090; font-weight: 700; margin-bottom: 6px;">Message:</div>'
     + '      <div style="font-size: 14.5px; line-height: 1.6; color: #f0f2f6;">' + escapedMessage + '</div>'
     + '    </div>'
     + '    '
-    + '    <a href="mailto:' + escapedEmail + '?subject=Re:%20' + encodeURIComponent(data.topic) + '%20%E2%80%94%20Tejas%20Waghmare" style="display: block; text-align: center; background: #F5E025; color: #000; padding: 12px 20px; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 14px;">'
-    + '      Reply to ' + escapedName + ' &rarr;'
-    + '    </a>'
-  + '  </div>'
-  + '</body>'
-  + '</html>';
+    + '    <div style="padding: 12px 16px; background: #111317; border: 1px solid #232733; border-radius: 8px; font-size: 12.5px; color: #8e95a3; text-align: center;">'
+    + '      💬 If you ever want to write an additional manual follow-up in the future, you can write directly to <a href="mailto:' + escapedEmail + '" style="color: #F5E025; text-decoration: underline;">' + escapedEmail + '</a>.'
+    + '    </div>'
+    + '  </div>'
+    + '</body>'
+    + '</html>';
 }
 
 /**

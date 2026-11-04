@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Host
+Host: https://tcwaghmare.github.io
+
+# Sitemaps
+Sitemap: https://tcwaghmare.github.io/sitemap.xml

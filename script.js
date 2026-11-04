@@ -961,7 +961,7 @@
   const AUTO_RESPONDER_CONFIG = {
     // 1. Google Apps Script Web App (RECOMMENDED: 100% Free native Gmail delivery directly to visitor)
     // Deploy google_apps_script_autoresponder.js in script.google.com and paste your Web App URL below:
-    googleScriptUrl: 'https://script.google.com/macros/s/AKfycbzd3PjjuxkDH9Qabt1DMbJNu6loTcoYpTs0HHUkiL1rVhL_AX2kTt2LOojuyVjeefgJUA/exec',
+    googleScriptUrl: 'https://script.google.com/macros/s/AKfycbyLaoX7UU9_uvtgNAC1Chcq1PEzcOvfbQl3kp53t2JlPrfD1dRw5btr2SwuTCpXAEfG1A/exec',
 
     // 2. EmailJS (Alternative client-side email dispatch service)
     emailjs: {

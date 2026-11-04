@@ -4,25 +4,17 @@
  * Google Apps Script (GAS) Web App
  * ==============================================================================
  * 
- * WHAT THIS SCRIPT DOES:
- * 1. Instantly sends a warm, gentle, beautifully formatted confirmation email
- *    directly to the visitor's Gmail address as soon as they submit your contact form.
- * 2. Displays your official profile image prominently at the top with a golden border.
- * 3. Personally greets them by name and assures them that you will definitely
- *    reply to them ASAP.
- * 4. Highlights your Portfolio and Social Links (LinkedIn & GitHub) with clickable buttons.
- * 5. Does NOT include your personal contact info (phone/WhatsApp/direct email) in the visitor's reply.
- * 6. Simultaneously delivers a detailed lead notification to your Gmail (tejaswaghmare900@gmail.com)
- *    including the visitor's phone, email, and a 1-click direct reply button.
- * 
- * ------------------------------------------------------------------------------
- * HOW TO TEST & DEPLOY IN GOOGLE APPS SCRIPT:
- * 1. Open https://script.google.com and open your "Tejas Portfolio Auto-Responder" project.
- * 2. In Code.gs, select all, delete everything, and paste this entire file. Click Save (💾).
- * 3. 1-CLICK TEST: In the dropdown at the top (next to "Debug"), select "testSendAutoReply"
- *    and click "Run". Authorize permissions if prompted. Check your Gmail inbox!
- * 4. DEPLOY: Click the blue "Deploy" button (top right) ➔ "Manage deployments".
- *    Click the Pencil icon (✏️ Edit) ➔ Version: select "New version" ➔ click "Deploy".
+ * 100% AUTOMATED — ZERO MANUAL WORK REQUIRED:
+ * 1. As soon as any visitor submits the contact form on your portfolio website,
+ *    Google Apps Script automatically and instantly sends this personalized
+ *    confirmation email directly to their email address.
+ * 2. It does NOT ask you for permission or approval each time. It runs 24/7 autonomously.
+ * 3. Greets the visitor by name with a warm, gentle message thanking them for visiting
+ *    your portfolio website and assuring them you will definitely reply ASAP.
+ * 4. Displays your official profile image prominently at the top with a golden border.
+ * 5. Includes your official links in order: Portfolio (1st), LinkedIn, and GitHub.
+ * 6. Keeps your personal phone/WhatsApp contact info private.
+ * 7. Simultaneously sends an alert to your Gmail (tejaswaghmare900@gmail.com) with the lead info.
  * ==============================================================================
  */
 
@@ -41,6 +33,7 @@ var CONFIG = {
 
 /**
  * Handles incoming POST requests from the portfolio contact form.
+ * Executes 100% automatically in the background.
  */
 function doPost(e) {
   try {
@@ -73,16 +66,16 @@ function doPost(e) {
     }
 
     // --------------------------------------------------------------------------
-    // 1. SEND WARM, GENTLE AUTO-REPLY TO THE VISITOR'S GMAIL
+    // 1. SEND WARM, GENTLE AUTO-REPLY TO THE VISITOR'S GMAIL (100% AUTOMATIC)
     //    (Contains Profile Picture, Warm Reassurance & Social Links — NO Contact Info)
     // --------------------------------------------------------------------------
-    var autoReplySubject = '✨ Thank you for reaching out, ' + visitorName + '! — Tejas C. Waghmare';
+    var autoReplySubject = '✨ Thank you for visiting my portfolio, ' + visitorName + '! — Tejas C. Waghmare';
     var autoReplyPlain = 'Hi ' + visitorName + ',\n\n'
-      + 'Thank you for taking the time to explore my portfolio and reach out! I have received your message regarding ' + topic + '.\n\n'
-      + 'Your inquiry is safely in my inbox, and I will definitely get back to you as soon as possible.\n\n'
-      + 'Explore My Portfolio: ' + CONFIG.portfolioUrl + '\n'
-      + 'Connect on LinkedIn: ' + CONFIG.linkedinUrl + '\n'
-      + 'GitHub Projects: ' + CONFIG.githubUrl + '\n\n'
+      + 'Thank you so much for visiting my portfolio website and taking the time to reach out regarding ' + topic + '!\n\n'
+      + 'Your message is safely in my personal inbox, and I will definitely review it and reply to you as soon as possible.\n\n'
+      + '1. Explore My Portfolio: ' + CONFIG.portfolioUrl + '\n'
+      + '2. Connect on LinkedIn: ' + CONFIG.linkedinUrl + '\n'
+      + '3. GitHub Projects: ' + CONFIG.githubUrl + '\n\n'
       + 'Warm regards,\n'
       + CONFIG.ownerName + '\n'
       + CONFIG.title + '\n'
@@ -127,7 +120,7 @@ function doPost(e) {
     GmailApp.sendEmail(CONFIG.ownerEmail, notifySubject, notifyPlain, {
       name: 'Portfolio Contact Engine',
       htmlBody: notifyHtml,
-      replyTo: visitorEmail // Clicking "Reply" in your Gmail directly replies to the visitor!
+      replyTo: visitorEmail
     });
 
     // --------------------------------------------------------------------------
@@ -184,8 +177,6 @@ function doGet(e) {
 /**
  * 1-CLICK TEST FUNCTION:
  * Run this directly inside Google Apps Script editor to test sending an email!
- * Select "testSendAutoReply" from the function dropdown at the top, then click "Run".
- * It will instantly send a test auto-reply email directly to tejaswaghmare900@gmail.com!
  */
 function testSendAutoReply() {
   var testPayload = {
@@ -197,7 +188,7 @@ function testSendAutoReply() {
         call_whatsapp_permission: "Yes",
         topic: "A project",
         urgency: "ASAP",
-        message: "This is a live test to verify the auto-reply email delivery with profile image and social links."
+        message: "Testing automated email delivery with profile image, warm message, and social links."
       })
     }
   };
@@ -206,12 +197,13 @@ function testSendAutoReply() {
 }
 
 /**
- * Builds the responsive HTML email delivered to the visitor.
+ * Builds the responsive HTML email delivered automatically to the visitor.
  * Features:
  * - Prominent circular profile image of Tejas with electric yellow border
- * - Personalized greeting and warm reassurance that Tejas will definitely reply ASAP
+ * - Personalized greeting thanking them for visiting the portfolio website
+ * - Reassurance that Tejas will definitely reply ASAP
  * - Clean copy of their inquiry
- * - Portfolio & Social links (LinkedIn, GitHub)
+ * - Social links in order: 1. Portfolio, 2. LinkedIn, 3. GitHub
  * - NO personal contact info (no phone, whatsapp, or direct email displayed)
  */
 function buildVisitorEmailHtml(data) {
@@ -226,7 +218,7 @@ function buildVisitorEmailHtml(data) {
     + '<head>'
     + '  <meta charset="UTF-8">'
     + '  <meta name="viewport" content="width=device-width, initial-scale=1.0">'
-    + '  <title>Thank You for Reaching Out</title>'
+    + '  <title>Thank You for Visiting My Portfolio</title>'
     + '</head>'
     + '<body style="margin: 0; padding: 0; background-color: #0c0d10; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif; color: #e6e8ec; -webkit-font-smoothing: antialiased;">'
     + '  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #0c0d10; padding: 32px 16px;">'
@@ -264,10 +256,10 @@ function buildVisitorEmailHtml(data) {
     + '              </div>'
     + '              '
     + '              <h1 style="margin: 0; font-size: 24px; line-height: 1.3; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">'
-    + '                Thank you for reaching out, <span style="color: #F5E025;">' + escapedName + '</span>!'
+    + '                Thank you for visiting my portfolio, <span style="color: #F5E025;">' + escapedName + '</span>!'
     + '              </h1>'
     + '              <p style="margin: 6px 0 0 0; font-size: 14px; color: #9da3af;">'
-    + '                I received your message regarding <strong>' + escapedTopic + '</strong>.'
+    + '                I received your note regarding <strong>' + escapedTopic + '</strong>.'
     + '              </p>'
     + '            </td>'
     + '          </tr>'
@@ -279,7 +271,7 @@ function buildVisitorEmailHtml(data) {
     + '                Hi <strong>' + escapedName + '</strong>,'
     + '              </p>'
     + '              <p style="font-size: 15px; line-height: 1.65; color: #d2d6df; margin: 0 0 16px 0;">'
-    + '                Thank you for taking the time to explore my portfolio and reach out. I truly appreciate your message and interest in collaborating!'
+    + '                Thank you so much for visiting my portfolio website and taking the time to reach out! I truly appreciate your message and interest in my work.'
     + '              </p>'
     + '              '
     + '              <!-- Reassurance Callout -->'
@@ -314,26 +306,26 @@ function buildVisitorEmailHtml(data) {
     + '                While I review your note, feel free to explore my analytics projects, interactive dashboards, or connect with me across my social profiles:'
     + '              </p>'
     + '              '
-    + '              <!-- Social Links & Portfolio CTA Buttons (No Contact Info) -->'
+    + '              <!-- Social Links & Portfolio CTA Buttons (Portfolio 1st, LinkedIn, GitHub) -->'
     + '              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 20px 0 10px 0;">'
     + '                <tr>'
     + '                  <td align="center" style="padding-bottom: 10px;">'
     + '                    <a href="' + CONFIG.portfolioUrl + '" target="_blank" style="display: block; width: 100%; box-sizing: border-box; text-align: center; background: #F5E025; color: #0c0d10; padding: 12px 20px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; box-shadow: 0 4px 14px rgba(245, 224, 37, 0.25);">'
-    + '                      🌐 Explore My Interactive Portfolio &rarr;'
+    + '                      🌐 1. Explore My Interactive Portfolio &rarr;'
     + '                    </a>'
     + '                  </td>'
     + '                </tr>'
     + '                <tr>'
     + '                  <td align="center" style="padding-bottom: 10px;">'
     + '                    <a href="' + CONFIG.linkedinUrl + '" target="_blank" style="display: block; width: 100%; box-sizing: border-box; text-align: center; background: #232732; border: 1px solid #363c4c; color: #ffffff; padding: 11px 20px; border-radius: 8px; font-weight: 600; font-size: 13.5px; text-decoration: none;">'
-    + '                      💼 Connect with Me on LinkedIn &rarr;'
+    + '                      💼 2. Connect with Me on LinkedIn &rarr;'
     + '                    </a>'
     + '                  </td>'
     + '                </tr>'
     + '                <tr>'
     + '                  <td align="center">'
     + '                    <a href="' + CONFIG.githubUrl + '" target="_blank" style="display: block; width: 100%; box-sizing: border-box; text-align: center; background: #1a1d24; border: 1px solid #2a2e3a; color: #c4c8d3; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px; text-decoration: none;">'
-    + '                      🐙 View My Projects on GitHub &rarr;'
+    + '                      🐙 3. View My Projects on GitHub &rarr;'
     + '                    </a>'
     + '                  </td>'
     + '                </tr>'
@@ -362,7 +354,6 @@ function buildVisitorEmailHtml(data) {
 
 /**
  * Builds the notification email delivered to Tejas with 1-click reply to visitor.
- * (Contains the visitor's details so Tejas can contact them back).
  */
 function buildOwnerNotificationHtml(data) {
   var escapedName = escapeHtml(data.name);

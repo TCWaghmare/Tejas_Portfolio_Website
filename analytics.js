@@ -21,7 +21,7 @@
     // Replace 'G-XXXXXXXXXX' with your Google Measurement ID from GA4
     ga4: {
       enabled: true,
-      measurementId: 'G-XXXXXXXXXX' // e.g. 'G-ABC123XYZ0'
+      measurementId: 'G-RL2KNEHDN4'
     },
 
     // Plausible Analytics (Privacy-first, cookieless)

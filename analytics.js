@@ -28,7 +28,7 @@
     // Set enabled to true and replace domain with your site's custom domain
     plausible: {
       enabled: false,
-      domain: 'tejaswaghmare.com', // e.g. 'yourdomain.com'
+      domain: 'www.tejaswaghmare.me',
       apiHost: 'https://plausible.io'
     },
 

@@ -17,7 +17,7 @@
 var CONFIG = {
   ownerName: 'Tejas C. Waghmare',
   ownerEmail: 'tejaswaghmare900@gmail.com',
-  portfolioUrl: 'https://tcwaghmare.github.io/',
+  portfolioUrl: 'https://www.tejaswaghmare.me/',
   linkedinUrl: 'https://www.linkedin.com/in/tejascwaghmare',
   githubUrl: 'https://github.com/TCWaghmare',
   profileImageUrl: 'https://raw.githubusercontent.com/TCWaghmare/Tejas_Portfolio_Website/main/Asset/tejas_avatar.png',

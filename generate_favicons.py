@@ -23,3 +23,4 @@ for filename, size in png_specs:
     resized = src.resize(size, Image.Resampling.LANCZOS)
     resized.save(filename, 'PNG', optimize=True)
     print(f'Generated {filename} ({size[0]}x{size[1]})')
+

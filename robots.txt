@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://tcwaghmare.github.io
+Host: https://www.tejaswaghmare.me
 
 # Sitemaps
-Sitemap: https://tcwaghmare.github.io/sitemap.xml
+Sitemap: https://www.tejaswaghmare.me/sitemap.xml

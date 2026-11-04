@@ -136,7 +136,7 @@ for b_path, code, title in badges_info:
 bar_y = 502
 draw.line([(60, bar_y), (690, bar_y)], fill=(34, 38, 49, 255), width=1)
 
-url_str = "tcwaghmare.github.io"
+url_str = "www.tejaswaghmare.me"
 url_bbox = draw.textbbox((0, 0), url_str, font=f_url)
 url_tw = url_bbox[2] - url_bbox[0]
 url_th = url_bbox[3] - url_bbox[1]

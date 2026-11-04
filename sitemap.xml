@@ -2,43 +2,43 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://tcwaghmare.github.io/</loc>
+    <loc>https://www.tejaswaghmare.me/</loc>
     <lastmod>2026-11-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     
     <!-- Primary Portfolio Social Banner -->
     <image:image>
-      <image:loc>https://tcwaghmare.github.io/Asset/og-image.jpg</image:loc>
+      <image:loc>https://www.tejaswaghmare.me/Asset/og-image.jpg</image:loc>
       <image:title>Tejas C. Waghmare - Data Analyst &amp; BI Specialist Portfolio</image:title>
       <image:caption>Microsoft Certified Data Analyst and Business Intelligence Specialist portfolio showcase.</image:caption>
     </image:image>
 
     <!-- Profile Hero Portrait -->
     <image:image>
-      <image:loc>https://tcwaghmare.github.io/Asset/profile_hero.webp</image:loc>
+      <image:loc>https://www.tejaswaghmare.me/Asset/profile_hero.webp</image:loc>
       <image:title>Tejas C. Waghmare - Microsoft Certified Associate</image:title>
       <image:caption>Portrait of Tejas C. Waghmare, Data Analyst &amp; BI Specialist.</image:caption>
     </image:image>
 
     <!-- Amazon Sales Dashboard Project -->
     <image:image>
-      <image:loc>https://tcwaghmare.github.io/Asset/amazon_sales_dashboard.jpg</image:loc>
+      <image:loc>https://www.tejaswaghmare.me/Asset/amazon_sales_dashboard.jpg</image:loc>
       <image:title>Amazon Global Sales Performance Dashboard</image:title>
       <image:caption>Power BI interactive dashboard analyzing $32.8M in revenue, returns, and profitability.</image:caption>
     </image:image>
 
     <!-- Microsoft Certifications -->
     <image:image>
-      <image:loc>https://tcwaghmare.github.io/Badges/pl%20300.png</image:loc>
+      <image:loc>https://www.tejaswaghmare.me/Badges/pl%20300.png</image:loc>
       <image:title>Microsoft Certified: Power BI Data Analyst Associate (PL-300)</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://tcwaghmare.github.io/Badges/dp%20600.png</image:loc>
+      <image:loc>https://www.tejaswaghmare.me/Badges/dp%20600.png</image:loc>
       <image:title>Microsoft Certified: Fabric Analytics Engineer Associate (DP-600)</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://tcwaghmare.github.io/Badges/dp%20700.png</image:loc>
+      <image:loc>https://www.tejaswaghmare.me/Badges/dp%20700.png</image:loc>
       <image:title>Microsoft Certified: Fabric Data Engineer Associate (DP-700)</image:title>
     </image:image>
   </url>

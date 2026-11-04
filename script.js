@@ -978,7 +978,7 @@
     ownerName: 'Tejas C. Waghmare',
     ownerEmail: 'tejaswaghmare900@gmail.com',
 
-    portfolioUrl: 'https://tcwaghmare.github.io/',
+    portfolioUrl: 'https://www.tejaswaghmare.me/',
     linkedinUrl: 'https://www.linkedin.com/in/tejascwaghmare',
     githubUrl: 'https://github.com/TCWaghmare'
   };

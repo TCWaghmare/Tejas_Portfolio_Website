@@ -8045,3 +8045,675 @@ img {
   color: inherit;
   -webkit-text-fill-color: inherit;
 }
+
+/* ==========================================================================
+   Resume Preview Modal & Live PDF Viewer System
+   ========================================================================== */
+.resume-modal-overlay {
+  z-index: 100000;
+  padding: 24px 16px;
+}
+
+.resume-modal-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 980px;
+  margin: auto;
+  padding: 32px 34px 28px;
+  background: rgba(20, 21, 25, 0.98);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 28px;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.8),
+              0 0 60px rgba(245, 224, 37, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(28px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.32s ease;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.resume-modal-inner::-webkit-scrollbar {
+  width: 6px;
+}
+
+.resume-modal-inner::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+.resume-modal-overlay.active .resume-modal-inner {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.resume-modal-close {
+  top: 22px;
+  right: 22px;
+}
+
+/* Modal Top Bar */
+.resume-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.resume-modal-title-col {
+  flex: 1;
+  min-width: 260px;
+}
+
+.resume-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 11px;
+  border-radius: 9999px;
+  margin-bottom: 8px;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: resumeLivePulse 1.8s infinite;
+}
+
+@keyframes resumeLivePulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.35);
+  }
+}
+
+.resume-modal-title {
+  font-family: var(--font-heading);
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 700;
+  color: var(--text-pure);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.02em;
+}
+
+.resume-modal-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Actions in Header */
+.resume-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.resume-view-switcher {
+  display: inline-flex;
+  background: var(--bg-nested);
+  padding: 3px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  gap: 2px;
+}
+
+.resume-switch-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 13px;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-family: var(--font-display);
+}
+
+.resume-switch-btn:hover {
+  color: var(--text-pure);
+}
+
+.resume-switch-btn.active {
+  background: var(--bg-pill);
+  color: var(--text-pure);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.resume-action-pill-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-pill);
+  border: 1px solid var(--border-card);
+  color: var(--text-pure);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.resume-action-pill-btn:hover {
+  background: #36373f;
+  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--accent-yellow);
+  transform: translateY(-1px);
+}
+
+/* Download CTA Button & Animation */
+.resume-download-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 20px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  background: var(--accent-yellow);
+  color: #000000;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.resume-download-cta:hover {
+  background: var(--accent-yellow-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px var(--accent-yellow-glow);
+}
+
+.resume-download-cta.downloading {
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.resume-download-cta.download-complete {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.45) !important;
+  transform: scale(1.02);
+}
+
+/* Floating Download Toast Message (Requirement 2) */
+.resume-download-toast {
+  position: absolute;
+  top: 24px;
+  right: 76px;
+  z-index: 1000;
+  background: rgba(16, 185, 129, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 11px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45),
+              0 0 24px rgba(16, 185, 129, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-12px) scale(0.96);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.resume-download-toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.toast-check-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast-headline {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.toast-caption {
+  font-size: 11px;
+  opacity: 0.92;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+/* Resume Viewport */
+.resume-viewer-viewport {
+  background: #0f1013;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 16px;
+  max-height: calc(85vh - 240px);
+  min-height: 480px;
+  overflow-y: auto;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.resume-viewer-viewport::-webkit-scrollbar {
+  width: 6px;
+}
+
+.resume-viewer-viewport::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+/* Zoom Controls Bar */
+.resume-zoom-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 14px auto;
+  padding: 5px 14px;
+  background: rgba(20, 21, 26, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  width: fit-content;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.zoom-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-pure);
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--accent-yellow);
+}
+
+.zoom-btn-reset {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  color: var(--text-body);
+}
+
+.zoom-btn-reset:hover {
+  color: var(--text-pure);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.zoom-level-text {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--accent-yellow);
+  font-weight: 700;
+  min-width: 44px;
+  text-align: center;
+}
+
+/* Loading Indicator */
+.resume-loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  color: var(--text-muted);
+}
+
+.resume-spinner-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(245, 224, 37, 0.18);
+  border-top-color: var(--accent-yellow);
+  border-radius: 50%;
+  animation: resumeSpinner 0.8s linear infinite;
+}
+
+@keyframes resumeSpinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.resume-loading-text {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Scan Mode Sheets Container */
+.resume-canvas-scroll-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.resume-page-sheet {
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6),
+              0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  max-width: 100%;
+}
+
+.resume-canvas-page {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Embed Mode Wrap */
+.resume-embed-wrap {
+  width: 100%;
+  height: 60vh;
+  min-height: 480px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.resume-pdf-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Resume Modal Footer */
+.resume-modal-footer {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Bottom Continuous Updates Note (Requirement 3) */
+.resume-update-notice-card {
+  background: rgba(245, 224, 37, 0.06);
+  border: 1px solid rgba(245, 224, 37, 0.24);
+  border-radius: 16px;
+  padding: 14px 18px;
+  position: relative;
+}
+
+.resume-notice-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent-yellow);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.resume-notice-message {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-body);
+  margin: 0;
+}
+
+.resume-notice-message strong {
+  color: var(--text-pure);
+}
+
+.resume-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.resume-footer-contact-btn {
+  font-size: 13px;
+  padding: 9px 18px;
+}
+
+/* Mobile Navigation Resume Button */
+.nav-mobile-resume-btn {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+/* Light Theme Overrides for Resume Modal */
+[data-theme="light"] .resume-modal-inner {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.2),
+              0 0 50px rgba(148, 99, 0, 0.12);
+}
+
+[data-theme="light"] .resume-modal-close {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+[data-theme="light"] .resume-modal-close:hover {
+  background: #F5E025;
+  border-color: #F5E025;
+  color: #000000;
+}
+
+[data-theme="light"] .resume-modal-title {
+  color: #0f172a;
+}
+
+[data-theme="light"] .resume-modal-sub {
+  color: #475569;
+}
+
+[data-theme="light"] .resume-view-switcher {
+  background: #eef1f6;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .resume-switch-btn {
+  color: #64748b;
+}
+
+[data-theme="light"] .resume-switch-btn:hover {
+  color: #0f172a;
+}
+
+[data-theme="light"] .resume-switch-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .resume-action-pill-btn {
+  background: #f1f3f7;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+[data-theme="light"] .resume-action-pill-btn:hover {
+  background: #e2e5eb;
+  color: var(--accent-yellow);
+}
+
+[data-theme="light"] .resume-viewer-viewport {
+  background: #eef2f7;
+  border-color: rgba(0, 0, 0, 0.08);
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+[data-theme="light"] .resume-viewer-viewport::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .resume-zoom-bar {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+}
+
+[data-theme="light"] .zoom-btn {
+  color: #0f172a;
+}
+
+[data-theme="light"] .zoom-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .zoom-btn-reset {
+  background: rgba(0, 0, 0, 0.06);
+  color: #475569;
+}
+
+[data-theme="light"] .zoom-btn-reset:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+[data-theme="light"] .resume-page-sheet {
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15),
+              0 2px 6px rgba(15, 23, 42, 0.08);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .resume-update-notice-card {
+  background: rgba(148, 99, 0, 0.06);
+  border-color: rgba(148, 99, 0, 0.22);
+}
+
+[data-theme="light"] .resume-notice-message {
+  color: #334155;
+}
+
+[data-theme="light"] .resume-notice-message strong {
+  color: #0f172a;
+}
+
+/* Responsive Styles for Resume Modal */
+@media (max-width: 768px) {
+  .resume-modal-inner {
+    padding: 24px 18px 20px;
+    border-radius: 22px;
+  }
+
+  .resume-modal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding-bottom: 14px;
+  }
+
+  .resume-modal-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .resume-view-switcher {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .resume-switch-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .resume-download-cta {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px;
+  }
+
+  .resume-viewer-viewport {
+    max-height: 56vh;
+    min-height: 360px;
+    padding: 10px 8px;
+  }
+
+  .resume-download-toast {
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    justify-content: center;
+  }
+
+  .resume-footer-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .resume-footer-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+}

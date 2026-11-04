@@ -146,6 +146,15 @@
         <a href="#hobbies" class="nav-item">Hobbies</a>
         <a href="#contact" class="nav-item">Contact</a>
         <div class="nav-mobile-bottom">
+          <a href="tejas resume.pdf" class="btn btn-secondary-pill nav-mobile-resume-btn" onclick="openResumeModal(event)" aria-label="Open Resume Preview">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>View Resume</span>
+          </a>
           <a href="#contact" class="btn btn-primary-yellow nav-mobile-cta">Let's Connect &rarr;</a>
         </div>
       </nav>
@@ -169,8 +178,14 @@
           </svg>
         </button>
 
-        <a href="tejas resume.pdf" target="_blank" class="btn btn-secondary-pill nav-resume-btn" download data-analytics="resume-download">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <a href="tejas resume.pdf" class="btn btn-secondary-pill nav-resume-btn" onclick="openResumeModal(event)" aria-label="Open Resume Preview" data-analytics="resume-modal-open">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
           <span>Resume</span>
         </a>
         <a href="#contact" class="btn btn-primary-yellow nav-cta-btn">
@@ -2914,6 +2929,141 @@
   <div class="footer-tip" id="footer-tip">Message me 💬</div>
 
 
+  <!-- =======================================================================
+       RESUME PREVIEW MODAL (Full Scanned PDF View, Instant Download & Continuous Updates Note)
+       ======================================================================= -->
+  <div id="resume-modal" class="cm-overlay resume-modal-overlay" role="dialog" aria-modal="true" aria-label="Tejas C. Waghmare Resume Preview" aria-hidden="true">
+    <div class="cm-backdrop" onclick="closeResumeModal()"></div>
+    
+    <button type="button" class="cm-close resume-modal-close" onclick="closeResumeModal()" aria-label="Close resume preview" title="Close (Esc)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    
+    <div class="resume-modal-inner">
+      <!-- Modal Top Bar -->
+      <div class="resume-modal-header">
+        <div class="resume-modal-title-col">
+          <div class="resume-live-badge">
+            <span class="live-pulse-dot" aria-hidden="true"></span>
+            <span>VERIFIED &bull; LATEST VERSION</span>
+          </div>
+          <h2 class="resume-modal-title display-text">Tejas C. Waghmare <span class="serif-accent highlight-yellow">&mdash; Resume</span></h2>
+          <p class="resume-modal-sub">Data Analyst &bull; Business Intelligence &bull; Power BI &bull; SQL &bull; Python &bull; Excel</p>
+        </div>
+
+        <div class="resume-modal-actions">
+          <!-- View Switcher -->
+          <div class="resume-view-switcher" role="group" aria-label="Resume View Mode">
+            <button type="button" id="btn-view-scan" class="resume-switch-btn active" onclick="switchResumeView('scan')" title="High-fidelity scanned sheet view">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              <span>Scan View</span>
+            </button>
+            <button type="button" id="btn-view-embed" class="resume-switch-btn" onclick="switchResumeView('embed')" title="Browser native PDF reader with zoom & search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              <span>Interactive PDF</span>
+            </button>
+          </div>
+
+          <!-- Open in new tab -->
+          <a href="tejas resume.pdf" target="_blank" class="resume-action-pill-btn" title="Open full PDF in new tab" aria-label="Open PDF in new tab">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+
+          <!-- Download Button -->
+          <button type="button" id="resume-download-btn-header" class="btn btn-primary-yellow resume-download-cta" onclick="downloadResumeFromModal(this)" aria-label="Download Resume PDF">
+            <svg class="download-icon-default" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span class="download-btn-label">Download PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Floating Toast for Download Completion (Requirement 2) -->
+      <div id="resume-download-toast" class="resume-download-toast" role="status" aria-live="polite">
+        <div class="toast-check-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="toast-message-body">
+          <div class="toast-headline">Resume Download Complete</div>
+          <div class="toast-caption">Tejas_C_Waghmare_Resume.pdf saved to your device.</div>
+        </div>
+      </div>
+
+      <!-- Resume Viewer Viewport (Requirement 1) -->
+      <div class="resume-viewer-viewport">
+        <!-- Zoom toolbar for canvas mode -->
+        <div class="resume-zoom-bar" id="resume-zoom-controls">
+          <button type="button" class="zoom-btn" onclick="adjustResumeZoom(-0.15)" aria-label="Zoom out" title="Zoom Out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+          <span id="resume-zoom-level" class="zoom-level-text">100%</span>
+          <button type="button" class="zoom-btn" onclick="adjustResumeZoom(0.15)" aria-label="Zoom in" title="Zoom In">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+          <button type="button" class="zoom-btn zoom-btn-reset" onclick="resetResumeZoom()" aria-label="Fit to width" title="Fit to width">
+            Fit Width
+          </button>
+        </div>
+
+        <!-- Loading spinner for PDF rendering -->
+        <div id="resume-loading-indicator" class="resume-loading-indicator">
+          <div class="resume-spinner-ring"></div>
+          <div class="resume-loading-text">Loading latest resume scan...</div>
+        </div>
+
+        <!-- Scan Mode (PDF.js Canvas Render showing whole scanned PDF) -->
+        <div id="resume-canvas-container" class="resume-canvas-scroll-wrap">
+          <!-- Rendered canvas sheets inserted dynamically -->
+        </div>
+
+        <!-- Embed Mode (Iframe / Native PDF reader) -->
+        <div id="resume-embed-container" class="resume-embed-wrap" style="display: none;">
+          <iframe id="resume-native-frame" class="resume-pdf-iframe" title="Tejas Waghmare Resume Viewer"></iframe>
+        </div>
+      </div>
+
+      <!-- Bottom Note & Action Bar (Requirement 3) -->
+      <div class="resume-modal-footer">
+        <div class="resume-update-notice-card">
+          <div class="resume-notice-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>CONTINUOUS LEARNING &amp; FREQUENT UPDATES</span>
+          </div>
+          <p class="resume-notice-message">
+            <strong>Note:</strong> This resume is frequently updated as I continuously learn new technologies, master advanced analytics &amp; BI tools, and complete hands-on projects. As my skills expand, latest certifications and milestones are promptly reflected in this document.
+          </p>
+        </div>
+
+        <div class="resume-footer-actions">
+          <button type="button" id="resume-download-btn-footer" class="btn btn-primary-yellow resume-download-cta" onclick="downloadResumeFromModal(this)" aria-label="Download Latest Resume PDF">
+            <svg class="download-icon-default" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span class="download-btn-label">Download Latest Resume</span>
+          </button>
+          
+          <button type="button" class="btn btn-secondary-pill resume-footer-contact-btn" onclick="closeResumeModal(); openContactModal(event);" aria-label="Open contact modal">
+            <span>Have an Opportunity? Let's Talk &rarr;</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF.js library for high-fidelity in-browser PDF rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="analytics.js?v=20261103_v1"></script>
   <script src="script.js?v=20261026_supabase"></script>
 </body>

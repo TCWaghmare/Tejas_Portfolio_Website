@@ -463,13 +463,21 @@
     });
 
     // --------------------------------------------------------------------------
-    // E. Resume Download Tracking
+    // E. Resume Preview & Download Tracking
     // --------------------------------------------------------------------------
     document.addEventListener('click', (e) => {
-      const resumeLink = e.target.closest('a[href*="resume"], [data-analytics="resume-download"]');
+      const modalTrigger = e.target.closest('[data-analytics="resume-modal-open"], .nav-resume-btn, .nav-mobile-resume-btn');
+      if (modalTrigger) {
+        trackEvent('resume_preview_open', {
+          trigger: modalTrigger.className
+        });
+        return;
+      }
+
+      const resumeLink = e.target.closest('a[href*="resume"][download], [data-analytics="resume-download"], .resume-download-cta');
       if (resumeLink) {
         trackEvent('resume_download', {
-          file_name: resumeLink.getAttribute('href') || 'resume.pdf',
+          file_name: resumeLink.getAttribute('href') || 'Tejas_C_Waghmare_Resume.pdf',
           link_text: resumeLink.textContent.trim()
         });
       }

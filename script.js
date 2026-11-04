@@ -369,7 +369,7 @@
     });
 
     // Close menu when clicking any nav item or mobile CTA
-    navLinks.querySelectorAll('.nav-item, .nav-mobile-cta').forEach((link) => {
+    navLinks.querySelectorAll('.nav-item, .nav-mobile-cta, .nav-mobile-resume-btn').forEach((link) => {
       link.addEventListener('click', () => {
         navLinks.classList.remove('mobile-open');
         mobileToggle.classList.remove('active');
@@ -680,15 +680,259 @@
     document.body.style.overflow = '';
   };
 
-  // Close modal on Escape key
+  // Close modals on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      const modal = document.getElementById('kova-contact-modal');
-      if (modal && modal.classList.contains('active')) {
+      const contactModal = document.getElementById('kova-contact-modal');
+      if (contactModal && contactModal.classList.contains('active')) {
         window.closeContactModal();
+      }
+      const resumeModal = document.getElementById('resume-modal');
+      if (resumeModal && resumeModal.classList.contains('active')) {
+        window.closeResumeModal();
       }
     }
   });
+
+  // =========================================================================
+  // Resume Preview Modal & Live PDF Viewer System
+  // =========================================================================
+  let resumePdfDoc = null;
+  let resumePdfScale = 1.35;
+  let isResumeLoaded = false;
+  let currentResumeView = 'scan'; // 'scan' or 'embed'
+  let downloadToastTimer = null;
+
+  function getInitialResumeScale() {
+    const w = window.innerWidth;
+    if (w <= 480) return 0.65;
+    if (w <= 768) return 0.85;
+    if (w <= 1024) return 1.1;
+    return 1.35;
+  }
+
+  window.openResumeModal = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const modal = document.getElementById('resume-modal');
+    if (!modal) return;
+    
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    // Hide footer cursor tip if visible
+    const tip = document.getElementById('footer-tip');
+    if (tip) tip.classList.remove('visible');
+
+    // Trigger analytics tracking if available
+    try {
+      if (typeof window.trackPortfolioEvent === 'function') {
+        window.trackPortfolioEvent('resume_modal_open', { trigger: 'resume_btn' });
+      }
+    } catch(err) {}
+
+    // Load resume if not loaded yet
+    if (!isResumeLoaded) {
+      resumePdfScale = getInitialResumeScale();
+      loadAndRenderResume();
+    }
+  };
+
+  window.closeResumeModal = function() {
+    const modal = document.getElementById('resume-modal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  };
+
+  window.switchResumeView = function(viewMode) {
+    currentResumeView = viewMode;
+    const btnScan = document.getElementById('btn-view-scan');
+    const btnEmbed = document.getElementById('btn-view-embed');
+    const canvasWrap = document.getElementById('resume-canvas-container');
+    const embedWrap = document.getElementById('resume-embed-container');
+    const zoomControls = document.getElementById('resume-zoom-controls');
+    const iframe = document.getElementById('resume-native-frame');
+
+    if (viewMode === 'scan') {
+      if (btnScan) btnScan.classList.add('active');
+      if (btnEmbed) btnEmbed.classList.remove('active');
+      if (canvasWrap) canvasWrap.style.display = 'flex';
+      if (embedWrap) embedWrap.style.display = 'none';
+      if (zoomControls) zoomControls.style.display = 'flex';
+    } else {
+      if (btnScan) btnScan.classList.remove('active');
+      if (btnEmbed) btnEmbed.classList.add('active');
+      if (canvasWrap) canvasWrap.style.display = 'none';
+      if (embedWrap) embedWrap.style.display = 'block';
+      if (zoomControls) zoomControls.style.display = 'none';
+
+      // Always load latest version using cache-busting timestamp
+      if (iframe && (!iframe.src || iframe.src.indexOf('tejas resume.pdf') === -1)) {
+        iframe.src = 'tejas resume.pdf?v=' + Date.now() + '#toolbar=1&navpanes=0&view=FitH';
+      }
+    }
+  };
+
+  window.adjustResumeZoom = function(delta) {
+    if (currentResumeView !== 'scan') return;
+    const newScale = Math.round((resumePdfScale + delta) * 100) / 100;
+    if (newScale >= 0.5 && newScale <= 2.5) {
+      resumePdfScale = newScale;
+      renderResumePages();
+    }
+  };
+
+  window.resetResumeZoom = function() {
+    if (currentResumeView !== 'scan') return;
+    resumePdfScale = getInitialResumeScale();
+    renderResumePages();
+  };
+
+  async function loadAndRenderResume() {
+    const loader = document.getElementById('resume-loading-indicator');
+    const iframe = document.getElementById('resume-native-frame');
+    
+    if (loader) loader.style.display = 'flex';
+    
+    // Attempt rendering using PDF.js
+    if (window.pdfjsLib) {
+      try {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        // Cache-busting URL guarantees the latest version is always rendered
+        const pdfUrl = 'tejas resume.pdf?v=' + Date.now();
+        const loadingTask = window.pdfjsLib.getDocument({
+          url: pdfUrl,
+          cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+          cMapPacked: true
+        });
+
+        resumePdfDoc = await loadingTask.promise;
+        await renderResumePages();
+        isResumeLoaded = true;
+        if (loader) loader.style.display = 'none';
+        return;
+      } catch (e) {
+        console.warn('PDF.js rendering note (switching to native embed fallback):', e);
+      }
+    }
+
+    // Fallback to native PDF iframe
+    if (loader) loader.style.display = 'none';
+    if (iframe) {
+      iframe.src = 'tejas resume.pdf?v=' + Date.now() + '#toolbar=1&navpanes=0&view=FitH';
+    }
+    window.switchResumeView('embed');
+    isResumeLoaded = true;
+  }
+
+  async function renderResumePages() {
+    if (!resumePdfDoc) return;
+    const container = document.getElementById('resume-canvas-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+
+    for (let pageNum = 1; pageNum <= resumePdfDoc.numPages; pageNum++) {
+      const page = await resumePdfDoc.getPage(pageNum);
+      const viewport = page.getViewport({ scale: resumePdfScale });
+
+      const pageSheet = document.createElement('div');
+      pageSheet.className = 'resume-page-sheet';
+
+      const canvas = document.createElement('canvas');
+      canvas.className = 'resume-canvas-page';
+      canvas.width = Math.floor(viewport.width * dpr);
+      canvas.height = Math.floor(viewport.height * dpr);
+      canvas.style.width = Math.floor(viewport.width) + 'px';
+      canvas.style.height = Math.floor(viewport.height) + 'px';
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const renderContext = {
+        canvasContext: ctx,
+        viewport: viewport
+      };
+
+      await page.render(renderContext).promise;
+      pageSheet.appendChild(canvas);
+      container.appendChild(pageSheet);
+    }
+
+    const zoomLabel = document.getElementById('resume-zoom-level');
+    if (zoomLabel) {
+      const baseScale = getInitialResumeScale();
+      const percent = Math.round((resumePdfScale / baseScale) * 100);
+      zoomLabel.textContent = percent + '%';
+    }
+  }
+
+  // Download Resume Function (Triggered by Header or Footer Download CTA)
+  window.downloadResumeFromModal = function(triggerBtn) {
+    // 1. Download file directly (with cache-busting to ensure latest version is fetched)
+    const link = document.createElement('a');
+    link.href = 'tejas resume.pdf?v=' + Date.now();
+    link.download = 'Tejas_C_Waghmare_Resume.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // 2. Track in analytics
+    try {
+      if (typeof window.trackPortfolioEvent === 'function') {
+        window.trackPortfolioEvent('resume_download_success', {
+          file_name: 'Tejas_C_Waghmare_Resume.pdf',
+          source: 'resume_modal'
+        });
+      }
+    } catch(e) {}
+
+    // 3. Update all download buttons in modal (header and footer)
+    const buttons = document.querySelectorAll('.resume-download-cta');
+    buttons.forEach(btn => {
+      btn.classList.add('downloading');
+      const label = btn.querySelector('.download-btn-label');
+      if (label) label.textContent = 'Downloading...';
+    });
+
+    setTimeout(() => {
+      buttons.forEach(btn => {
+        btn.classList.remove('downloading');
+        btn.classList.add('download-complete');
+        const label = btn.querySelector('.download-btn-label');
+        if (label) label.textContent = '✓ Downloaded!';
+      });
+
+      // 4. Show the very short message of download completion (Toast)
+      const toast = document.getElementById('resume-download-toast');
+      if (toast) {
+        toast.classList.add('show');
+        if (downloadToastTimer) clearTimeout(downloadToastTimer);
+        downloadToastTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3400);
+      }
+
+      // 5. Revert button label back after 3.8s
+      setTimeout(() => {
+        buttons.forEach(btn => {
+          btn.classList.remove('download-complete');
+          const label = btn.querySelector('.download-btn-label');
+          if (label) {
+            if (btn.id === 'resume-download-btn-footer') {
+              label.textContent = 'Download Latest Resume';
+            } else {
+              label.textContent = 'Download PDF';
+            }
+          }
+        });
+      }, 3800);
+    }, 400);
+  };
 
   // 6. One-Click Copy Contact Email
   window.copyContactEmail = function(btn) {

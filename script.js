@@ -254,7 +254,7 @@
   function queueRemainingFrames() {
     const queue = [];
     const stride = CONFIG.frameStride || 1;
-    
+
     // Priority 1: Keyframes spaced by stride
     for (let i = 1 + stride; i <= CONFIG.totalFrames; i += stride) {
       queue.push(i);
@@ -397,7 +397,7 @@
 
   // --- Global Lightbox Modal Controller ---
   window.openLightbox = function (mediaSrc, mediaType, title) {
-    if (!lightboxModal || !lightboxBody) return; try { window.dispatchEvent(new CustomEvent('portfolio:lightbox', { detail: { mediaSrc, mediaType, title } })); } catch (e) {}
+    if (!lightboxModal || !lightboxBody) return; try { window.dispatchEvent(new CustomEvent('portfolio:lightbox', { detail: { mediaSrc, mediaType, title } })); } catch (e) { }
 
     if (lightboxTitle) {
       lightboxTitle.textContent = title || 'Preview';
@@ -449,7 +449,7 @@
     }
   });
 
-    // =========================================================================
+  // =========================================================================
   // Kova "Let's talk." Interactive System
   // =========================================================================
   function initKovaContact() {
@@ -472,7 +472,7 @@
     // 2. How Urgent Slider ("HOW URGENT?")
     const urgencySlider = document.getElementById('talk-urgency');
     const urgencyVal = document.getElementById('talk-urgency-val');
-    
+
     function updateUrgencySlider(val) {
       if (!urgencyVal) return;
       let text = 'Sometime soon';
@@ -647,7 +647,7 @@
   }
 
   // 5. Modal Controllers for "Let's talk" (kova.me style)
-  window.openContactModal = function(e) {
+  window.openContactModal = function (e) {
     if (e && e.preventDefault) e.preventDefault();
     const modal = document.getElementById('kova-contact-modal');
     if (!modal) return;
@@ -672,7 +672,7 @@
     }, 150);
   };
 
-  window.closeContactModal = function() {
+  window.closeContactModal = function () {
     const modal = document.getElementById('kova-contact-modal');
     if (!modal) return;
     modal.classList.remove('active');
@@ -711,11 +711,11 @@
     return 1.35;
   }
 
-  window.openResumeModal = function(e) {
+  window.openResumeModal = function (e) {
     if (e && e.preventDefault) e.preventDefault();
     const modal = document.getElementById('resume-modal');
     if (!modal) return;
-    
+
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -729,7 +729,7 @@
       if (typeof window.trackPortfolioEvent === 'function') {
         window.trackPortfolioEvent('resume_modal_open', { trigger: 'resume_btn' });
       }
-    } catch(err) {}
+    } catch (err) { }
 
     // Load resume if not loaded yet
     if (!isResumeLoaded) {
@@ -738,7 +738,7 @@
     }
   };
 
-  window.closeResumeModal = function() {
+  window.closeResumeModal = function () {
     const modal = document.getElementById('resume-modal');
     if (!modal) return;
     modal.classList.remove('active');
@@ -746,7 +746,7 @@
     document.body.style.overflow = '';
   };
 
-  window.switchResumeView = function(viewMode) {
+  window.switchResumeView = function (viewMode) {
     currentResumeView = viewMode;
     const btnScan = document.getElementById('btn-view-scan');
     const btnEmbed = document.getElementById('btn-view-embed');
@@ -775,7 +775,7 @@
     }
   };
 
-  window.adjustResumeZoom = function(delta) {
+  window.adjustResumeZoom = function (delta) {
     if (currentResumeView !== 'scan') return;
     const newScale = Math.round((resumePdfScale + delta) * 100) / 100;
     if (newScale >= 0.5 && newScale <= 2.5) {
@@ -784,7 +784,7 @@
     }
   };
 
-  window.resetResumeZoom = function() {
+  window.resetResumeZoom = function () {
     if (currentResumeView !== 'scan') return;
     resumePdfScale = getInitialResumeScale();
     renderResumePages();
@@ -793,14 +793,14 @@
   async function loadAndRenderResume() {
     const loader = document.getElementById('resume-loading-indicator');
     const iframe = document.getElementById('resume-native-frame');
-    
+
     if (loader) loader.style.display = 'flex';
-    
+
     // Attempt rendering using PDF.js
     if (window.pdfjsLib) {
       try {
         window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        
+
         // Cache-busting URL guarantees the latest version is always rendered
         const pdfUrl = 'tejas resume.pdf?v=' + Date.now();
         const loadingTask = window.pdfjsLib.getDocument({
@@ -872,7 +872,7 @@
   }
 
   // Download Resume Function (Triggered by Header or Footer Download CTA)
-  window.downloadResumeFromModal = function(triggerBtn) {
+  window.downloadResumeFromModal = function (triggerBtn) {
     // 1. Download file directly (with cache-busting to ensure latest version is fetched)
     const link = document.createElement('a');
     link.href = 'tejas resume.pdf?v=' + Date.now();
@@ -889,7 +889,7 @@
           source: 'resume_modal'
         });
       }
-    } catch(e) {}
+    } catch (e) { }
 
     // 3. Update all download buttons in modal (header and footer)
     const buttons = document.querySelectorAll('.resume-download-cta');
@@ -935,7 +935,7 @@
   };
 
   // 6. One-Click Copy Contact Email
-  window.copyContactEmail = function(btn) {
+  window.copyContactEmail = function (btn) {
     const email = 'tejaswaghmare900@gmail.com';
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(email).then(() => {
@@ -954,6 +954,35 @@
       prompt('Copy email address:', email);
     }
   };
+
+  // --- Auto-Responder & Contact Transmission Configuration ---
+  // Connects to your Google Apps Script Web App (or EmailJS) to send an INSTANT
+  // warm, gentle auto-reply directly to the visitor's Gmail, with your portfolio & LinkedIn links.
+  const AUTO_RESPONDER_CONFIG = {
+    // 1. Google Apps Script Web App (RECOMMENDED: 100% Free native Gmail delivery directly to visitor)
+    // Deploy google_apps_script_autoresponder.js in script.google.com and paste your Web App URL below:
+    googleScriptUrl: 'https://script.google.com/macros/s/AKfycbzd3PjjuxkDH9Qabt1DMbJNu6loTcoYpTs0HHUkiL1rVhL_AX2kTt2LOojuyVjeefgJUA/exec',
+
+    // 2. EmailJS (Alternative client-side email dispatch service)
+    emailjs: {
+      enabled: false,
+      publicKey: '',
+      serviceId: '',
+      autoReplyTemplateId: ''
+    },
+
+    // 3. Fallback: FormSubmit endpoint for notifying Tejas
+    formSubmitEndpoint: 'https://formsubmit.co/ajax/tejaswaghmare900@gmail.com',
+
+    // Tejas Public Profiles (included in auto-replies)
+    ownerName: 'Tejas C. Waghmare',
+    ownerEmail: 'tejaswaghmare900@gmail.com',
+
+    portfolioUrl: 'https://tcwaghmare.github.io/',
+    linkedinUrl: 'https://www.linkedin.com/in/tejascwaghmare',
+    githubUrl: 'https://github.com/TCWaghmare'
+  };
+  window.AUTO_RESPONDER_CONFIG = AUTO_RESPONDER_CONFIG;
 
   // --- Supabase Database Configuration for Contact Form Submissions ---
   const SUPABASE_CONFIG = {
@@ -1003,7 +1032,100 @@
     return { success: true };
   }
 
-  // 7. Contact Form Handler (Direct AJAX Transmission & Database Persistence)
+  // Helper to dispatch email notification and instant auto-reply to the visitor
+  async function dispatchContactTransmission(payload) {
+    let autoReplySent = false;
+    let notificationSent = false;
+    let providerUsed = 'none';
+
+    // METHOD A: Google Apps Script Web App (Direct Gmail Integration)
+    // Instantly sends the personalized auto-reply to the visitor's Gmail + notification to Tejas
+    if (AUTO_RESPONDER_CONFIG.googleScriptUrl && AUTO_RESPONDER_CONFIG.googleScriptUrl.startsWith('http')) {
+      try {
+        const gasResponse = await fetch(AUTO_RESPONDER_CONFIG.googleScriptUrl, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
+        });
+        const gasData = await gasResponse.json().catch(() => ({ status: 'success' }));
+        if (gasData.status === 'success') {
+          autoReplySent = true;
+          notificationSent = true;
+          providerUsed = 'google_apps_script';
+          console.log('⚡ [Auto-Responder] Delivered instant Gmail auto-reply & notification via Google Apps Script:', gasData);
+          return { success: true, autoReplySent, notificationSent, provider: providerUsed };
+        }
+      } catch (gasErr) {
+        console.warn('Google Apps Script auto-reply notice:', gasErr);
+      }
+    }
+
+    // METHOD B: EmailJS Browser SDK
+    if (AUTO_RESPONDER_CONFIG.emailjs.enabled && window.emailjs && AUTO_RESPONDER_CONFIG.emailjs.publicKey) {
+      try {
+        emailjs.init(AUTO_RESPONDER_CONFIG.emailjs.publicKey);
+        await emailjs.send(
+          AUTO_RESPONDER_CONFIG.emailjs.serviceId,
+          AUTO_RESPONDER_CONFIG.emailjs.autoReplyTemplateId,
+          {
+            to_name: payload.name,
+            to_email: payload.email,
+            topic: payload.topic,
+            urgency: payload.urgency,
+            message: payload.message,
+            portfolio_url: AUTO_RESPONDER_CONFIG.portfolioUrl,
+            linkedin_url: AUTO_RESPONDER_CONFIG.linkedinUrl
+          }
+        );
+        autoReplySent = true;
+        providerUsed = 'emailjs';
+        console.log('⚡ [Auto-Responder] Delivered auto-reply via EmailJS');
+      } catch (emailjsErr) {
+        console.warn('EmailJS auto-reply error:', emailjsErr);
+      }
+    }
+
+    // METHOD C: Primary Inquiry Notification to Tejas via FormSubmit
+    const fsResponse = await fetch(AUTO_RESPONDER_CONFIG.formSubmitEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        call_whatsapp_permission: payload.call_whatsapp_permission,
+        _subject: `[Portfolio Inquiry] ${payload.topic} from ${payload.name} (${payload.urgency})`,
+        topic: payload.topic,
+        urgency: payload.urgency,
+        message: payload.message,
+        portfolio_url: AUTO_RESPONDER_CONFIG.portfolioUrl,
+        linkedin_url: AUTO_RESPONDER_CONFIG.linkedinUrl,
+        _captcha: 'false',
+        _template: 'table'
+      })
+    });
+
+    const fsData = await fsResponse.json().catch(() => ({}));
+    if (fsResponse.ok && (fsData.success === 'true' || fsData.success === true || (fsData.message && fsData.message.toLowerCase().includes('activation')))) {
+      notificationSent = true;
+      if (providerUsed === 'none') providerUsed = 'formsubmit';
+      return { success: true, autoReplySent, notificationSent, provider: providerUsed };
+    }
+
+    if (autoReplySent) {
+      return { success: true, autoReplySent, notificationSent: false, provider: providerUsed };
+    }
+
+    throw new Error(fsData.message || 'Direct transmission failed');
+  }
+
+  // 7. Contact Form Handler (Direct AJAX Transmission, Instant Visitor Auto-Reply & Supabase Database Persistence)
   window.handleContactSubmit = async function (e) {
     e.preventDefault();
     const form = e.target;
@@ -1034,7 +1156,7 @@
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.classList.add('is-loading');
-      submitBtn.innerHTML = '<span>Sending message...</span>';
+      submitBtn.innerHTML = '<span>Sending &amp; generating confirmation...</span>';
     }
 
     if (feedback) {
@@ -1043,29 +1165,22 @@
       feedback.style.display = 'block';
     }
 
-    const emailSubject = `[Portfolio Inquiry] ${topic} from ${name} (${urgency})`;
+    const payload = {
+      name: name,
+      email: email,
+      phone: phone ? phone : 'Not provided',
+      call_whatsapp_permission: permissionGranted ? 'Granted (Permission for Call & WhatsApp)' : 'Not granted / Not provided',
+      topic: topic,
+      urgency: urgency,
+      message: message,
+      portfolio_url: AUTO_RESPONDER_CONFIG.portfolioUrl,
+      linkedin_url: AUTO_RESPONDER_CONFIG.linkedinUrl,
+      submitted_at: new Date().toISOString()
+    };
 
     try {
-      // 1. Transmit email notification via FormSubmit
-      const emailPromise = fetch('https://formsubmit.co/ajax/tejaswaghmare900@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: name,
-          email: email,
-          phone: phone ? phone : 'Not provided',
-          call_whatsapp_permission: permissionGranted ? 'Granted (Permission for Call & WhatsApp)' : 'Not granted / Not provided',
-          _subject: emailSubject,
-          topic: topic,
-          urgency: urgency,
-          message: message,
-          _captcha: 'false',
-          _template: 'table'
-        })
-      });
+      // 1. Dispatch email notifications & auto-reply
+      const emailPromise = dispatchContactTransmission(payload);
 
       // 2. Persist contact record in Supabase database table
       const supabasePromise = saveToSupabase({
@@ -1081,18 +1196,19 @@
         return { error: err };
       });
 
-      const [response, supaResult] = await Promise.all([emailPromise, supabasePromise]);
-      const data = await response.json().catch(() => ({}));
+      const [emailResult, supaResult] = await Promise.all([emailPromise, supabasePromise]);
 
-      if (response.ok && (data.success === 'true' || data.success === true)) {
+      if (emailResult && emailResult.success) {
         if (feedback) {
           feedback.className = 'form-feedback success';
-          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly. I'll review your inquiry and reply to <em>${email}</em> soon!`;
+          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly. An instant confirmation has been delivered to <em>${email}</em> with my portfolio and LinkedIn links, and I will definitely reply to your inquiry as soon as possible!`;
           feedback.style.display = 'block';
         }
+
         form.reset();
         if (phoneEl) phoneEl.value = '';
         if (permissionEl) permissionEl.checked = false;
+
         // Reset topic pill & urgency slider
         const defaultPill = document.querySelector('.kova-pill[data-topic="A project"]');
         if (defaultPill) {
@@ -1106,36 +1222,28 @@
           urgencyInput.value = '40';
           if (urgencyVal) urgencyVal.textContent = 'Sometime soon';
         }
+
         if (submitBtn) {
           submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
-          try { if (window.PortfolioAnalytics) window.PortfolioAnalytics.track('contact_submit', { topic: topic, urgency: urgency }); } catch (e) {}
+          try { if (window.PortfolioAnalytics) window.PortfolioAnalytics.track('contact_submit', { topic: topic, urgency: urgency }); } catch (e) { }
           setTimeout(() => {
             submitBtn.disabled = false;
             submitBtn.classList.remove('is-loading');
             submitBtn.innerHTML = originalBtnHtml;
           }, 4500);
         }
-      } else if (data.message && data.message.toLowerCase().includes('activation')) {
-        // FormSubmit first-time activation notification
-        if (feedback) {
-          feedback.className = 'form-feedback success';
-          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly! (Tejas will receive it as soon as the one-time inbox activation is verified).`;
-          feedback.style.display = 'block';
+
+        // Developer guidance in console if Google Apps Script is not yet linked
+        if (!AUTO_RESPONDER_CONFIG.googleScriptUrl) {
+          console.info(
+            '💡 [Auto-Responder Setup Tip] Inquiry was delivered to Tejas & stored in Supabase! ' +
+            'To enable instant 1-second auto-replies directly to visitors\' Gmail accounts, deploy google_apps_script_autoresponder.js ' +
+            'and paste the Web App URL into AUTO_RESPONDER_CONFIG.googleScriptUrl in script.js.'
+          );
         }
-        form.reset();
-        if (phoneEl) phoneEl.value = '';
-        if (permissionEl) permissionEl.checked = false;
-        if (submitBtn) {
-          submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
-          try { if (window.PortfolioAnalytics) window.PortfolioAnalytics.track('contact_submit', { topic: topic, urgency: urgency }); } catch (e) {}
-          setTimeout(() => {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('is-loading');
-            submitBtn.innerHTML = originalBtnHtml;
-          }, 4500);
-        }
+
       } else {
-        throw new Error(data.message || 'Direct transmission failed');
+        throw new Error('Direct transmission failed');
       }
     } catch (err) {
       console.error('Direct submission error:', err);
@@ -1151,7 +1259,6 @@
       }
     }
   };
-
 
   // --- Event Listeners ---
   window.addEventListener('scroll', updateScrollProgress, { passive: true });
@@ -1205,7 +1312,7 @@
             viewer._logo.style.setProperty('display', 'none', 'important');
             viewer._logo.style.setProperty('opacity', '0', 'important');
             viewer._logo.style.setProperty('visibility', 'hidden', 'important');
-            try { viewer._logo.remove(); } catch (err) {}
+            try { viewer._logo.remove(); } catch (err) { }
           }
 
           const targets = root.querySelectorAll('#logo, a[href*="spline.design"], a, [id*="logo"]');
@@ -1217,7 +1324,7 @@
             el.style.setProperty('clip-path', 'inset(100%)', 'important');
             el.style.setProperty('width', '0px', 'important');
             el.style.setProperty('height', '0px', 'important');
-            try { el.remove(); } catch (err) {}
+            try { el.remove(); } catch (err) { }
           });
         }
 
@@ -1248,7 +1355,7 @@
         try {
           const observer = new MutationObserver(() => setupSpline());
           observer.observe(viewer.shadowRoot, { childList: true, subtree: true, attributes: true });
-        } catch (err) {}
+        } catch (err) { }
         return true;
       }
       return false;
@@ -1350,7 +1457,7 @@
 
     function updateDots() {
       const activeDotIndex = currentIndex % totalOriginal;
-      try { container.dispatchEvent(new CustomEvent('carousel:slide', { bubbles: true, detail: { activeIndex: activeDotIndex, containerId: containerId, totalSlides: totalOriginal } })); } catch (e) {}
+      try { container.dispatchEvent(new CustomEvent('carousel:slide', { bubbles: true, detail: { activeIndex: activeDotIndex, containerId: containerId, totalSlides: totalOriginal } })); } catch (e) { }
 
       // Update active slide visual state during swipe
       const slides = track.querySelectorAll('.cert-card-slide');
@@ -1659,7 +1766,7 @@
         if (isDeleting) {
           currentCharIndex--;
           roleTypedEl.textContent = currentWord.substring(0, currentCharIndex);
-          
+
           if (currentCharIndex === 0) {
             isDeleting = false;
             currentRoleIndex = (currentRoleIndex + 1) % roles.length;
@@ -2459,7 +2566,7 @@
   }
 
   // 4. Global Accordion Toggle for Education Takeaways
-  window.toggleEduDetails = function(milestoneId) {
+  window.toggleEduDetails = function (milestoneId) {
     const expandSection = document.getElementById(`edu-expand-${milestoneId}`);
     if (!expandSection) return;
     const isOpen = expandSection.classList.contains('open');

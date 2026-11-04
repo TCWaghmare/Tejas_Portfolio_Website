@@ -8,7 +8,7 @@
  * 1. When a visitor submits your form, Google Apps Script automatically sends
  *    them the warm auto-reply email with your profile picture and social links.
  * 2. It does NOT require you to click or reply to anything.
- * 3. It also sends YOU a lead summary alert so you know someone reached out.
+ * 3. High-deliverability settings configured to land directly in Primary Inboxes.
  * ==============================================================================
  */
 
@@ -61,9 +61,9 @@ function doPost(e) {
 
     // --------------------------------------------------------------------------
     // 1. SEND WARM, GENTLE AUTO-REPLY TO THE VISITOR'S GMAIL (100% AUTOMATIC)
-    //    Delivered directly to the visitor's email address entered in the form
+    //    Sent directly through your Gmail account (shows in your Sent folder)
     // --------------------------------------------------------------------------
-    var autoReplySubject = '✨ Thank you for visiting my portfolio, ' + visitorName + '! — Tejas C. Waghmare';
+    var autoReplySubject = 'Thank you for visiting my portfolio, ' + visitorName + '! — Tejas C. Waghmare';
     var autoReplyPlain = 'Hi ' + visitorName + ',\n\n'
       + 'Thank you so much for visiting my portfolio website and taking the time to reach out regarding ' + topic + '!\n\n'
       + 'Your message is safely in my personal inbox, and I will definitely review it and reply to you as soon as possible.\n\n'
@@ -83,7 +83,16 @@ function doPost(e) {
       message: message
     });
 
+    // Send via GmailApp (appears in Sent items and maintains highest inbox deliverability)
+    // with automatic fallback to MailApp to guarantee delivery in all permission states
     try {
+      GmailApp.sendEmail(visitorEmail, autoReplySubject, autoReplyPlain, {
+        name: CONFIG.ownerName,
+        htmlBody: autoReplyHtml,
+        replyTo: CONFIG.ownerEmail
+      });
+    } catch (gErr) {
+      Logger.log('GmailApp auto-reply fallback to MailApp: ' + gErr);
       MailApp.sendEmail({
         to: visitorEmail,
         subject: autoReplySubject,
@@ -92,18 +101,12 @@ function doPost(e) {
         name: CONFIG.ownerName,
         replyTo: CONFIG.ownerEmail
       });
-    } catch (mailErr) {
-      GmailApp.sendEmail(visitorEmail, autoReplySubject, autoReplyPlain, {
-        name: CONFIG.ownerName,
-        htmlBody: autoReplyHtml,
-        replyTo: CONFIG.ownerEmail
-      });
     }
 
     // --------------------------------------------------------------------------
     // 2. SEND LEAD NOTIFICATION ALERT TO TEJAS (YOUR ADMIN ALERT)
     // --------------------------------------------------------------------------
-    var notifySubject = '⚡ [Portfolio Lead] ' + topic + ' from ' + visitorName + ' (' + urgency + ')';
+    var notifySubject = '[Portfolio Lead] ' + topic + ' from ' + visitorName + ' (' + urgency + ')';
     var notifyPlain = 'New Portfolio Inquiry:\n'
       + 'Name: ' + visitorName + '\n'
       + 'Email: ' + visitorEmail + '\n'
@@ -124,18 +127,19 @@ function doPost(e) {
     });
 
     try {
+      GmailApp.sendEmail(CONFIG.ownerEmail, notifySubject, notifyPlain, {
+        name: 'Portfolio Contact Engine',
+        htmlBody: notifyHtml,
+        replyTo: visitorEmail
+      });
+    } catch (gErr2) {
+      Logger.log('GmailApp notification fallback to MailApp: ' + gErr2);
       MailApp.sendEmail({
         to: CONFIG.ownerEmail,
         subject: notifySubject,
         body: notifyPlain,
         htmlBody: notifyHtml,
         name: 'Portfolio Contact Engine',
-        replyTo: visitorEmail
-      });
-    } catch (mailErr2) {
-      GmailApp.sendEmail(CONFIG.ownerEmail, notifySubject, notifyPlain, {
-        name: 'Portfolio Contact Engine',
-        htmlBody: notifyHtml,
         replyTo: visitorEmail
       });
     }

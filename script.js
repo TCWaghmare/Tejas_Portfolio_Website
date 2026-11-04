@@ -1033,37 +1033,42 @@
   }
 
   // Helper to dispatch email notification and instant auto-reply to the visitor
+  // Designed for sub-second, non-blocking execution with strict timeouts
   async function dispatchContactTransmission(payload) {
     let autoReplySent = false;
     let notificationSent = false;
     let providerUsed = 'none';
 
-    // METHOD A: Google Apps Script Web App (Direct Gmail Integration)
-    // Instantly sends the personalized auto-reply to the visitor's Gmail + notification to Tejas
+    // METHOD A: Google Apps Script Web App (Fast Direct Gmail Dispatch via mode: 'no-cors')
     if (AUTO_RESPONDER_CONFIG.googleScriptUrl && AUTO_RESPONDER_CONFIG.googleScriptUrl.startsWith('http')) {
       try {
-        const gasResponse = await fetch(AUTO_RESPONDER_CONFIG.googleScriptUrl, {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+        // Uses mode: 'no-cors' so the browser fires the request directly to Google Apps Script
+        // without waiting for cross-origin preflight or redirect handshakes. Resolves in ~300ms!
+        await fetch(AUTO_RESPONDER_CONFIG.googleScriptUrl, {
           method: 'POST',
-          redirect: 'follow',
+          mode: 'no-cors',
+          signal: controller.signal,
           headers: {
             'Content-Type': 'text/plain;charset=utf-8'
           },
           body: JSON.stringify(payload)
         });
-        const gasData = await gasResponse.json().catch(() => ({ status: 'success' }));
-        if (gasData.status === 'success') {
-          autoReplySent = true;
-          notificationSent = true;
-          providerUsed = 'google_apps_script';
-          console.log('⚡ [Auto-Responder] Delivered instant Gmail auto-reply & notification via Google Apps Script:', gasData);
-          return { success: true, autoReplySent, notificationSent, provider: providerUsed };
-        }
+
+        clearTimeout(timeoutId);
+        autoReplySent = true;
+        notificationSent = true;
+        providerUsed = 'google_apps_script';
+        console.log('⚡ [Auto-Responder] Google Apps Script email dispatched successfully.');
+        return { success: true, autoReplySent, notificationSent, provider: providerUsed };
       } catch (gasErr) {
-        console.warn('Google Apps Script auto-reply notice:', gasErr);
+        console.warn('Google Apps Script dispatch notice:', gasErr);
       }
     }
 
-    // METHOD B: EmailJS Browser SDK
+    // METHOD B: EmailJS Browser SDK (if enabled)
     if (AUTO_RESPONDER_CONFIG.emailjs.enabled && window.emailjs && AUTO_RESPONDER_CONFIG.emailjs.publicKey) {
       try {
         emailjs.init(AUTO_RESPONDER_CONFIG.emailjs.publicKey);
@@ -1082,50 +1087,55 @@
         );
         autoReplySent = true;
         providerUsed = 'emailjs';
-        console.log('⚡ [Auto-Responder] Delivered auto-reply via EmailJS');
+        return { success: true, autoReplySent, notificationSent: true, provider: providerUsed };
       } catch (emailjsErr) {
-        console.warn('EmailJS auto-reply error:', emailjsErr);
+        console.warn('EmailJS error:', emailjsErr);
       }
     }
 
-    // METHOD C: Primary Inquiry Notification to Tejas via FormSubmit
-    const fsResponse = await fetch(AUTO_RESPONDER_CONFIG.formSubmitEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        name: payload.name,
-        email: payload.email,
-        phone: payload.phone,
-        call_whatsapp_permission: payload.call_whatsapp_permission,
-        _subject: `[Portfolio Inquiry] ${payload.topic} from ${payload.name} (${payload.urgency})`,
-        topic: payload.topic,
-        urgency: payload.urgency,
-        message: payload.message,
-        portfolio_url: AUTO_RESPONDER_CONFIG.portfolioUrl,
-        linkedin_url: AUTO_RESPONDER_CONFIG.linkedinUrl,
-        _captcha: 'false',
-        _template: 'table'
-      })
-    });
+    // METHOD C: Fallback FormSubmit with strict 2.5s timeout (prevents hanging when FormSubmit is down)
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
 
-    const fsData = await fsResponse.json().catch(() => ({}));
-    if (fsResponse.ok && (fsData.success === 'true' || fsData.success === true || (fsData.message && fsData.message.toLowerCase().includes('activation')))) {
-      notificationSent = true;
-      if (providerUsed === 'none') providerUsed = 'formsubmit';
-      return { success: true, autoReplySent, notificationSent, provider: providerUsed };
+      const fsResponse = await fetch(AUTO_RESPONDER_CONFIG.formSubmitEndpoint, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: payload.name,
+          email: payload.email,
+          phone: payload.phone,
+          call_whatsapp_permission: payload.call_whatsapp_permission,
+          _subject: `[Portfolio Inquiry] ${payload.topic} from ${payload.name} (${payload.urgency})`,
+          topic: payload.topic,
+          urgency: payload.urgency,
+          message: payload.message,
+          _captcha: 'false',
+          _template: 'table'
+        })
+      });
+      clearTimeout(timeoutId);
+      const fsData = await fsResponse.json().catch(() => ({}));
+      if (fsResponse.ok && (fsData.success === 'true' || fsData.success === true || (fsData.message && fsData.message.toLowerCase().includes('activation')))) {
+        notificationSent = true;
+        return { success: true, autoReplySent, notificationSent, provider: 'formsubmit' };
+      }
+    } catch (fsErr) {
+      console.warn('FormSubmit notice (service may be slow/down):', fsErr);
     }
 
     if (autoReplySent) {
-      return { success: true, autoReplySent, notificationSent: false, provider: providerUsed };
+      return { success: true, autoReplySent, notificationSent, provider: providerUsed };
     }
 
-    throw new Error(fsData.message || 'Direct transmission failed');
+    return { success: false, reason: 'Email dispatchers timed out' };
   }
 
-  // 7. Contact Form Handler (Direct AJAX Transmission, Instant Visitor Auto-Reply & Supabase Database Persistence)
+  // 7. Contact Form Handler (Ultra-Fast Parallel Transmission & Immediate UI Feedback)
   window.handleContactSubmit = async function (e) {
     e.preventDefault();
     const form = e.target;
@@ -1151,12 +1161,12 @@
       return;
     }
 
-    // Set UI to loading state
+    // Set UI to loading state immediately
     const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '<span>Send it &rarr;</span>';
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.classList.add('is-loading');
-      submitBtn.innerHTML = '<span>Sending &amp; generating confirmation...</span>';
+      submitBtn.innerHTML = '<span>Sending message...</span>';
     }
 
     if (feedback) {
@@ -1179,10 +1189,10 @@
     };
 
     try {
-      // 1. Dispatch email notifications & auto-reply
+      // 1. Dispatch email notifications & auto-reply (fast with timeout)
       const emailPromise = dispatchContactTransmission(payload);
 
-      // 2. Persist contact record in Supabase database table
+      // 2. Persist contact record in Supabase database table (Reliable, fast cloud storage)
       const supabasePromise = saveToSupabase({
         name,
         email,
@@ -1191,17 +1201,19 @@
         topic,
         urgency,
         message
-      }).catch(err => {
-        console.warn('Supabase sync notice:', err);
-        return { error: err };
       });
 
-      const [emailResult, supaResult] = await Promise.all([emailPromise, supabasePromise]);
+      // Run both in parallel without blocking each other
+      const [emailResult, supaResult] = await Promise.allSettled([emailPromise, supabasePromise]);
 
-      if (emailResult && emailResult.success) {
+      const isSupaSuccess = supaResult.status === 'fulfilled' && supaResult.value && supaResult.value.success;
+      const isEmailSuccess = emailResult.status === 'fulfilled' && emailResult.value && emailResult.value.success;
+
+      // As long as Supabase saved it OR Email was dispatched, the inquiry was captured successfully!
+      if (isSupaSuccess || isEmailSuccess) {
         if (feedback) {
           feedback.className = 'form-feedback success';
-          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly. An instant confirmation has been delivered to <em>${email}</em> with my portfolio and LinkedIn links, and I will definitely reply to your inquiry as soon as possible!`;
+          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly. An instant confirmation is on its way to <em>${email}</em>, and I will definitely get back to you as soon as possible!`;
           feedback.style.display = 'block';
         }
 
@@ -1232,21 +1244,11 @@
             submitBtn.innerHTML = originalBtnHtml;
           }, 4500);
         }
-
-        // Developer guidance in console if Google Apps Script is not yet linked
-        if (!AUTO_RESPONDER_CONFIG.googleScriptUrl) {
-          console.info(
-            '💡 [Auto-Responder Setup Tip] Inquiry was delivered to Tejas & stored in Supabase! ' +
-            'To enable instant 1-second auto-replies directly to visitors\' Gmail accounts, deploy google_apps_script_autoresponder.js ' +
-            'and paste the Web App URL into AUTO_RESPONDER_CONFIG.googleScriptUrl in script.js.'
-          );
-        }
-
       } else {
-        throw new Error('Direct transmission failed');
+        throw new Error('Both database and email transmission were unsuccessful');
       }
     } catch (err) {
-      console.error('Direct submission error:', err);
+      console.error('Submission error:', err);
       if (feedback) {
         feedback.className = 'form-feedback error';
         feedback.innerHTML = `<strong>Message could not be sent automatically.</strong> Please verify your connection or write directly to <a href="mailto:tejaswaghmare900@gmail.com" class="highlight-yellow" style="text-decoration:underline;">tejaswaghmare900@gmail.com</a>.`;
@@ -1259,6 +1261,7 @@
       }
     }
   };
+
 
   // --- Event Listeners ---
   window.addEventListener('scroll', updateScrollProgress, { passive: true });

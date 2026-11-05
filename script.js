@@ -2577,16 +2577,19 @@
     }
   }
 
-  // --- Floating 3D Data Analytics Tool Orbs: Persistent Drag Placement & Anti-Clipping Physics ---
+  // --- Floating 3D Data Analytics Tool Orbs: Interactive Hover & Zero-Gravity Continuous Float ---
   function initFloatingTools() {
     const heroSection = document.getElementById('home') || document.querySelector('.hero-section');
     const orbs = document.querySelectorAll('.hero-tool-orb');
     if (!heroSection || !orbs.length) return;
 
-    // Orb physics state objects
-    const orbStates = Array.from(orbs).map((orb) => {
+    // Orb physics state objects with individual out-of-phase floating frequencies
+    const orbStates = Array.from(orbs).map((orb, i) => {
+      const phaseOffset = i * 1.256;
+      const speedMult = 0.9 + (i % 3) * 0.15;
       return {
         el: orb,
+        glass: orb.querySelector('.orb-glass'),
         baseX: 0,
         baseY: 0,
         currX: 0,
@@ -2601,11 +2604,16 @@
         targetRotZ: 0,
         scale: 1,
         targetScale: 1,
+        isHovered: false,
+        hoverRelX: 0,
+        hoverRelY: 0,
         isDragging: false,
         pointerStartX: 0,
         pointerStartY: 0,
         startBaseX: 0,
-        startBaseY: 0
+        startBaseY: 0,
+        phaseOffset,
+        speedMult
       };
     });
 
@@ -2617,12 +2625,22 @@
 
     let activeDragState = null;
     let animFrameId = null;
-    let lastTime = performance.now();
+    let isHeroVisible = true;
 
-    // 1. Mouse & Pointer Tracking on Hero Section
+    // Pause physics calculations when hero section is scrolled off-screen (saves 100% CPU)
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          isHeroVisible = entry.isIntersecting;
+        });
+      }, { threshold: 0.05 });
+      observer.observe(heroSection);
+    }
+
+    // 1. Mouse Tracking across Hero for smooth proximity attraction
     function onPointerMove(e) {
       const rect = heroSection.getBoundingClientRect();
-      if (e.clientY < rect.top - 120 || e.clientY > rect.bottom + 120) {
+      if (e.clientY < rect.top - 80 || e.clientY > rect.bottom + 80) {
         pointer.isActive = false;
         return;
       }
@@ -2631,43 +2649,65 @@
       pointer.x = e.clientX;
       pointer.y = e.clientY;
 
-      // If user is actively dragging an orb, follow cursor constrained strictly near profile image
+      // Handle active drag movement
       if (activeDragState) {
         const dx = e.clientX - activeDragState.pointerStartX;
         const dy = e.clientY - activeDragState.pointerStartY;
         let newX = activeDragState.startBaseX + dx;
         let newY = activeDragState.startBaseY + dy;
 
-        // Restriction: Can ONLY move near the profile image (max 85px radius from resting spot)
-        const maxRadius = 85;
+        // Restriction: Can move within safe radius near profile image
+        const maxRadius = 110;
         const distFromOrigin = Math.hypot(newX, newY);
         if (distFromOrigin > maxRadius) {
           newX = (newX / distFromOrigin) * maxRadius;
           newY = (newY / distFromOrigin) * maxRadius;
         }
 
-        // Anti-Clipping Guard: Prevent pushing past the container boundaries
-        newX = Math.max(-80, Math.min(30, newX));
-        newY = Math.max(-75, Math.min(75, newY));
-
         activeDragState.targetX = newX;
         activeDragState.targetY = newY;
       }
     }
 
-    heroSection.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointermove', onPointerMove, { passive: true });
-
     heroSection.addEventListener('pointerleave', () => {
       if (!activeDragState) {
         pointer.isActive = false;
       }
     });
 
-    // 2. Drag & Drop: Click and move logo to any place NEAR profile image, then STAY and FLOAT
+    // 2. Interactive Cursor Hover & Touch Listeners for Each Tool Orb
     orbStates.forEach((state) => {
       const orb = state.el;
 
+      function updateOrbPointer(clientX, clientY) {
+        const rect = orb.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        state.hoverRelX = Math.max(-1.5, Math.min(1.5, (clientX - cx) / (rect.width / 2)));
+        state.hoverRelY = Math.max(-1.5, Math.min(1.5, (clientY - cy) / (rect.height / 2)));
+      }
+
+      orb.addEventListener('pointerenter', (e) => {
+        state.isHovered = true;
+        orb.classList.add('is-hovered');
+        updateOrbPointer(e.clientX, e.clientY);
+      });
+
+      orb.addEventListener('pointermove', (e) => {
+        if (state.isHovered) {
+          updateOrbPointer(e.clientX, e.clientY);
+        }
+      });
+
+      orb.addEventListener('pointerleave', () => {
+        state.isHovered = false;
+        orb.classList.remove('is-hovered');
+        state.hoverRelX = 0;
+        state.hoverRelY = 0;
+      });
+
+      // Drag & drop handlers
       function onDragStart(clientX, clientY) {
         activeDragState = state;
         state.isDragging = true;
@@ -2676,18 +2716,6 @@
         state.startBaseX = state.baseX;
         state.startBaseY = state.baseY;
         orb.classList.add('is-dragging');
-        orb.style.animation = 'none';
-      }
-
-      function onDragEnd() {
-        if (state.isDragging) {
-          // The logo STAYS in that new place and continues floating from there!
-          state.baseX = state.targetX;
-          state.baseY = state.targetY;
-          state.isDragging = false;
-          orb.classList.remove('is-dragging');
-          if (activeDragState === state) activeDragState = null;
-        }
       }
 
       orb.addEventListener('pointerdown', (e) => {
@@ -2697,12 +2725,12 @@
 
       orb.addEventListener('touchstart', (e) => {
         if (e.touches && e.touches[0]) {
+          state.isHovered = true;
+          orb.classList.add('is-hovered');
+          updateOrbPointer(e.touches[0].clientX, e.touches[0].clientY);
           onDragStart(e.touches[0].clientX, e.touches[0].clientY);
         }
-      }, { passive: false });
-
-      // Disable conflicting CSS keyframe transforms
-      orb.style.animation = 'none';
+      }, { passive: true });
     });
 
     function releaseGlobalDrag() {
@@ -2719,64 +2747,77 @@
     window.addEventListener('touchend', releaseGlobalDrag);
     window.addEventListener('pointercancel', releaseGlobalDrag);
 
-    // 3. Physics Engine: Use pure GPU CSS keyframe animation on mobile; run JS physics on desktop only when visible
-    if (isMobile) {
-      // Return early: mobile uses 100% hardware-accelerated CSS animations with 0% main-thread CPU usage
-      return;
-    }
-
+    // 3. High-Performance 60 FPS Physics Loop (Desktop & Mobile)
     function updatePhysics(now) {
       animFrameId = requestAnimationFrame(updatePhysics);
+      if (!isHeroVisible) return;
 
-      const dt = Math.min((now - lastTime) / 1000, 0.08);
-      lastTime = now;
       const t = now * 0.0016;
 
-      orbStates.forEach((state, i) => {
+      orbStates.forEach((state) => {
         const orb = state.el;
+        const p = state.phaseOffset;
+        const s = state.speedMult;
+
+        // Continuous Organic 3D Floating Motion (Prominent, natural sinusoidal orbital drift)
+        const floatX = Math.sin(t * s * 1.1 + p) * 11 + Math.cos(t * s * 0.5 + p * 0.7) * 4;
+        const floatY = Math.cos(t * s * 0.95 + p) * 14 + Math.sin(t * s * 0.6 + p * 1.3) * 5;
+        const floatRotX = Math.sin(t * s * 0.8 + p) * 6;
+        const floatRotY = Math.cos(t * s * 0.7 + p * 1.2) * 7;
+        const floatRotZ = Math.sin(t * s * 1.0 + p * 1.4) * 4;
 
         if (state.isDragging) {
-          state.targetScale = 1.15;
-          state.targetRotZ = (state.targetX - state.currX) * 0.35;
+          state.targetScale = 1.22;
+          state.targetRotX = 0;
+          state.targetRotY = 0;
+          state.targetRotZ = (state.targetX - state.currX) * 0.4;
+        } else if (state.isHovered) {
+          // Direct Cursor Hover: Dynamic 3D Card Tilt & Magnetic Follow
+          state.targetScale = 1.24;
+          state.targetRotX = -state.hoverRelY * 18;
+          state.targetRotY = state.hoverRelX * 18;
+          state.targetRotZ = state.hoverRelX * 6;
+
+          const hoverOffsetX = state.hoverRelX * 16;
+          const hoverOffsetY = state.hoverRelY * 16;
+          state.targetX = state.baseX + floatX * 0.25 + hoverOffsetX;
+          state.targetY = state.baseY + floatY * 0.25 + hoverOffsetY;
         } else {
-          // Natural organic sine wave floating in place
-          const floatX = Math.sin(t + i * 1.4) * 4.5;
-          const floatY = Math.cos(t * 0.85 + i * 1.3) * 5.5;
+          // Normal Idle Floating + Nearby Cursor Proximity Pull
+          let proxX = 0;
+          let proxY = 0;
+          let proxRotX = 0;
+          let proxRotY = 0;
+          let proxScale = 1;
 
-          // Proximity reaction when cursor is near (safe bounded micro-movement, max 8px)
-          const rect = orb.getBoundingClientRect();
-          const orbCenterX = rect.left + rect.width / 2;
-          const orbCenterY = rect.top + rect.height / 2;
-          const distMouseX = pointer.x - orbCenterX;
-          const distMouseY = pointer.y - orbCenterY;
-          const dist = Math.hypot(distMouseX, distMouseY);
+          if (pointer.isActive) {
+            const rect = orb.getBoundingClientRect();
+            const orbCenterX = rect.left + rect.width / 2;
+            const orbCenterY = rect.top + rect.height / 2;
+            const distMouseX = pointer.x - orbCenterX;
+            const distMouseY = pointer.y - orbCenterY;
+            const dist = Math.hypot(distMouseX, distMouseY);
 
-          let hoverX = 0;
-          let hoverY = 0;
-          let tiltRotX = 0;
-          let tiltRotY = 0;
-
-          if (pointer.isActive && dist < 160 && dist > 0) {
-            const pull = Math.max(0, 1 - dist / 160);
-            hoverX = (distMouseX / dist) * pull * 7;
-            hoverY = (distMouseY / dist) * pull * 7;
-            tiltRotX = -distMouseY * 0.05 * pull;
-            tiltRotY = distMouseX * 0.05 * pull;
-            state.targetScale = 1.08;
-          } else {
-            state.targetScale = 1;
+            if (dist < 180 && dist > 0) {
+              const pull = Math.max(0, 1 - dist / 180);
+              proxX = (distMouseX / dist) * pull * 14;
+              proxY = (distMouseY / dist) * pull * 14;
+              proxRotX = -distMouseY * 0.08 * pull;
+              proxRotY = distMouseX * 0.08 * pull;
+              proxScale = 1 + pull * 0.12;
+            }
           }
 
-          // Target is anchored at its user-placed spot (baseX, baseY) + floating wave + hover micro-drift
-          state.targetX = state.baseX + floatX + hoverX;
-          state.targetY = state.baseY + floatY + hoverY;
-          state.targetRotX = tiltRotX;
-          state.targetRotY = tiltRotY;
-          state.targetRotZ = (state.targetX - state.currX) * 0.15;
+          state.targetScale = proxScale;
+          state.targetX = state.baseX + floatX + proxX;
+          state.targetY = state.baseY + floatY + proxY;
+          state.targetRotX = floatRotX + proxRotX;
+          state.targetRotY = floatRotY + proxRotY;
+          state.targetRotZ = floatRotZ;
         }
 
         // Smooth spring interpolation
-        const ease = state.isDragging ? 0.4 : 0.12;
+        const ease = state.isDragging ? 0.35 : (state.isHovered ? 0.22 : 0.09);
         state.currX += (state.targetX - state.currX) * ease;
         state.currY += (state.targetY - state.currY) * ease;
         state.currRotX += (state.targetRotX - state.currRotX) * ease;

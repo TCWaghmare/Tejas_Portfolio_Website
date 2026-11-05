@@ -1308,7 +1308,7 @@ img {
 .hero-tool-orb {
   position: absolute;
   pointer-events: auto;
-  cursor: grab;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1322,11 +1322,17 @@ img {
   touch-action: none;
   transition: filter 0.3s ease;
   will-change: transform;
+  z-index: 10;
+}
+
+.hero-tool-orb:hover,
+.hero-tool-orb.is-hovered {
+  z-index: 30 !important;
 }
 
 .hero-tool-orb.is-dragging {
   cursor: grabbing !important;
-  z-index: 30 !important;
+  z-index: 35 !important;
 }
 
 .hero-tool-orb.is-dragging .orb-glass {
@@ -1422,35 +1428,41 @@ img {
 }
 
 .hero-tool-orb:hover .orb-tag,
+.hero-tool-orb.is-hovered .orb-tag,
 .hero-tool-orb:focus-visible .orb-tag {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
 /* Individual Tool Color Signatures on Hover */
-.orb-excel:hover .orb-glass {
+.orb-excel:hover .orb-glass,
+.orb-excel.is-hovered .orb-glass {
   border-color: #21A366;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(33, 163, 102, 0.55);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.75), 0 0 32px rgba(33, 163, 102, 0.7);
 }
 
-.orb-powerbi:hover .orb-glass {
+.orb-powerbi:hover .orb-glass,
+.orb-powerbi.is-hovered .orb-glass {
   border-color: #F2C811;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(242, 200, 17, 0.6);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.75), 0 0 32px rgba(242, 200, 17, 0.75);
 }
 
-.orb-python:hover .orb-glass {
+.orb-python:hover .orb-glass,
+.orb-python.is-hovered .orb-glass {
   border-color: #387EB8;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(56, 126, 184, 0.55);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.75), 0 0 32px rgba(56, 126, 184, 0.7);
 }
 
-.orb-sql:hover .orb-glass {
+.orb-sql:hover .orb-glass,
+.orb-sql.is-hovered .orb-glass {
   border-color: #E53935;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(229, 57, 53, 0.55);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.75), 0 0 32px rgba(229, 57, 53, 0.7);
 }
 
-.orb-fabric:hover .orb-glass {
+.orb-fabric:hover .orb-glass,
+.orb-fabric.is-hovered .orb-glass {
   border-color: #00BCF2;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.7), 0 0 28px rgba(0, 188, 242, 0.55);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.75), 0 0 32px rgba(0, 188, 242, 0.7);
 }
 
 /* Floating Close Around the Profile Image (Protected from Section Edge Clipping) */

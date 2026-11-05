@@ -493,6 +493,16 @@
       const firstEl = focusable[0];
       const lastEl = focusable[focusable.length - 1];
 
+      if (!activeModalElement.contains(document.activeElement)) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          lastEl.focus();
+        } else {
+          firstEl.focus();
+        }
+        return;
+      }
+
       if (e.shiftKey) {
         if (document.activeElement === firstEl) {
           e.preventDefault();
@@ -518,28 +528,190 @@
     }
   });
 
-  // --- Global Lightbox Modal Controller ---
-  window.openLightbox = function (mediaSrc, mediaType, title) {
-    if (!lightboxModal || !lightboxBody) return; try { window.dispatchEvent(new CustomEvent('portfolio:lightbox', { detail: { mediaSrc, mediaType, title } })); } catch (e) { }
+  // --- Global Lightbox Modal & Zoom Controller ---
+  let lightboxScale = 1;
+  let lightboxPanX = 0;
+  let lightboxPanY = 0;
+  let isLightboxDragging = false;
+  let lightboxDragStartX = 0;
+  let lightboxDragStartY = 0;
 
-    if (lightboxTitle) {
-      lightboxTitle.textContent = title || 'Preview';
+  function decodeHtmlEntities(str) {
+    if (!str) return '';
+    const txt = document.createElement('textarea');
+    txt.innerHTML = str;
+    return txt.value;
+  }
+
+  function getDescriptiveAltText(mediaSrc, title, customAlt) {
+    if (customAlt && typeof customAlt === 'string') {
+      return decodeHtmlEntities(customAlt);
+    }
+    const clean = decodeHtmlEntities(title || '');
+    const src = (mediaSrc || '').toLowerCase();
+
+    if (src.includes('dashboard 1') || src.includes('overview')) {
+      return `High-resolution Power BI Overview Dashboard for NYC Airbnb Hospitality Intelligence: Analyzes 30,259 listings across 5 NYC boroughs, visualizing key metrics including $389.3M estimated revenue, 52.4% average occupancy, borough distribution, and pricing trends.`;
+    }
+    if (src.includes('dashboard 2') || src.includes('room')) {
+      return `High-resolution Power BI Room Type Analysis Dashboard for NYC Airbnb: Comparative breakdown of Entire homes, Private rooms, and Shared rooms, evaluating average daily rates, booking frequency, and revenue generation.`;
+    }
+    if (src.includes('dashboard 3') || src.includes('host')) {
+      return `High-resolution Power BI Host Performance Dashboard for NYC Airbnb: Analysis of superhost vs standard host metrics, listing density, host response speeds, and multi-property management impact.`;
+    }
+    if (src.includes('dashboard 4') || src.includes('rating')) {
+      return `High-resolution Power BI Rating Distribution Dashboard for NYC Airbnb: Review score breakdown across cleanliness, communication, and location with customer sentiment distribution.`;
+    }
+    if (src.includes('backery sale dashboard') || src.includes('backery_sale')) {
+      return `High-resolution Excel Pivot Dashboard for Bakery Sales and Profitability: Financial analysis of 16,569 transactions across 3 store locations, tracking \u20B93.44M revenue, item profit margins, and 40% waste cost reduction targets.`;
+    }
+    if (src.includes('backery_transaction')) {
+      return `High-resolution Excel Transaction Dashboard for Bakery Operations: Hourly sales velocity, customer traffic patterns, peak morning/evening checkout volumes, and payment method distribution.`;
+    }
+    if (src.includes('backery data analysis insights')) {
+      return `High-resolution Excel Analytical Insights view for Bakery Operations: Root cause diagnosis of discounting losses, seasonal demand forecasting, and inventory shelf-life optimization strategies.`;
+    }
+    if (src.includes('amazon_sales')) {
+      return `High-resolution Executive Sales Performance Dashboard for Amazon E-Commerce: Cross-regional revenue analysis tracking 50,000+ orders, $32.8M total sales, 6 product categories, and 5 global fulfillment territories.`;
+    }
+    if (src.includes('badges/pl 300') || src.includes('pl 300.png')) {
+      return `Official Microsoft Certified: Power BI Data Analyst Associate (PL-300) verified digital badge credential recognizing data modeling, DAX measures, and workspace deployment mastery.`;
+    }
+    if (src.includes('badges/dp 600') || src.includes('dp 600.png')) {
+      return `Official Microsoft Certified: Fabric Analytics Engineer Associate (DP-600) verified digital badge credential recognizing lakehouse architecture, data warehousing, and semantic modeling expertise.`;
+    }
+    if (src.includes('badges/dp 700') || src.includes('dp 700.png')) {
+      return `Official Microsoft Certified: Fabric Data Engineer Associate (DP-700) verified digital badge credential validating enterprise ETL pipelines, lakehouse ingestion, and data security architectures.`;
+    }
+    if (src.includes('ai-skills-fest')) {
+      return `Official Microsoft: AI Skills Fest 2026 verified achievement digital badge credential demonstrating practical knowledge of AI tools, productivity acceleration, and ethical AI deployment.`;
+    }
+    if (src.includes('mckinsey-org-forward')) {
+      return `Official McKinsey.org Forward Program digital badge credential certifying practical business problem solving, structured communications, digital toolkits, and adaptability.`;
+    }
+    if (src.includes('certificates/powerbi pl300')) {
+      return `Official Microsoft Certified: Power BI Data Analyst Associate (PL-300) certificate awarded to Tejas C. Waghmare.`;
+    }
+    if (src.includes('dp 600.jpg')) {
+      return `Official Microsoft Certified: Fabric Analytics Engineer Associate (DP-600) certificate awarded to Tejas C. Waghmare.`;
+    }
+    if (src.includes('dp-700') || src.includes('credentia.png')) {
+      return `Official Microsoft Certified: Fabric Data Engineer Associate (DP-700) certificate awarded to Tejas C. Waghmare.`;
+    }
+    if (src.includes('udemy python')) {
+      return `Official Udemy Certificate of Completion for Python for Data Science and Machine Learning Bootcamp awarded to Tejas C. Waghmare, validating Pandas, NumPy, visualization, and predictive modeling.`;
+    }
+    if (src.includes('hobby_analytical')) {
+      return `Visual depiction of Analytical Thinking: Exploratory data analysis, hypothesis validation, and uncovering hidden data patterns.`;
+    }
+    if (src.includes('hobby_problem_solving')) {
+      return `Structured Problem Solving Framework diagram: Methodical progression connecting Problem definition, Critical Thinking, and Data Solution.`;
+    }
+    if (src.includes('hobby_storytelling')) {
+      return `Visual illustration of Data Storytelling: Translating complex statistical findings into actionable executive business roadmaps.`;
+    }
+    if (src.includes('hobby_design')) {
+      return `Visual design system of Dashboard & UI Design: Clean user interface hierarchy, deliberate contrast, and intuitive business intelligence layouts.`;
+    }
+    if (src.includes('hobby_travelling')) {
+      return `Photograph depicting Travelling and Trekking: Tejas exploring mountain peaks, waterfalls, and scenic outdoor trails.`;
+    }
+    if (src.includes('hobby_cooking')) {
+      return `Photograph representing Culinary Craft: High-precision cooking with fresh ingredients and balanced culinary composition.`;
+    }
+    if (src.includes('hobby_music')) {
+      return `Visual representing Music and Flow State: Studio headphones and curated ambient playlists for focused deep data work.`;
     }
 
+    return clean ? `High-resolution preview of ${clean}` : 'High-resolution preview image';
+  }
+
+  function updateLightboxTransform() {
+    if (!lightboxBody) return;
+    const img = lightboxBody.querySelector('img');
+    const zoomText = document.getElementById('lightbox-zoom-level');
+    if (zoomText) {
+      zoomText.textContent = Math.round(lightboxScale * 100) + '%';
+    }
+    if (!img) return;
+
+    if (lightboxScale <= 1) {
+      lightboxScale = 1;
+      lightboxPanX = 0;
+      lightboxPanY = 0;
+      img.style.transform = '';
+      img.classList.remove('is-zoomed', 'is-dragging');
+      img.style.cursor = 'zoom-in';
+    } else {
+      img.style.transform = `scale(${lightboxScale}) translate(${lightboxPanX / lightboxScale}px, ${lightboxPanY / lightboxScale}px)`;
+      img.classList.add('is-zoomed');
+      if (!isLightboxDragging) img.style.cursor = 'grab';
+    }
+  }
+
+  window.adjustLightboxZoom = function (delta) {
+    if (!lightboxModal || !lightboxModal.classList.contains('active')) return;
+    const img = lightboxBody ? lightboxBody.querySelector('img') : null;
+    if (!img) return;
+
+    const newScale = Math.round((lightboxScale + delta) * 100) / 100;
+    if (newScale >= 0.5 && newScale <= 3.0) {
+      lightboxScale = newScale;
+      updateLightboxTransform();
+    }
+  };
+
+  window.resetLightboxZoom = function () {
+    lightboxScale = 1;
+    lightboxPanX = 0;
+    lightboxPanY = 0;
+    updateLightboxTransform();
+  };
+
+  function panLightboxImage(dx, dy) {
+    if (lightboxScale <= 1) return;
+    lightboxPanX += dx;
+    lightboxPanY += dy;
+    updateLightboxTransform();
+  }
+
+  window.openLightbox = function (mediaSrc, mediaType, title, altText) {
+    if (!lightboxModal || !lightboxBody) return;
+    try {
+      window.dispatchEvent(new CustomEvent('portfolio:lightbox', { detail: { mediaSrc, mediaType, title } }));
+    } catch (e) { }
+
+    const cleanTitle = decodeHtmlEntities(title || 'Preview');
+    if (lightboxTitle) {
+      lightboxTitle.textContent = cleanTitle;
+    }
+
+    const zoomControls = document.getElementById('lightbox-zoom-controls');
     lightboxBody.innerHTML = '';
+    resetLightboxZoom();
 
     if (mediaType === 'video') {
+      if (zoomControls) zoomControls.style.display = 'none';
       const video = document.createElement('video');
       video.src = mediaSrc;
       video.controls = true;
       video.autoplay = true;
       video.style.width = '100%';
       video.style.maxHeight = '75vh';
+      video.setAttribute('aria-label', cleanTitle || 'Video walkthrough');
+      video.tabIndex = 0;
+      video.innerHTML = '<p>Your browser does not support the video tag. <a href="' + mediaSrc + '" download>Download video</a>.</p>';
       lightboxBody.appendChild(video);
     } else {
+      if (zoomControls) zoomControls.style.display = 'flex';
       const img = document.createElement('img');
       img.src = mediaSrc;
-      img.alt = title || 'Preview Image';
+      const descriptiveAlt = getDescriptiveAltText(mediaSrc, title, altText);
+      img.alt = descriptiveAlt;
+      img.setAttribute('role', 'img');
+      img.setAttribute('aria-label', descriptiveAlt);
+      img.title = cleanTitle + ' (Click or use +/- keys to zoom)';
+      img.tabIndex = 0;
       lightboxBody.appendChild(img);
     }
 
@@ -554,6 +726,7 @@
     lightboxModal.classList.remove('active');
     lightboxModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    resetLightboxZoom();
     releaseFocusFromModal(lightboxModal);
 
     if (lightboxBody) {
@@ -567,12 +740,97 @@
     }
   };
 
-  // Close lightbox on Escape key
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightboxModal && lightboxModal.classList.contains('active')) {
+  // Keyboard controls for Lightbox (Escape to close, +/- to zoom, 0/r to reset, arrows to pan)
+  document.addEventListener('keydown', (e) => {
+    if (!lightboxModal || !lightboxModal.classList.contains('active')) return;
+
+    if (e.key === 'Escape') {
       window.closeLightbox();
+      return;
+    }
+
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
+    if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      window.adjustLightboxZoom(0.25);
+    } else if (e.key === '-' || e.key === '_') {
+      e.preventDefault();
+      window.adjustLightboxZoom(-0.25);
+    } else if (e.key === '0' || e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      window.resetLightboxZoom();
+    } else if (lightboxScale > 1) {
+      const step = 40;
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        panLightboxImage(0, step);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        panLightboxImage(0, -step);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        panLightboxImage(step, 0);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        panLightboxImage(-step, 0);
+      }
     }
   });
+
+  // Lightbox mouse drag-to-pan, click-to-toggle-zoom, and wheel zoom
+  if (lightboxBody) {
+    lightboxBody.addEventListener('mousedown', (e) => {
+      const img = lightboxBody.querySelector('img');
+      if (!img || lightboxScale <= 1) return;
+      isLightboxDragging = true;
+      lightboxDragStartX = e.clientX - lightboxPanX;
+      lightboxDragStartY = e.clientY - lightboxPanY;
+      img.classList.add('is-dragging');
+      e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isLightboxDragging) return;
+      lightboxPanX = e.clientX - lightboxDragStartX;
+      lightboxPanY = e.clientY - lightboxDragStartY;
+      const img = lightboxBody ? lightboxBody.querySelector('img') : null;
+      if (img) {
+        img.style.transform = `scale(${lightboxScale}) translate(${lightboxPanX / lightboxScale}px, ${lightboxPanY / lightboxScale}px)`;
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isLightboxDragging) {
+        isLightboxDragging = false;
+        const img = lightboxBody ? lightboxBody.querySelector('img') : null;
+        if (img) img.classList.remove('is-dragging');
+        updateLightboxTransform();
+      }
+    });
+
+    lightboxBody.addEventListener('click', (e) => {
+      const img = lightboxBody.querySelector('img');
+      if (e.target === img && !isLightboxDragging) {
+        if (lightboxScale === 1) {
+          lightboxScale = 1.75;
+        } else {
+          lightboxScale = 1;
+          lightboxPanX = 0;
+          lightboxPanY = 0;
+        }
+        updateLightboxTransform();
+      }
+    });
+
+    lightboxBody.addEventListener('wheel', (e) => {
+      const img = lightboxBody.querySelector('img');
+      if (!img) return;
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.2 : -0.2;
+      window.adjustLightboxZoom(delta);
+    }, { passive: false });
+  }
 
   // =========================================================================
   // Kova "Let's talk." Interactive System
@@ -858,6 +1116,8 @@
       resumePdfScale = getInitialResumeScale();
       loadAndRenderResume();
     }
+
+    trapFocusInModal(modal);
   };
 
   window.closeResumeModal = function () {
@@ -912,6 +1172,24 @@
     resumePdfScale = getInitialResumeScale();
     renderResumePages();
   };
+
+  // Keyboard zoom controls for Resume Modal (+, -, 0, r)
+  document.addEventListener('keydown', (e) => {
+    const resumeModal = document.getElementById('resume-modal');
+    if (!resumeModal || !resumeModal.classList.contains('active')) return;
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
+    if (e.key === '+' || e.key === '=') {
+      e.preventDefault();
+      window.adjustResumeZoom(0.15);
+    } else if (e.key === '-' || e.key === '_') {
+      e.preventDefault();
+      window.adjustResumeZoom(-0.15);
+    } else if (e.key === '0' || e.key === 'r' || e.key === 'R') {
+      e.preventDefault();
+      window.resetResumeZoom();
+    }
+  });
 
   async function loadAndRenderResume() {
     const loader = document.getElementById('resume-loading-indicator');
@@ -972,6 +1250,9 @@
       canvas.height = Math.floor(viewport.height * dpr);
       canvas.style.width = Math.floor(viewport.width) + 'px';
       canvas.style.height = Math.floor(viewport.height) + 'px';
+      canvas.setAttribute('role', 'img');
+      canvas.setAttribute('aria-label', `Tejas C. Waghmare Professional Resume - Page ${pageNum} of ${resumePdfDoc.numPages}`);
+      canvas.tabIndex = 0;
 
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);

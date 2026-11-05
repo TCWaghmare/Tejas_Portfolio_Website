@@ -1361,7 +1361,7 @@
         </div>
       `;
       feedback.style.display = 'block';
-      feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(function() { feedback.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 60);
     }
 
     form.reset();

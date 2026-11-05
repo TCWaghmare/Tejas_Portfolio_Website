@@ -5908,6 +5908,13 @@ img {
   color: #86efac;
 }
 
+.form-feedback:has(.kova-success-card) {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
 .form-feedback.error {
   display: block;
   background: rgba(239, 68, 68, 0.12);

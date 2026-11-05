@@ -9037,3 +9037,55 @@ img {
     word-break: break-all;
   }
 }
+
+
+/* ==========================================================================
+   Android 11 & Medium 4G Mobile Hardware Acceleration & Smooth Momentum Scroll
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Restore native momentum scroll on Android mobile */
+  html, body {
+    scroll-behavior: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Eliminate GPU-throttling backdrop blurs on mobile GPUs (Mali / Adreno) */
+  .site-header,
+  .nav-links,
+  .bento-card,
+  .cm-inner,
+  .kova-talk-container,
+  .tools-marquee-viewport,
+  .edu-card,
+  .hero-trust-ribbon,
+  .project-card,
+  .lightbox-card,
+  .loader-card,
+  .kova-success-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Simplify box-shadow rendering for mobile compositor */
+  .bento-card,
+  .edu-card,
+  .project-card,
+  .cm-inner,
+  .kova-talk-container {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Completely hide Spline 3D WebGL on mobile */
+  #hero-spline-viewer,
+  spline-viewer {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Hardware-accelerate marquee track */
+  .tools-marquee-track {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+}

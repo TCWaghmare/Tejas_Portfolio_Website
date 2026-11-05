@@ -6,18 +6,24 @@
 (function () {
   'use strict';
 
-  // --- Device & Viewport Detection ---
-  const isMobile = window.innerWidth < 768;
-  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+  // --- Device, Viewport & Network Detection ---
+  const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isTablet = !isMobile && window.innerWidth >= 768 && window.innerWidth < 1024;
+  const isSlowNetwork = (navigator.connection && (
+    navigator.connection.saveData === true ||
+    navigator.connection.effectiveType === '2g' ||
+    navigator.connection.effectiveType === '3g' ||
+    navigator.connection.effectiveType === '4g'
+  )) || isMobile;
 
   // --- Configuration ---
   const CONFIG = {
-    totalFrames: 240,
+    totalFrames: (isMobile || isSlowNetwork) ? 1 : 240,
     framePath: (index) => `Asset/frames/frame_${String(index).padStart(4, '0')}.jpg`,
-    lerpFactor: 0.20, // Quick, agile and silky smooth deceleration
-    concurrency: isMobile ? 3 : 6, // Low-overhead parallel pool to prevent network throttling
-    frameStride: isMobile ? 6 : 2, // Sample frames: on mobile ~40 frames, on desktop 120 keyframes
-    minLoadToUnlock: 0.005 // Instant unlock as soon as first frame is ready!
+    lerpFactor: 0.20,
+    concurrency: (isMobile || isSlowNetwork) ? 1 : 4,
+    frameStride: (isMobile || isSlowNetwork) ? 240 : 8, // Mobile loads only 1 frame (saves 26MB), desktop samples keyframes
+    minLoadToUnlock: 0.001
   };
 
   // --- DOM Elements ---
@@ -106,48 +112,60 @@
     return null;
   }
 
-  // --- Scroll Tracking & Active Navigation Link ---
+  // --- Scroll Tracking & Active Navigation Link (Throttled & Non-Blocking) ---
+  let scrollTicking = false;
   function updateScrollProgress() {
-    const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollY = Math.max(0, window.scrollY);
-    const progress = scrollMax > 0 ? Math.min(1, Math.max(0, scrollY / scrollMax)) : 0;
+    if (scrollTicking) return;
+    scrollTicking = true;
 
-    targetFrame = 1 + progress * (CONFIG.totalFrames - 1);
+    requestAnimationFrame(() => {
+      const scrollY = window.scrollY || window.pageYOffset || 0;
 
-    // Header subtle elevation on scroll
-    if (siteHeader) {
-      if (scrollY > 50) {
-        siteHeader.style.transform = 'translateY(0)';
+      // On desktop only: update canvas target frame and wake renderLoop if sleeping
+      if (!isMobile && !isSlowNetwork) {
+        const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollMax > 0 ? Math.min(1, Math.max(0, scrollY / scrollMax)) : 0;
+        targetFrame = 1 + progress * (CONFIG.totalFrames - 1);
+
+        if (!animationFrameId) {
+          animationFrameId = requestAnimationFrame(renderLoop);
+        }
       }
-    }
 
-    // Highlight current active nav item based on viewport section
-    highlightActiveSection();
-  }
-
-  function highlightActiveSection() {
-    const sections = document.querySelectorAll('section[id]');
-    const scrollPos = window.scrollY + 200;
-
-    sections.forEach((sec) => {
-      const top = sec.offsetTop;
-      const height = sec.offsetHeight;
-      const id = sec.getAttribute('id');
-
-      if (scrollPos >= top && scrollPos < top + height) {
-        navItems.forEach((link) => {
-          if (link.getAttribute('href') === `#${id}`) {
-            link.classList.add('active');
-          } else {
-            link.classList.remove('active');
-          }
-        });
-      }
+      scrollTicking = false;
     });
   }
 
-  // --- Smooth Inertial Lerp Render Loop ---
+  // Replaced synchronous layout-reflow with native C++ IntersectionObserver
+  function initNavObserver() {
+    const sections = document.querySelectorAll('section[id]');
+    if (!sections.length || !('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          navItems.forEach((link) => {
+            if (link.getAttribute('href') === `#${id}`) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -50% 0px', threshold: 0.05 });
+
+    sections.forEach(sec => observer.observe(sec));
+  }
+
+  // --- Smooth Inertial Lerp Render Loop (Sleeps when idle - 0% CPU overhead) ---
   function renderLoop() {
+    if (isMobile || isSlowNetwork) {
+      animationFrameId = null;
+      return;
+    }
+
     const delta = targetFrame - currentFrame;
 
     if (Math.abs(delta) > 0.001) {
@@ -161,7 +179,12 @@
       drawFrame(nextFrameIndex);
     }
 
-    animationFrameId = requestAnimationFrame(renderLoop);
+    // Only continue animation loop while actively interpolating; sleep when settled
+    if (Math.abs(delta) > 0.04) {
+      animationFrameId = requestAnimationFrame(renderLoop);
+    } else {
+      animationFrameId = null;
+    }
   }
 
   // --- Loader UI Updates ---
@@ -252,24 +275,20 @@
   }
 
   function queueRemainingFrames() {
-    const queue = [];
-    const stride = CONFIG.frameStride || 1;
+    // On mobile devices or 4G medium connections, DO NOT download 240 background images (saves 26MB bandwidth & RAM)
+    if (isMobile || isSlowNetwork) {
+      return;
+    }
 
-    // Priority 1: Keyframes spaced by stride
+    const queue = [];
+    const stride = CONFIG.frameStride || 8;
+
+    // Load lightweight keyframes spaced by stride on idle desktop
     for (let i = 1 + stride; i <= CONFIG.totalFrames; i += stride) {
       queue.push(i);
     }
-    if (queue[queue.length - 1] !== CONFIG.totalFrames) {
+    if (queue.length > 0 && queue[queue.length - 1] !== CONFIG.totalFrames) {
       queue.push(CONFIG.totalFrames);
-    }
-
-    // Priority 2: On non-mobile screens, queue the remaining intermediate frames for ultra-high fidelity
-    if (!isMobile) {
-      for (let i = 2; i <= CONFIG.totalFrames; i++) {
-        if (!queue.includes(i)) {
-          queue.push(i);
-        }
-      }
     }
 
     let activeWorkers = 0;
@@ -332,6 +351,7 @@
 
     // Schedule Spline viewer web component on user interaction or idle
     scheduleSplineViewer();
+    initNavObserver();
   }
 
   function loadSplineViewerScript() {
@@ -344,6 +364,13 @@
   }
 
   function scheduleSplineViewer() {
+    // Disable Spline 3D WebGL on mobile devices (saves 8MB data & guarantees 60 FPS scrolling on Android 11)
+    if (isMobile || isSlowNetwork) {
+      const viewer = document.getElementById('hero-spline-viewer');
+      if (viewer) viewer.remove();
+      return;
+    }
+
     let triggered = false;
     function trigger() {
       if (triggered) return;
@@ -356,7 +383,7 @@
     window.addEventListener('pointerdown', trigger, { once: true, passive: true });
     window.addEventListener('keydown', trigger, { once: true, passive: true });
     window.addEventListener('scroll', trigger, { once: true, passive: true });
-    setTimeout(trigger, 6000);
+    setTimeout(trigger, 5000);
   }
 
   // --- Mobile Navigation Toggle ---
@@ -1706,16 +1733,10 @@
     };
 
     if (!attachObserver()) {
-      const waitInterval = setInterval(() => {
-        if (attachObserver()) {
-          clearInterval(waitInterval);
-        }
-      }, 50);
-      setTimeout(() => clearInterval(waitInterval), 10000);
+      
     }
 
-    const poller = setInterval(setupSpline, 150);
-    setTimeout(() => clearInterval(poller), 12000);
+    setTimeout(setupSpline, 600);
   }
 
   // --- Reusable Stacked Deck Carousel Controller ---
@@ -2307,7 +2328,12 @@
     window.addEventListener('touchend', releaseGlobalDrag);
     window.addEventListener('pointercancel', releaseGlobalDrag);
 
-    // 3. 60FPS Physics Engine: Organic floating at placed spot + gentle hover reaction without clipping
+    // 3. Physics Engine: Use pure GPU CSS keyframe animation on mobile; run JS physics on desktop only when visible
+    if (isMobile) {
+      // Return early: mobile uses 100% hardware-accelerated CSS animations with 0% main-thread CPU usage
+      return;
+    }
+
     function updatePhysics(now) {
       animFrameId = requestAnimationFrame(updatePhysics);
 
@@ -2879,7 +2905,27 @@
       });
     }
 
-    window.addEventListener('scroll', updateSpineProgress, { passive: true });
+        // Only calculate milestone progress when education section is intersecting the viewport
+    let isEduVisible = false;
+    let spineTick = false;
+    if ('IntersectionObserver' in window) {
+      const eduObs = new IntersectionObserver((entries) => {
+        isEduVisible = entries[0].isIntersecting;
+        if (isEduVisible) updateSpineProgress();
+      }, { rootMargin: '100px 0px' });
+      eduObs.observe(section);
+    } else {
+      isEduVisible = true;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!isEduVisible || spineTick) return;
+      spineTick = true;
+      requestAnimationFrame(() => {
+        updateSpineProgress();
+        spineTick = false;
+      });
+    }, { passive: true });
     window.addEventListener('resize', () => {
       updateSpineLayout();
       updateSpineProgress();

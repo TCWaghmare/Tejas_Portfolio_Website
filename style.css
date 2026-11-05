@@ -9089,3 +9089,140 @@ img {
     transform: translateZ(0);
   }
 }
+
+
+/* ==========================================================================
+   Comprehensive Keyboard Navigation & Focus-Visible States (WCAG 2.1 AA/AAA)
+   ========================================================================== */
+
+/* Skip to Main Content Link */
+.skip-to-content {
+  position: fixed;
+  top: -120px;
+  left: 20px;
+  z-index: 99999;
+  background: var(--accent-yellow);
+  color: #000000 !important;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(245, 224, 37, 0.65);
+  text-decoration: none;
+  transition: top 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.skip-to-content:focus-visible {
+  top: 18px;
+  outline: 3px solid #ffffff !important;
+  outline-offset: 3px !important;
+}
+
+[data-theme="light"] .skip-to-content {
+  background: #0f172a;
+  color: #ffffff !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .skip-to-content:focus-visible {
+  outline: 3px solid #946300 !important;
+}
+
+/* Global High-Visibility Focus-Visible Ring (Active exclusively on keyboard Tab navigation) */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+}
+
+/* Light Theme Global Focus-Visible Ring */
+[data-theme="light"] a:focus-visible,
+[data-theme="light"] button:focus-visible,
+[data-theme="light"] [role="button"]:focus-visible,
+[data-theme="light"] summary:focus-visible,
+[data-theme="light"] input:focus-visible,
+[data-theme="light"] textarea:focus-visible,
+[data-theme="light"] select:focus-visible,
+[data-theme="light"] [tabindex="0"]:focus-visible {
+  outline: 2px solid #8c5c00 !important;
+  outline-offset: 3px !important;
+}
+
+/* Specific Interactive Component Focus Refinements */
+.nav-item:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-pure);
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 2px !important;
+}
+
+[data-theme="light"] .nav-item:focus-visible {
+  background: rgba(0, 0, 0, 0.06);
+  color: #0f172a;
+  outline: 2px solid #8c5c00 !important;
+}
+
+.theme-toggle-btn:focus-visible,
+.mobile-toggle:focus-visible,
+.back-to-top:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+  border-color: var(--accent-yellow) !important;
+}
+
+.cert-dot:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 4px !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+
+.cert-nav-arrow:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+  border-color: var(--accent-yellow) !important;
+}
+
+.kova-pill:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+  border-color: var(--accent-yellow) !important;
+}
+
+.kova-send-btn:focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 3px !important;
+}
+
+[data-theme="light"] .kova-send-btn:focus-visible {
+  outline: 3px solid #0f172a !important;
+}
+
+.kova-range:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 6px !important;
+}
+
+.tool-item:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 4px !important;
+}
+
+.deck-front-card:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+  border-color: var(--accent-yellow) !important;
+}
+
+.cm-close:focus-visible,
+.lightbox-close:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+}

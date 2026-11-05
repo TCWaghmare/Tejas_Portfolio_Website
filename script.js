@@ -447,6 +447,77 @@
     });
   }
 
+  // =========================================================================
+  // Accessible Modal Focus & Keyboard Trap Controller (WCAG 2.4.3 & 2.1.2)
+  // =========================================================================
+  let activeModalElement = null;
+  let lastActiveElementBeforeModal = null;
+
+  function trapFocusInModal(modal) {
+    if (!modal) return;
+    lastActiveElementBeforeModal = document.activeElement;
+    activeModalElement = modal;
+
+    // Move focus inside the modal gracefully
+    setTimeout(() => {
+      const firstInput = modal.querySelector('input:not([type="hidden"]):not([disabled]), textarea:not([disabled])');
+      const closeBtn = modal.querySelector('.cm-close, .lightbox-close, button:not([disabled])');
+      const target = firstInput || closeBtn;
+      if (target && typeof target.focus === 'function') {
+        target.focus();
+      }
+    }, 120);
+  }
+
+  function releaseFocusFromModal(modal) {
+    if (activeModalElement === modal) {
+      activeModalElement = null;
+    }
+    if (lastActiveElementBeforeModal && typeof lastActiveElementBeforeModal.focus === 'function') {
+      try {
+        lastActiveElementBeforeModal.focus();
+      } catch (e) { }
+    }
+    lastActiveElementBeforeModal = null;
+  }
+
+  // Trap Tab and Shift+Tab navigation exclusively inside the open modal
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab' && activeModalElement) {
+      const focusable = Array.from(activeModalElement.querySelectorAll(
+        'button:not([disabled]):not([aria-hidden="true"]), [href]:not([aria-hidden="true"]), input:not([type="hidden"]):not([disabled]):not([aria-hidden="true"]), select:not([disabled]):not([aria-hidden="true"]), textarea:not([disabled]):not([aria-hidden="true"]), [tabindex]:not([tabindex="-1"]):not([aria-hidden="true"])'
+      )).filter(el => el.offsetParent !== null || window.getComputedStyle(el).display !== 'none');
+
+      if (focusable.length === 0) return;
+
+      const firstEl = focusable[0];
+      const lastEl = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        }
+      } else {
+        if (document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    }
+  });
+
+  // Global keyboard activation for role="button" and .deck-front-card with Enter or Space
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const target = e.target;
+      if (target && (target.classList.contains('deck-front-card') || (target.getAttribute('role') === 'button' && target.tagName !== 'BUTTON'))) {
+        e.preventDefault();
+        target.click();
+      }
+    }
+  });
+
   // --- Global Lightbox Modal Controller ---
   window.openLightbox = function (mediaSrc, mediaType, title) {
     if (!lightboxModal || !lightboxBody) return; try { window.dispatchEvent(new CustomEvent('portfolio:lightbox', { detail: { mediaSrc, mediaType, title } })); } catch (e) { }
@@ -475,6 +546,7 @@
     lightboxModal.classList.add('active');
     lightboxModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    trapFocusInModal(lightboxModal);
   };
 
   window.closeLightbox = function () {
@@ -482,6 +554,7 @@
     lightboxModal.classList.remove('active');
     lightboxModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    releaseFocusFromModal(lightboxModal);
 
     if (lightboxBody) {
       // Stop video playback if any
@@ -717,11 +790,7 @@
       window.setupKineticElement(modalTitle);
     }
 
-    // Auto-focus first input field for smooth accessibility
-    setTimeout(() => {
-      const firstInput = modal.querySelector('#talk-name');
-      if (firstInput) firstInput.focus();
-    }, 150);
+    trapFocusInModal(modal);
   };
 
   window.closeContactModal = function () {
@@ -730,6 +799,7 @@
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    releaseFocusFromModal(modal);
   };
 
   // Close modals on Escape key
@@ -796,6 +866,7 @@
     modal.classList.remove('active');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    releaseFocusFromModal(modal);
   };
 
   window.switchResumeView = function (viewMode) {
@@ -1940,6 +2011,19 @@
     }
 
     // Controls listeners
+    // Keyboard navigation with ArrowLeft and ArrowRight keys
+    container.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+        startAutoPlay();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextSlide();
+        startAutoPlay();
+      }
+    });
+
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
         nextSlide();
@@ -2451,6 +2535,18 @@
       item.addEventListener('mouseleave', deactivate);
       item.addEventListener('focus', activate);
       item.addEventListener('blur', deactivate);
+
+      // Support keyboard Enter / Space toggle
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (item.classList.contains('is-active')) {
+            deactivate();
+          } else {
+            activate();
+          }
+        }
+      });
 
       // Support mobile tap / direct click toggle
       item.addEventListener('click', (e) => {

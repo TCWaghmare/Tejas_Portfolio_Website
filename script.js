@@ -6,23 +6,17 @@
 (function () {
   'use strict';
 
-  // --- Device, Viewport & Network Detection ---
+  // --- Device & Viewport Detection ---
   const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const isTablet = !isMobile && window.innerWidth >= 768 && window.innerWidth < 1024;
-  const isSlowNetwork = (navigator.connection && (
-    navigator.connection.saveData === true ||
-    navigator.connection.effectiveType === '2g' ||
-    navigator.connection.effectiveType === '3g' ||
-    navigator.connection.effectiveType === '4g'
-  )) || isMobile;
 
-  // --- Configuration ---
+  // --- Configuration (Active on BOTH Laptop & Mobile for 60FPS fluid scroll) ---
   const CONFIG = {
-    totalFrames: (isMobile || isSlowNetwork) ? 1 : 240,
+    totalFrames: 240,
     framePath: (index) => `Asset/frames/frame_${String(index).padStart(4, '0')}.jpg`,
-    lerpFactor: 0.20,
-    concurrency: (isMobile || isSlowNetwork) ? 1 : 4,
-    frameStride: (isMobile || isSlowNetwork) ? 240 : 8, // Mobile loads only 1 frame (saves 26MB), desktop samples keyframes
+    lerpFactor: isMobile ? 0.22 : 0.18, // Ultra-smooth fluid deceleration
+    concurrency: isMobile ? 2 : 4,      // Lightweight parallel worker pool (preserves 4G bandwidth)
+    frameStride: isMobile ? 4 : 2,      // Mobile samples 60 keyframes (~3.5MB total), desktop samples 120 keyframes
     minLoadToUnlock: 0.001
   };
 
@@ -48,6 +42,7 @@
   let targetFrame = 1;
   let currentFrame = 1;
   let renderedFrame = -1;
+  let renderedActualIndex = -1;
   let isPageInteractive = false;
   let animationFrameId = null;
 
@@ -57,7 +52,8 @@
   let dpr = 1;
 
   function resizeCanvas() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // On mobile screens, cap DPR to 1 (or 1.2) to match 720p frame resolution and ensure locked 60 FPS GPU fill rate
+    dpr = isMobile ? Math.min(window.devicePixelRatio || 1, 1.2) : Math.min(window.devicePixelRatio || 1, 2);
     canvasWidth = window.innerWidth;
     canvasHeight = window.innerHeight;
 
@@ -65,17 +61,23 @@
     canvas.height = Math.round(canvasHeight * dpr);
 
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
 
     renderedFrame = -1;
     drawFrame(Math.round(currentFrame));
   }
 
-  // --- Aspect Ratio Cover Draw Algorithm ---
+  // --- Aspect Ratio Cover Draw Algorithm (Zero Sticking & Progressive Refinement) ---
   function drawFrame(frameIndex) {
-    const img = getClosestLoadedImage(frameIndex);
-    if (!img) return;
+    const match = getClosestLoadedFrame(frameIndex);
+    if (!match) return;
 
+    // Skip redraw only if the exact same image is already displayed at this requested frame
+    if (match.index === renderedActualIndex && renderedFrame === frameIndex) {
+      return;
+    }
+
+    const img = match.img;
     const imgWidth = img.naturalWidth || 1280;
     const imgHeight = img.naturalHeight || 720;
 
@@ -86,57 +88,59 @@
     const offsetY = (canvas.height - drawHeight) / 2;
 
     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    renderedActualIndex = match.index;
     renderedFrame = frameIndex;
-
   }
 
-  // --- Zero-Flicker Fallback to Closest Loaded Frame ---
-  function getClosestLoadedImage(requestedIndex) {
+  // --- Zero-Flicker Fallback to Closest Loaded Frame with Index ---
+  function getClosestLoadedFrame(requestedIndex) {
     const target = Math.max(1, Math.min(CONFIG.totalFrames, Math.round(requestedIndex)));
 
     if (images[target] && images[target].complete && images[target].naturalWidth > 0) {
-      return images[target];
+      return { img: images[target], index: target };
     }
 
     for (let offset = 1; offset < CONFIG.totalFrames; offset++) {
       const prev = target - offset;
       if (prev >= 1 && images[prev] && images[prev].complete && images[prev].naturalWidth > 0) {
-        return images[prev];
+        return { img: images[prev], index: prev };
       }
       const next = target + offset;
       if (next <= CONFIG.totalFrames && images[next] && images[next].complete && images[next].naturalWidth > 0) {
-        return images[next];
+        return { img: images[next], index: next };
       }
     }
 
     return null;
   }
 
-  // --- Scroll Tracking & Active Navigation Link (Throttled & Non-Blocking) ---
-  let scrollTicking = false;
-  function updateScrollProgress() {
-    if (scrollTicking) return;
-    scrollTicking = true;
-
-    requestAnimationFrame(() => {
-      const scrollY = window.scrollY || window.pageYOffset || 0;
-
-      // On desktop only: update canvas target frame and wake renderLoop if sleeping
-      if (!isMobile && !isSlowNetwork) {
-        const scrollMax = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = scrollMax > 0 ? Math.min(1, Math.max(0, scrollY / scrollMax)) : 0;
-        targetFrame = 1 + progress * (CONFIG.totalFrames - 1);
-
-        if (!animationFrameId) {
-          animationFrameId = requestAnimationFrame(renderLoop);
-        }
-      }
-
-      scrollTicking = false;
-    });
+  // Backward compatibility alias
+  function getClosestLoadedImage(requestedIndex) {
+    const match = getClosestLoadedFrame(requestedIndex);
+    return match ? match.img : null;
   }
 
-  // Replaced synchronous layout-reflow with native C++ IntersectionObserver
+  // --- Scroll Tracking: Operates smoothly on BOTH Laptop and Mobile ---
+  function updateScrollProgress() {
+    const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+    const totalHeight = Math.max(
+      document.body.scrollHeight || 0,
+      document.documentElement.scrollHeight || 0
+    );
+    const scrollMax = Math.max(1, totalHeight - viewportHeight);
+    const progress = Math.min(1, Math.max(0, scrollY / scrollMax));
+
+    // Calculate target frame across the full 1 to 240 range
+    targetFrame = 1 + progress * (CONFIG.totalFrames - 1);
+
+    // Wake up renderLoop if it was asleep
+    if (!animationFrameId) {
+      animationFrameId = requestAnimationFrame(renderLoop);
+    }
+  }
+
+  // Native C++ IntersectionObserver for active section link highlighting (0 layout reflows)
   function initNavObserver() {
     const sections = document.querySelectorAll('section[id]');
     if (!sections.length || !('IntersectionObserver' in window)) return;
@@ -159,30 +163,29 @@
     sections.forEach(sec => observer.observe(sec));
   }
 
-  // --- Smooth Inertial Lerp Render Loop (Sleeps when idle - 0% CPU overhead) ---
+  // --- Smooth Inertial Lerp Render Loop (60 FPS motion, 0% CPU when settled) ---
   function renderLoop() {
-    if (isMobile || isSlowNetwork) {
-      animationFrameId = null;
-      return;
-    }
-
     const delta = targetFrame - currentFrame;
 
-    if (Math.abs(delta) > 0.001) {
+    // Smooth exponential lerp interpolation
+    if (Math.abs(delta) > 0.005) {
       currentFrame += delta * CONFIG.lerpFactor;
     } else {
       currentFrame = targetFrame;
     }
 
-    const nextFrameIndex = Math.round(currentFrame);
-    if (nextFrameIndex !== renderedFrame) {
+    const nextFrameIndex = Math.max(1, Math.min(CONFIG.totalFrames, Math.round(currentFrame)));
+    if (nextFrameIndex !== renderedFrame || renderedActualIndex === -1) {
       drawFrame(nextFrameIndex);
     }
 
-    // Only continue animation loop while actively interpolating; sleep when settled
-    if (Math.abs(delta) > 0.04) {
+    // Continue running while actively decelerating; sleep when settled to preserve battery & CPU
+    if (Math.abs(targetFrame - currentFrame) > 0.04) {
       animationFrameId = requestAnimationFrame(renderLoop);
     } else {
+      currentFrame = targetFrame;
+      const finalIndex = Math.max(1, Math.min(CONFIG.totalFrames, Math.round(currentFrame)));
+      drawFrame(finalIndex);
       animationFrameId = null;
     }
   }
@@ -209,6 +212,7 @@
   // --- Frame Preloading Pipeline ---
   function startPreloading() {
     resizeCanvas();
+    updateScrollProgress();
 
     // Immediately unlock interface so hero content, typography and avatar render with zero delay
     unlockInterface();
@@ -219,7 +223,8 @@
     firstImg.onload = () => {
       images[1] = firstImg;
       loadedCount++;
-      drawFrame(1);
+      updateScrollProgress();
+      drawFrame(Math.round(currentFrame));
       deferBackgroundFrames();
     };
     firstImg.onerror = () => {
@@ -258,32 +263,29 @@
       queueRemainingFrames();
     }
 
-    // Start buffering on first user interaction
+    // Start buffering promptly without blocking initial render
     window.addEventListener('scroll', startBuffering, { once: true, passive: true });
     window.addEventListener('wheel', startBuffering, { once: true, passive: true });
     window.addEventListener('touchstart', startBuffering, { once: true, passive: true });
+    window.addEventListener('touchmove', startBuffering, { once: true, passive: true });
     window.addEventListener('keydown', startBuffering, { once: true, passive: true });
 
-    // Or after 3.5s of idle time
+    // Begin background buffering 200ms after Frame 1 load so frames are ready before user scrolls
     setTimeout(() => {
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(startBuffering, { timeout: 4000 });
+        requestIdleCallback(startBuffering, { timeout: 500 });
       } else {
         startBuffering();
       }
-    }, 3500);
+    }, 200);
   }
 
+  // Smart Prioritized Keyframe Pipeline (Never sticks, buffers 60 keyframes on mobile, 120 on desktop)
   function queueRemainingFrames() {
-    // On mobile devices or 4G medium connections, DO NOT download 240 background images (saves 26MB bandwidth & RAM)
-    if (isMobile || isSlowNetwork) {
-      return;
-    }
-
     const queue = [];
-    const stride = CONFIG.frameStride || 8;
+    const stride = CONFIG.frameStride || (isMobile ? 4 : 2);
 
-    // Load lightweight keyframes spaced by stride on idle desktop
+    // Phase 1: Load evenly spaced keyframes across the entire scroll range (so full motion is available immediately!)
     for (let i = 1 + stride; i <= CONFIG.totalFrames; i += stride) {
       queue.push(i);
     }
@@ -291,12 +293,28 @@
       queue.push(CONFIG.totalFrames);
     }
 
+    // Phase 2: On desktop, queue intermediate frames for ultra-high 240fps fidelity
+    if (!isMobile) {
+      for (let i = 2; i <= CONFIG.totalFrames; i++) {
+        if (!queue.includes(i)) {
+          queue.push(i);
+        }
+      }
+    }
+
     let activeWorkers = 0;
+    const maxWorkers = CONFIG.concurrency || (isMobile ? 2 : 4);
 
     function work() {
       if (queue.length === 0 && activeWorkers === 0) return;
 
-      while (activeWorkers < CONFIG.concurrency && queue.length > 0) {
+      // Sort pending queue by proximity to targetFrame so frames near user scroll position load first!
+      if (queue.length > 1) {
+        const cur = targetFrame;
+        queue.sort((a, b) => Math.abs(a - cur) - Math.abs(b - cur));
+      }
+
+      while (activeWorkers < maxWorkers && queue.length > 0) {
         const frameIdx = queue.shift();
         activeWorkers++;
 
@@ -307,6 +325,13 @@
           images[frameIdx] = img;
           loadedCount++;
           activeWorkers--;
+
+          // If the user's current scroll position would benefit from this newly loaded frame, redraw it immediately!
+          const target = Math.round(currentFrame);
+          if (renderedActualIndex !== target && Math.abs(target - frameIdx) < Math.abs(target - renderedActualIndex)) {
+            drawFrame(target);
+          }
+
           work();
         };
 
@@ -315,11 +340,11 @@
       }
     }
 
-    // Defer background frame loading to idle time so main UI thread stays 100% responsive
+    // Start background buffering gently without competing with initial paint
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => work(), { timeout: 800 });
+      requestIdleCallback(() => work(), { timeout: 300 });
     } else {
-      setTimeout(work, 150);
+      setTimeout(work, 80);
     }
   }
 
@@ -1633,6 +1658,7 @@
   }
 
   window.addEventListener('scroll', updateScrollProgress, { passive: true });
+  window.addEventListener('touchmove', updateScrollProgress, { passive: true });
   window.addEventListener('resize', resizeCanvas);
 
   // --- Spline 3D Watermark Cleaner & Scroll-Lock Controller ---

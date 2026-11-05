@@ -188,8 +188,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
   
   <link rel="preload" href="Asset/profile_hero.webp" as="image" type="image/webp" fetchpriority="high">
-  <link rel="preload" href="style.css?v=20261026_contact_phone" as="style">
-  <link rel="stylesheet" href="style.css?v=20261026_contact_phone">
+  <link rel="preload" href="style.css?v=20261105_validation" as="style">
+  <link rel="stylesheet" href="style.css?v=20261105_validation">
 </head>
 <body>
 
@@ -2884,10 +2884,22 @@
         </p>
       </div>
 
-      <!-- Kova Interactive Contact Form -->
-      <form id="portfolio-contact-form" class="kova-talk-form" onsubmit="handleContactSubmit(event)">
+      <!-- Kova Interactive Contact Form with Built-in Validation & Anti-Spam Protection -->
+      <form id="portfolio-contact-form" class="kova-talk-form" onsubmit="handleContactSubmit(event)" novalidate>
         <input type="hidden" name="_captcha" value="false" />
         <input type="hidden" name="_template" value="table" />
+        
+        <!-- Anti-Spam Honeypot Field (Invisible to human users, traps automated spam bots) -->
+        <div class="kova-hp-field" aria-hidden="true" style="position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; overflow: hidden !important; pointer-events: none !important; z-index: -1 !important;">
+          <label for="talk-website-hp">Company Website (Leave Blank)</label>
+          <input 
+            type="text" 
+            id="talk-website-hp" 
+            name="website_hp" 
+            tabindex="-1" 
+            autocomplete="off" 
+          />
+        </div>
         
         <!-- Field 1: Name -->
         <div class="kova-form-field">
@@ -2903,6 +2915,7 @@
             autocomplete="name"
             required 
           />
+          <div class="kova-field-error" id="talk-name-error" aria-live="polite"></div>
         </div>
 
         <!-- Field 2: Email -->
@@ -2919,6 +2932,7 @@
             autocomplete="email"
             required 
           />
+          <div class="kova-field-error" id="talk-email-error" aria-live="polite"></div>
         </div>
 
         <!-- Field 3: Contact Number (Optional, Strict Numeric Digits Only) -->
@@ -2941,6 +2955,7 @@
             maxlength="15"
             aria-describedby="talk-phone-hint"
           />
+          <div class="kova-field-error" id="talk-phone-error" aria-live="polite"></div>
           <div class="kova-field-hint" id="talk-phone-hint">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"></circle>
@@ -3026,6 +3041,7 @@
             rows="3"
             required
           ></textarea>
+          <div class="kova-field-error" id="talk-message-error" aria-live="polite"></div>
         </div>
 
         <!-- Submit Button Row -->
@@ -3183,6 +3199,6 @@
   <script src="analytics.js?v=20261103_v1"></script>
   <!-- EmailJS Browser SDK (Auto-Responder client) -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="script.js?v=20261104_autoresponder"></script>
+  <script src="script.js?v=20261105_validation"></script>
 </body>
 </html>

@@ -54,9 +54,31 @@ function doPost(e) {
     var urgency = (data.urgency || 'Normal').trim();
     var message = (data.message || '').trim();
 
-    if (!visitorEmail || visitorEmail.indexOf('@') === -1) {
+    // Anti-Spam Honeypot Check (Silently traps automated bot submissions)
+    var honeypot = (data.website_hp || data._hp || '').trim();
+    if (honeypot.length > 0) {
+      Logger.log('Bot submission trapped via honeypot: ' + honeypot);
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'success', message: 'Inquiry processed successfully.' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Strict Server-Side Validation
+    if (!visitorName || visitorName.length < 2) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'error', message: 'Valid name is required (minimum 2 characters).' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (!visitorEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(visitorEmail)) {
       return ContentService
         .createTextOutput(JSON.stringify({ status: 'error', message: 'Valid recipient email address is required.' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (!message || message.length < 5) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'error', message: 'Message is required (minimum 5 characters).' }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 

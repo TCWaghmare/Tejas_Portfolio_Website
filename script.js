@@ -1135,34 +1135,402 @@
     return { success: false, reason: 'Email dispatchers timed out' };
   }
 
-  // 7. Contact Form Handler (Ultra-Fast Parallel Transmission & Immediate UI Feedback)
+  // --- 7. Contact Form: Validation, Anti-Spam Protection & Success Engine ---
+  const FORM_INIT_TIME = Date.now();
+  let lastContactSubmitTime = 0;
+
+  function escapeHtmlStr(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // Individual field validation rules
+  function validateContactName(value) {
+    const trimmed = (value || '').trim();
+    if (!trimmed) {
+      return { valid: false, message: 'Please enter your name.' };
+    }
+    if (trimmed.length < 2) {
+      return { valid: false, message: 'Name must be at least 2 characters.' };
+    }
+    if (trimmed.length > 70) {
+      return { valid: false, message: 'Name must be 70 characters or less.' };
+    }
+    if (!/[a-zA-Z]/.test(trimmed)) {
+      return { valid: false, message: 'Please enter a valid name containing letters.' };
+    }
+    return { valid: true };
+  }
+
+  function validateContactEmail(value) {
+    const trimmed = (value || '').trim();
+    if (!trimmed) {
+      return { valid: false, message: 'Please enter your email address.' };
+    }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(trimmed)) {
+      return { valid: false, message: 'Please enter a valid email address (e.g. name@company.com).' };
+    }
+    return { valid: true };
+  }
+
+  function validateContactPhone(value) {
+    const trimmed = (value || '').trim();
+    if (!trimmed) {
+      return { valid: true }; // Optional field
+    }
+    const digitsOnly = trimmed.replace(/\D/g, '');
+    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+      return { valid: false, message: 'Phone number must be between 7 and 15 digits.' };
+    }
+    return { valid: true };
+  }
+
+  function validateContactMessage(value) {
+    const trimmed = (value || '').trim();
+    if (!trimmed) {
+      return { valid: false, message: 'Please enter your message.' };
+    }
+    if (trimmed.length < 10) {
+      return { valid: false, message: 'Please enter at least 10 characters so Tejas can understand your request.' };
+    }
+    if (trimmed.length > 3000) {
+      return { valid: false, message: 'Message must be 3,000 characters or less.' };
+    }
+    return { valid: true };
+  }
+
+  function setFieldError(inputEl, errorEl, message) {
+    if (!inputEl) return;
+    inputEl.classList.add('is-invalid');
+    inputEl.classList.remove('is-valid');
+    if (errorEl) {
+      errorEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg><span>${escapeHtmlStr(message)}</span>`;
+      errorEl.classList.add('active');
+    }
+  }
+
+  function clearFieldError(inputEl, errorEl) {
+    if (!inputEl) return;
+    inputEl.classList.remove('is-invalid');
+    if (errorEl) {
+      errorEl.innerHTML = '';
+      errorEl.classList.remove('active');
+    }
+    if (inputEl.value && inputEl.value.trim().length > 0) {
+      inputEl.classList.add('is-valid');
+    } else {
+      inputEl.classList.remove('is-valid');
+    }
+  }
+
+  // Interactive Real-Time Validation Listeners
+  function initContactFormValidation() {
+    const form = document.getElementById('portfolio-contact-form');
+    if (!form) return;
+
+    const nameInput = document.getElementById('talk-name');
+    const nameError = document.getElementById('talk-name-error');
+    const emailInput = document.getElementById('talk-email');
+    const emailError = document.getElementById('talk-email-error');
+    const phoneInput = document.getElementById('talk-phone');
+    const phoneError = document.getElementById('talk-phone-error');
+    const messageInput = document.getElementById('talk-message');
+    const messageError = document.getElementById('talk-message-error');
+
+    if (nameInput) {
+      nameInput.addEventListener('input', () => {
+        if (nameInput.classList.contains('is-invalid')) {
+          const res = validateContactName(nameInput.value);
+          if (res.valid) clearFieldError(nameInput, nameError);
+        }
+      });
+      nameInput.addEventListener('blur', () => {
+        if (nameInput.value.trim().length > 0) {
+          const res = validateContactName(nameInput.value);
+          if (!res.valid) setFieldError(nameInput, nameError, res.message);
+          else clearFieldError(nameInput, nameError);
+        }
+      });
+    }
+
+    if (emailInput) {
+      emailInput.addEventListener('input', () => {
+        if (emailInput.classList.contains('is-invalid')) {
+          const res = validateContactEmail(emailInput.value);
+          if (res.valid) clearFieldError(emailInput, emailError);
+        }
+      });
+      emailInput.addEventListener('blur', () => {
+        if (emailInput.value.trim().length > 0) {
+          const res = validateContactEmail(emailInput.value);
+          if (!res.valid) setFieldError(emailInput, emailError, res.message);
+          else clearFieldError(emailInput, emailError);
+        }
+      });
+    }
+
+    if (phoneInput) {
+      phoneInput.addEventListener('input', () => {
+        if (phoneInput.classList.contains('is-invalid')) {
+          const res = validateContactPhone(phoneInput.value);
+          if (res.valid) clearFieldError(phoneInput, phoneError);
+        }
+      });
+      phoneInput.addEventListener('blur', () => {
+        if (phoneInput.value.trim().length > 0) {
+          const res = validateContactPhone(phoneInput.value);
+          if (!res.valid) setFieldError(phoneInput, phoneError, res.message);
+          else clearFieldError(phoneInput, phoneError);
+        }
+      });
+    }
+
+    if (messageInput) {
+      messageInput.addEventListener('input', () => {
+        if (messageInput.classList.contains('is-invalid')) {
+          const res = validateContactMessage(messageInput.value);
+          if (res.valid) clearFieldError(messageInput, messageError);
+        }
+      });
+      messageInput.addEventListener('blur', () => {
+        if (messageInput.value.trim().length > 0) {
+          const res = validateContactMessage(messageInput.value);
+          if (!res.valid) setFieldError(messageInput, messageError, res.message);
+          else clearFieldError(messageInput, messageError);
+        }
+      });
+    }
+  }
+
+  // Reset form and re-enable inputs after successful submission
+  window.resetContactForm = function () {
+    const form = document.getElementById('portfolio-contact-form');
+    const feedback = document.getElementById('talk-form-feedback') || document.getElementById('form-feedback');
+    if (form) {
+      form.reset();
+      form.querySelectorAll('.kova-input').forEach(input => {
+        input.classList.remove('is-valid', 'is-invalid');
+      });
+      form.querySelectorAll('.kova-field-error').forEach(err => {
+        err.classList.remove('active');
+        err.innerHTML = '';
+      });
+    }
+    if (feedback) {
+      feedback.style.display = 'none';
+      feedback.innerHTML = '';
+      feedback.className = 'form-feedback';
+    }
+    const nameInput = document.getElementById('talk-name');
+    if (nameInput) nameInput.focus();
+  };
+
+  // Helper to render high-clarity success card
+  function displaySuccessCard(name, email, submitBtn, originalBtnHtml, form, topic, urgency) {
+    lastContactSubmitTime = Date.now();
+    const feedback = document.getElementById('talk-form-feedback') || document.getElementById('form-feedback');
+
+    if (feedback) {
+      feedback.className = 'form-feedback success';
+      feedback.innerHTML = `
+        <div class="kova-success-card">
+          <div class="kova-success-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Message Delivered Successfully</span>
+          </div>
+          <h3 class="kova-success-title">
+            Thank you, <span class="highlight-yellow">${escapeHtmlStr(name)}</span>!
+          </h3>
+          <p class="kova-success-text">
+            Your message is safely in my personal inbox. An instant confirmation email with my portfolio links and project details has been sent to <strong>${escapeHtmlStr(email)}</strong>.
+          </p>
+          <div class="kova-success-timeline">
+            <span>⚡ Expected Response:</span> Typically within 24 hours.
+          </div>
+          <button type="button" class="kova-reset-btn" onclick="resetContactForm()">
+            Send another message &rarr;
+          </button>
+        </div>
+      `;
+      feedback.style.display = 'block';
+      feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    form.reset();
+    form.querySelectorAll('.kova-input').forEach(input => {
+      input.classList.remove('is-valid', 'is-invalid');
+    });
+    form.querySelectorAll('.kova-field-error').forEach(err => {
+      err.classList.remove('active');
+      err.innerHTML = '';
+    });
+
+    const phoneEl = document.getElementById('talk-phone');
+    if (phoneEl) phoneEl.value = '';
+    const permissionEl = document.getElementById('talk-permission');
+    if (permissionEl) permissionEl.checked = false;
+
+    // Reset topic pill & urgency slider
+    const defaultPill = document.querySelector('.kova-pill[data-topic="A project"]');
+    if (defaultPill) {
+      document.querySelectorAll('.kova-pill').forEach(p => p.classList.remove('active'));
+      defaultPill.classList.add('active');
+      const topicInput = document.getElementById('talk-topic');
+      if (topicInput) topicInput.value = 'A project';
+    }
+    const urgencyInput = document.getElementById('talk-urgency');
+    const urgencyVal = document.getElementById('talk-urgency-val');
+    if (urgencyInput) {
+      urgencyInput.value = '40';
+      if (urgencyVal) urgencyVal.textContent = 'Sometime soon';
+    }
+
+    if (submitBtn) {
+      submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
+      try { if (window.PortfolioAnalytics) window.PortfolioAnalytics.track('contact_submit', { topic: topic, urgency: urgency }); } catch (e) { }
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('is-loading');
+        submitBtn.innerHTML = originalBtnHtml;
+      }, 4500);
+    }
+  }
+
+  // 7. Contact Form Handler (Comprehensive Validation, Spam Protection & Instant Feedback)
   window.handleContactSubmit = async function (e) {
     e.preventDefault();
     const form = e.target;
     const submitBtn = document.getElementById('talk-submit-btn') || form.querySelector('button[type="submit"]');
-    const name = form.name ? form.name.value.trim() : '';
-    const email = form.email ? form.email.value.trim() : '';
-    const phoneEl = document.getElementById('talk-phone') || form.phone;
-    const phone = phoneEl ? phoneEl.value.replace(/\D/g, '').trim() : '';
+    const nameInput = document.getElementById('talk-name') || form.name;
+    const emailInput = document.getElementById('talk-email') || form.email;
+    const phoneInput = document.getElementById('talk-phone') || form.phone;
+    const messageInput = document.getElementById('talk-message') || form.message;
+    const honeypotInput = document.getElementById('talk-website-hp') || form.website_hp;
     const permissionEl = document.getElementById('talk-permission') || form.permission_call_whatsapp;
     const permissionGranted = permissionEl ? permissionEl.checked : false;
     const topic = form.subject ? form.subject.value.trim() : 'Project Inquiry';
     const urgencyVal = document.getElementById('talk-urgency-val');
     const urgency = urgencyVal ? urgencyVal.textContent : 'Normal';
-    const message = form.message ? form.message.value.trim() : '';
     const feedback = document.getElementById('talk-form-feedback') || document.getElementById('form-feedback');
 
-    if (!name || !email || !message) {
+    const nameError = document.getElementById('talk-name-error');
+    const emailError = document.getElementById('talk-email-error');
+    const phoneError = document.getElementById('talk-phone-error');
+    const messageError = document.getElementById('talk-message-error');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const phone = phoneInput ? phoneInput.value.replace(/\D/g, '').trim() : '';
+    const message = messageInput ? messageInput.value.trim() : '';
+    const honeypot = honeypotInput ? honeypotInput.value.trim() : '';
+
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '<span>Send it &rarr;</span>';
+
+    // --------------------------------------------------------------------------
+    // A. STRICT FORM VALIDATION
+    // --------------------------------------------------------------------------
+    let hasValidationError = false;
+    let firstInvalidField = null;
+
+    const nameCheck = validateContactName(name);
+    if (!nameCheck.valid) {
+      setFieldError(nameInput, nameError, nameCheck.message);
+      hasValidationError = true;
+      if (!firstInvalidField) firstInvalidField = nameInput;
+    } else {
+      clearFieldError(nameInput, nameError);
+    }
+
+    const emailCheck = validateContactEmail(email);
+    if (!emailCheck.valid) {
+      setFieldError(emailInput, emailError, emailCheck.message);
+      hasValidationError = true;
+      if (!firstInvalidField) firstInvalidField = emailInput;
+    } else {
+      clearFieldError(emailInput, emailError);
+    }
+
+    const phoneCheck = validateContactPhone(phoneInput ? phoneInput.value : '');
+    if (!phoneCheck.valid) {
+      setFieldError(phoneInput, phoneError, phoneCheck.message);
+      hasValidationError = true;
+      if (!firstInvalidField) firstInvalidField = phoneInput;
+    } else {
+      clearFieldError(phoneInput, phoneError);
+    }
+
+    const messageCheck = validateContactMessage(message);
+    if (!messageCheck.valid) {
+      setFieldError(messageInput, messageError, messageCheck.message);
+      hasValidationError = true;
+      if (!firstInvalidField) firstInvalidField = messageInput;
+    } else {
+      clearFieldError(messageInput, messageError);
+    }
+
+    if (hasValidationError) {
       if (feedback) {
         feedback.className = 'form-feedback error';
-        feedback.innerHTML = '<strong>Please complete all required fields</strong> (name, email, and message).';
+        feedback.innerHTML = '<strong>Please correct the highlighted fields</strong> before submitting.';
+        feedback.style.display = 'block';
+      }
+      if (firstInvalidField) firstInvalidField.focus();
+      return;
+    }
+
+    // --------------------------------------------------------------------------
+    // B. ANTI-SPAM PROTECTION (Honeypot, Speed-Trap & Rate Limiting)
+    // --------------------------------------------------------------------------
+    // Check 1: Honeypot Trap
+    // Invisible field only filled by automated scraper bots
+    if (honeypot && honeypot.length > 0) {
+      console.warn('[Anti-Spam] Bot detected via honeypot trap.');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Sending message...</span>';
+      }
+      await new Promise(r => setTimeout(r, 600));
+      displaySuccessCard(name, email, submitBtn, originalBtnHtml, form, topic, urgency);
+      return;
+    }
+
+    // Check 2: Headless Bot Speed Trap
+    // Automated bots submit in < 1.5s from page initialization
+    const elapsedSeconds = (Date.now() - FORM_INIT_TIME) / 1000;
+    if (elapsedSeconds < 1.5) {
+      console.warn(`[Anti-Spam] Bot detected: submission too rapid (${elapsedSeconds.toFixed(2)}s).`);
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Sending message...</span>';
+      }
+      await new Promise(r => setTimeout(r, 600));
+      displaySuccessCard(name, email, submitBtn, originalBtnHtml, form, topic, urgency);
+      return;
+    }
+
+    // Check 3: Session Rate Limiting (25-second cooldown between submissions)
+    const nowTime = Date.now();
+    if (nowTime - lastContactSubmitTime < 25000) {
+      const remainingSeconds = Math.ceil((25000 - (nowTime - lastContactSubmitTime)) / 1000);
+      if (feedback) {
+        feedback.className = 'form-feedback error';
+        feedback.innerHTML = `<strong>Inquiry already received!</strong> Please wait ${remainingSeconds} seconds before sending another message.`;
         feedback.style.display = 'block';
       }
       return;
     }
 
-    // Set UI to loading state immediately
-    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '<span>Send it &rarr;</span>';
+    // --------------------------------------------------------------------------
+    // C. SECURE TRANSMISSION
+    // --------------------------------------------------------------------------
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.classList.add('is-loading');
@@ -1183,6 +1551,7 @@
       topic: topic,
       urgency: urgency,
       message: message,
+      website_hp: honeypot,
       portfolio_url: AUTO_RESPONDER_CONFIG.portfolioUrl,
       linkedin_url: AUTO_RESPONDER_CONFIG.linkedinUrl,
       submitted_at: new Date().toISOString()
@@ -1209,41 +1578,8 @@
       const isSupaSuccess = supaResult.status === 'fulfilled' && supaResult.value && supaResult.value.success;
       const isEmailSuccess = emailResult.status === 'fulfilled' && emailResult.value && emailResult.value.success;
 
-      // As long as Supabase saved it OR Email was dispatched, the inquiry was captured successfully!
       if (isSupaSuccess || isEmailSuccess) {
-        if (feedback) {
-          feedback.className = 'form-feedback success';
-          feedback.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been sent directly. An instant confirmation is on its way to <em>${email}</em>, and I will definitely get back to you as soon as possible!`;
-          feedback.style.display = 'block';
-        }
-
-        form.reset();
-        if (phoneEl) phoneEl.value = '';
-        if (permissionEl) permissionEl.checked = false;
-
-        // Reset topic pill & urgency slider
-        const defaultPill = document.querySelector('.kova-pill[data-topic="A project"]');
-        if (defaultPill) {
-          document.querySelectorAll('.kova-pill').forEach(p => p.classList.remove('active'));
-          defaultPill.classList.add('active');
-          const topicInput = document.getElementById('talk-topic');
-          if (topicInput) topicInput.value = 'A project';
-        }
-        const urgencyInput = document.getElementById('talk-urgency');
-        if (urgencyInput) {
-          urgencyInput.value = '40';
-          if (urgencyVal) urgencyVal.textContent = 'Sometime soon';
-        }
-
-        if (submitBtn) {
-          submitBtn.innerHTML = '<span>Sent Successfully! ✓</span>';
-          try { if (window.PortfolioAnalytics) window.PortfolioAnalytics.track('contact_submit', { topic: topic, urgency: urgency }); } catch (e) { }
-          setTimeout(() => {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('is-loading');
-            submitBtn.innerHTML = originalBtnHtml;
-          }, 4500);
-        }
+        displaySuccessCard(name, email, submitBtn, originalBtnHtml, form, topic, urgency);
       } else {
         throw new Error('Both database and email transmission were unsuccessful');
       }
@@ -1262,8 +1598,13 @@
     }
   };
 
+  // Auto-initialize real-time validation
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initContactFormValidation);
+  } else {
+    initContactFormValidation();
+  }
 
-  // --- Event Listeners ---
   window.addEventListener('scroll', updateScrollProgress, { passive: true });
   window.addEventListener('resize', resizeCanvas);
 

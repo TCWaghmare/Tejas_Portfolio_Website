@@ -67,111 +67,6 @@
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  // Switch between Login, Register, Forgot Password, and Reset Password views
-  function switchAuthView(viewName) {
-    const views = {
-      login: document.getElementById('auth-login-view'),
-      signup: document.getElementById('auth-signup-view'),
-      forgot: document.getElementById('auth-forgot-view'),
-      reset: document.getElementById('auth-reset-view')
-    };
-
-    const tabs = {
-      login: document.getElementById('tab-login'),
-      signup: document.getElementById('tab-signup'),
-      forgot: document.getElementById('tab-forgot')
-    };
-
-    Object.keys(views).forEach(key => {
-      if (views[key]) {
-        views[key].style.display = (key === viewName) ? 'block' : 'none';
-      }
-    });
-
-    Object.keys(tabs).forEach(key => {
-      if (tabs[key]) {
-        if (key === viewName) {
-          tabs[key].classList.add('active');
-        } else {
-          tabs[key].classList.remove('active');
-        }
-      }
-    });
-
-    // Reset error & success banners
-    ['auth-error-msg', 'signup-error-msg', 'signup-success-msg', 'forgot-error-msg', 'forgot-success-msg', 'reset-error-msg'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    });
-  }
-
-  // Register / Set Admin Password in Supabase Auth
-  async function handleAdminRegister(e) {
-    if (e) e.preventDefault();
-    const emailInput = document.getElementById('signup-email');
-    const pwdInput = document.getElementById('signup-password');
-    const errBanner = document.getElementById('signup-error-msg');
-    const successBanner = document.getElementById('signup-success-msg');
-    const submitBtn = document.getElementById('signup-submit-btn');
-
-    const email = (emailInput.value || '').trim().toLowerCase();
-    const password = (pwdInput.value || '').trim();
-
-    errBanner.style.display = 'none';
-    successBanner.style.display = 'none';
-
-    if (email !== CONFIG.authorizedEmail.toLowerCase()) {
-      errBanner.textContent = 'Access Denied. Only the administrator account (' + CONFIG.authorizedEmail + ') can configure dashboard access.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    if (password.length < 6) {
-      errBanner.textContent = 'Password must be at least 6 characters long.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    if (!supaClient || !supaClient.auth) {
-      errBanner.textContent = 'Supabase client unavailable. You can log in using the master security key.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.querySelector('.signup-btn-text').textContent = 'Configuring Supabase Auth...';
-
-    try {
-      const { data, error } = await supaClient.auth.signUp({
-        email: email,
-        password: password
-      });
-
-      if (error) throw error;
-
-      if (data && data.session) {
-        state.isAuthenticated = true;
-        sessionStorage.setItem('tp_supabase_jwt', data.session.access_token);
-        sessionStorage.setItem('tp_admin_auth_token', 'supabase_auth_' + Date.now());
-        showToast('Password registered with Supabase! Unlocking command center...', 'success');
-        setTimeout(unlockDashboard, 600);
-      } else {
-        successBanner.innerHTML = `<strong>Supabase Account Registered!</strong><br>A confirmation notice was dispatched to <strong>${escapeHtml(email)}</strong>.<br>If email confirmation is enabled in your Supabase project, click the link in your Gmail, then return here to Sign In. You can also sign in right now with the master key.`;
-        successBanner.style.display = 'block';
-        submitBtn.querySelector('.signup-btn-text').textContent = 'Registration Dispatched';
-      }
-    } catch (err) {
-      let errMsg = err.message || 'Unable to register credentials.';
-      if (errMsg.toLowerCase().includes('user already registered')) {
-        errMsg = 'An account with this email already exists in Supabase. You can sign in directly, or click "Forgot?" to reset your password.';
-      }
-      errBanner.textContent = errMsg;
-      errBanner.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.querySelector('.signup-btn-text').textContent = 'Register Password with Supabase';
-    }
-  }
-
   // Toggle Password input visibility (works for any password field ID)
   function togglePasswordVisibility(inputId = 'admin-password') {
     const input = document.getElementById(inputId);
@@ -179,7 +74,7 @@
     input.type = input.type === 'password' ? 'text' : 'password';
   }
 
-  // Standard Admin Login (Supabase Auth primary, with Master Security Key fallback)
+  // Standard Admin Login with Supabase Auth
   async function handleAdminLogin(e) {
     if (e) e.preventDefault();
     const emailInput = document.getElementById('admin-email');
@@ -194,7 +89,7 @@
     submitBtn.disabled = true;
     submitBtn.querySelector('.auth-btn-text').textContent = 'Verifying credentials...';
 
-    // 1. Verify email identity
+    // 1. Verify email identity against authorized admin email
     if (email !== CONFIG.authorizedEmail.toLowerCase()) {
       showAuthError('Access Denied. Only the authorized administrator account can unlock this dashboard.');
       submitBtn.disabled = false;
@@ -204,10 +99,9 @@
 
     try {
       let authSuccessful = false;
-
       let supaAuthError = null;
 
-      // 2. Try Supabase Auth email/password first
+      // 2. Authenticate directly via Supabase Auth
       if (supaClient && supaClient.auth) {
         try {
           const { data, error } = await supaClient.auth.signInWithPassword({
@@ -239,15 +133,9 @@
         sessionStorage.setItem('tp_admin_auth_token', 'authorized_' + Date.now());
         unlockDashboard();
       } else {
-        let errorHint = 'Invalid Password or Security Key.';
+        let errorHint = 'Invalid email or password.';
         if (supaAuthError) {
-          if (supaAuthError.toLowerCase().includes('invalid login credentials')) {
-            errorHint = 'Invalid Supabase credentials. If you haven\'t registered your password yet, click "Set Password" above, or use the emergency master key: TejasAdmin@2026!';
-          } else if (supaAuthError.toLowerCase().includes('email not confirmed')) {
-            errorHint = 'Supabase email not confirmed yet. Check your Gmail (tejaswaghmare900@gmail.com), or use the "Forgot?" tab to send a direct password reset link.';
-          } else {
-            errorHint = supaAuthError + '. You can also log in with the emergency master key: TejasAdmin@2026!';
-          }
+          errorHint = supaAuthError;
         }
         showAuthError(errorHint);
       }
@@ -256,114 +144,6 @@
     } finally {
       submitBtn.disabled = false;
       submitBtn.querySelector('.auth-btn-text').textContent = 'Authenticate & Unlock';
-    }
-  }
-
-  // Forgot Password: Request Supabase recovery email
-  async function handleForgotPassword(e) {
-    if (e) e.preventDefault();
-    const emailInput = document.getElementById('forgot-email');
-    const errBanner = document.getElementById('forgot-error-msg');
-    const successBanner = document.getElementById('forgot-success-msg');
-    const submitBtn = document.getElementById('forgot-submit-btn');
-
-    const email = (emailInput.value || '').trim().toLowerCase();
-    errBanner.style.display = 'none';
-    successBanner.style.display = 'none';
-
-    if (email !== CONFIG.authorizedEmail.toLowerCase()) {
-      errBanner.textContent = 'Access Denied. Password recovery can only be dispatched to the administrator Gmail.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    if (!supaClient || !supaClient.auth) {
-      errBanner.textContent = 'Supabase client unavailable. You can still log in using the master security key.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.querySelector('.forgot-btn-text').textContent = 'Dispatching recovery email...';
-
-    try {
-      const redirectUrl = window.location.origin + window.location.pathname;
-      const { data, error } = await supaClient.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl
-      });
-
-      if (error) throw error;
-
-      successBanner.innerHTML = `<strong>Recovery email dispatched!</strong><br>Check your Gmail inbox (${escapeHtml(email)}) and spam folder. Click the secure reset link in the email to choose your new password.`;
-      successBanner.style.display = 'block';
-      submitBtn.querySelector('.forgot-btn-text').textContent = 'Email Sent Successfully';
-    } catch (err) {
-      errBanner.textContent = 'Recovery error: ' + (err.message || 'Unable to send recovery email.');
-      errBanner.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.querySelector('.forgot-btn-text').textContent = 'Send Recovery Link';
-    }
-  }
-
-  // Set New Password: Submit after clicking Supabase recovery link
-  async function handleUpdateNewPassword(e) {
-    if (e) e.preventDefault();
-    const newPwdInput = document.getElementById('new-password');
-    const confirmPwdInput = document.getElementById('confirm-password');
-    const errBanner = document.getElementById('reset-error-msg');
-    const submitBtn = document.getElementById('reset-submit-btn');
-
-    const newPassword = (newPwdInput.value || '').trim();
-    const confirmPassword = (confirmPwdInput.value || '').trim();
-
-    errBanner.style.display = 'none';
-
-    if (newPassword.length < 6) {
-      errBanner.textContent = 'Password must be at least 6 characters long.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      errBanner.textContent = 'Passwords do not match. Please re-enter identical passwords.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    if (!supaClient || !supaClient.auth) {
-      errBanner.textContent = 'Supabase client unavailable.';
-      errBanner.style.display = 'block';
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.querySelector('.reset-btn-text').textContent = 'Updating password...';
-
-    try {
-      const { data, error } = await supaClient.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
-
-      showToast('Password updated successfully! Welcome back.', 'success');
-      state.isAuthenticated = true;
-      sessionStorage.setItem('tp_admin_auth_token', 'supabase_auth_' + Date.now());
-      if (data && data.user) {
-        sessionStorage.setItem('tp_admin_email', data.user.email);
-      }
-
-      // Clean recovery tokens from URL address bar
-      if (window.history && window.history.replaceState) {
-        window.history.replaceState(null, null, window.location.pathname);
-      }
-
-      unlockDashboard();
-    } catch (err) {
-      errBanner.textContent = 'Password update failed: ' + (err.message || 'Session expired. Please request a new reset link.');
-      errBanner.style.display = 'block';
-      submitBtn.disabled = false;
-      submitBtn.querySelector('.reset-btn-text').textContent = 'Save New Password & Unlock';
     }
   }
 
@@ -404,30 +184,7 @@
     window.location.reload();
   }
 
-  // Recovery URL & Auth State Listeners
-  function initAuthRecoveryListeners() {
-    // 1. Supabase Auth State Change Listener
-    if (supaClient && supaClient.auth) {
-      try {
-        supaClient.auth.onAuthStateChange(async (event, session) => {
-          if (event === 'PASSWORD_RECOVERY') {
-            switchAuthView('reset');
-          }
-        });
-      } catch (e) {}
-    }
-
-    // 2. Direct URL Hash inspection for recovery tokens
-    const hash = window.location.hash || '';
-    const search = window.location.search || '';
-    if (hash.includes('type=recovery') || search.includes('type=recovery')) {
-      switchAuthView('reset');
-    }
-  }
-
   async function checkStoredSession() {
-    initAuthRecoveryListeners();
-
     // 1. Check active Supabase Auth session first
     if (supaClient && supaClient.auth) {
       try {
@@ -1331,10 +1088,6 @@
   }
 
   // Global window exposure for UI button triggers
-  window.switchAuthView = switchAuthView;
-  window.handleAdminRegister = handleAdminRegister;
-  window.handleForgotPassword = handleForgotPassword;
-  window.handleUpdateNewPassword = handleUpdateNewPassword;
   window.handleAdminLogin = handleAdminLogin;
   window.handleAdminLogout = handleAdminLogout;
   window.togglePasswordVisibility = togglePasswordVisibility;

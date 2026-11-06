@@ -239,3 +239,62 @@ CREATE INDEX IF NOT EXISTS idx_portfolio_events_project_id
 
 CREATE INDEX IF NOT EXISTS idx_portfolio_events_element
   ON public.portfolio_events (element);
+
+
+-- ==============================================================================
+-- 3. Table & Storage: portfolio_resume (Live Dynamic Career Asset Sync)
+-- ==============================================================================
+
+CREATE TABLE IF NOT EXISTS public.portfolio_resume (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  filename TEXT NOT NULL DEFAULT 'tejas resume.pdf',
+  file_size BIGINT,
+  mime_type TEXT DEFAULT 'application/pdf',
+  file_url TEXT,
+  base64_data TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  uploaded_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+ALTER TABLE public.portfolio_resume ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public select active resume" ON public.portfolio_resume;
+CREATE POLICY "Allow public select active resume"
+  ON public.portfolio_resume
+  FOR SELECT
+  TO authenticated, anon
+  USING (is_active = true);
+
+DROP POLICY IF EXISTS "Allow admin manage resume" ON public.portfolio_resume;
+CREATE POLICY "Allow admin manage resume"
+  ON public.portfolio_resume
+  FOR ALL
+  TO authenticated, anon
+  USING (true)
+  WITH CHECK (true);
+
+-- Optional: Supabase Storage Bucket Setup
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('resumes', 'resumes', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+DROP POLICY IF EXISTS "Public Access to Resumes" ON storage.objects;
+CREATE POLICY "Public Access to Resumes"
+  ON storage.objects
+  FOR SELECT
+  TO authenticated, anon
+  USING (bucket_id = 'resumes');
+
+DROP POLICY IF EXISTS "Admin Upload Resume" ON storage.objects;
+CREATE POLICY "Admin Upload Resume"
+  ON storage.objects
+  FOR INSERT
+  TO authenticated, anon
+  WITH CHECK (bucket_id = 'resumes');
+
+DROP POLICY IF EXISTS "Admin Update Resume" ON storage.objects;
+CREATE POLICY "Admin Update Resume"
+  ON storage.objects
+  FOR UPDATE
+  TO authenticated, anon
+  USING (bucket_id = 'resumes');

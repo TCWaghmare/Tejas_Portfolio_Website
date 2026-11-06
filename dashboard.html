@@ -457,7 +457,83 @@
 
 
     <!-- =======================================================================
-         7. CONTACT & INQUIRY CRM (READ, WRITE, EDIT DATA)
+         7. RESUME & CAREER ASSET MANAGEMENT (LIVE CLOUD UPLOADER)
+         ======================================================================= -->
+    <section class="resume-manager-section">
+      <div class="resume-manager-card bento-card">
+        <div class="crm-header">
+          <div>
+            <div class="crm-badge" style="border-color: rgba(34, 197, 94, 0.4); color: #4ade80; background: rgba(34, 197, 94, 0.1);">LIVE PORTFOLIO ASSET</div>
+            <h2 class="card-title">Resume &amp; Career Document Manager</h2>
+            <p class="card-desc">Upload your latest updated resume PDF. It instantly updates the live resume viewer and download buttons across your portfolio.</p>
+          </div>
+          <div class="crm-actions">
+            <span id="resume-live-status-pill" class="badge-pill scheduled" style="font-size: 11px; padding: 6px 12px;">Active: tejas resume.pdf</span>
+          </div>
+        </div>
+
+        <div class="resume-upload-grid">
+          <!-- Dropzone & File Selector -->
+          <div class="resume-dropzone-wrap">
+            <div class="resume-dropzone" id="resume-dropzone" onclick="document.getElementById('resume-file-input').click()" ondragover="handleResumeDragOver(event)" ondragleave="handleResumeDragLeave(event)" ondrop="handleResumeFileDrop(event)">
+              <input type="file" id="resume-file-input" accept="application/pdf" style="display: none;" onchange="handleResumeFileSelect(event)">
+              <div class="resume-dropzone-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="12" y1="18" x2="12" y2="12"></line>
+                  <polyline points="9 15 12 12 15 15"></polyline>
+                </svg>
+              </div>
+              <div class="resume-dropzone-text">
+                <span class="resume-dropzone-title">Click to upload or drag &amp; drop PDF</span>
+                <span class="resume-dropzone-hint">Standard PDF document (Up to 10 MB) &bull; Replaces live portfolio CV</span>
+              </div>
+            </div>
+
+            <!-- Upload Meta & Actions Bar -->
+            <div id="resume-file-meta-bar" class="resume-meta-bar" style="display: none;">
+              <div class="resume-meta-info">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <div>
+                  <div id="resume-selected-name" class="resume-meta-filename">My_New_Resume.pdf</div>
+                  <div id="resume-selected-size" class="resume-meta-filesize">124 KB</div>
+                </div>
+              </div>
+              <div class="resume-meta-buttons">
+                <button type="button" id="resume-upload-btn" class="dash-btn-primary" onclick="publishNewResume()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <span>Publish to Portfolio</span>
+                </button>
+                <button type="button" class="dash-btn-secondary" onclick="resetResumeSelection()">Cancel</button>
+              </div>
+            </div>
+
+            <div id="resume-upload-status" class="auth-success-banner" style="display: none; margin-top: 12px;"></div>
+          </div>
+
+          <!-- Live Document Preview Pane -->
+          <div class="resume-preview-wrap">
+            <div class="resume-preview-header">
+              <span class="resume-preview-label">LIVE PREVIEW</span>
+              <div class="resume-preview-controls">
+                <a id="resume-external-preview-link" href="tejas resume.pdf" target="_blank" class="dash-btn-secondary" style="padding: 4px 10px; font-size: 11px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  <span>Open Full PDF</span>
+                </a>
+              </div>
+            </div>
+            <div class="resume-iframe-holder">
+              <iframe id="dashboard-resume-iframe" src="tejas resume.pdf" title="Active Resume Preview"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================================
+         8. CONTACT & INQUIRY CRM (READ, WRITE, EDIT DATA)
          ======================================================================= -->
     <section class="crm-section">
       <div class="crm-card bento-card">

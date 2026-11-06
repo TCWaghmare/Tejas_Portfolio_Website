@@ -1152,8 +1152,9 @@
       if (zoomControls) zoomControls.style.display = 'none';
 
       // Always load latest version using cache-busting timestamp
-      if (iframe && (!iframe.src || iframe.src.indexOf('tejas resume.pdf') === -1)) {
-        iframe.src = 'tejas resume.pdf?v=' + Date.now() + '#toolbar=1&navpanes=0&view=FitH';
+      if (iframe) {
+        const activeResume = getPortfolioActiveResumeUrl();
+        iframe.src = (activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now()) + '#toolbar=1&navpanes=0&view=FitH';
       }
     }
   };
@@ -1191,6 +1192,40 @@
     }
   });
 
+  // Get active resume URL (checks Supabase Storage, localStorage cache, or default repo file)
+  function getPortfolioActiveResumeUrl() {
+    return window.PORTFOLIO_DYNAMIC_RESUME_URL || 
+           localStorage.getItem('tp_uploaded_resume_url') || 
+           'tejas resume.pdf';
+  }
+
+  // Pre-fetch cloud resume from Supabase if updated by admin
+  (async function checkCloudResumeAsset() {
+    try {
+      const cloudUrl = 'https://tkuggtlofzofaeltlzul.supabase.co/storage/v1/object/public/resumes/tejas_resume.pdf';
+      const head = await fetch(cloudUrl, { method: 'HEAD' });
+      if (head.ok) {
+        window.PORTFOLIO_DYNAMIC_RESUME_URL = cloudUrl;
+        return;
+      }
+    } catch (e) {}
+
+    try {
+      const resp = await fetch('https://tkuggtlofzofaeltlzul.supabase.co/rest/v1/portfolio_resume?is_active=eq.true&select=file_url,base64_data&limit=1', {
+        headers: {
+          'apikey': 'sb_publishable_6jfofP0ME0VE5IrkyxVQGg_miRbVX_0',
+          'Authorization': 'Bearer sb_publishable_6jfofP0ME0VE5IrkyxVQGg_miRbVX_0'
+        }
+      });
+      if (resp.ok) {
+        const rows = await resp.json();
+        if (rows && rows.length > 0) {
+          window.PORTFOLIO_DYNAMIC_RESUME_URL = rows[0].file_url || rows[0].base64_data;
+        }
+      }
+    } catch (e) {}
+  })();
+
   async function loadAndRenderResume() {
     const loader = document.getElementById('resume-loading-indicator');
     const iframe = document.getElementById('resume-native-frame');
@@ -1203,7 +1238,8 @@
         window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         // Cache-busting URL guarantees the latest version is always rendered
-        const pdfUrl = 'tejas resume.pdf?v=' + Date.now();
+        const activeResume = getPortfolioActiveResumeUrl();
+        const pdfUrl = activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now();
         const loadingTask = window.pdfjsLib.getDocument({
           url: pdfUrl,
           cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
@@ -1223,7 +1259,8 @@
     // Fallback to native PDF iframe
     if (loader) loader.style.display = 'none';
     if (iframe) {
-      iframe.src = 'tejas resume.pdf?v=' + Date.now() + '#toolbar=1&navpanes=0&view=FitH';
+      const activeResume = getPortfolioActiveResumeUrl();
+      iframe.src = (activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now()) + '#toolbar=1&navpanes=0&view=FitH';
     }
     window.switchResumeView('embed');
     isResumeLoaded = true;
@@ -1279,7 +1316,8 @@
   window.downloadResumeFromModal = function (triggerBtn) {
     // 1. Download file directly (with cache-busting to ensure latest version is fetched)
     const link = document.createElement('a');
-    link.href = 'tejas resume.pdf?v=' + Date.now();
+    const activeResume = getPortfolioActiveResumeUrl();
+    link.href = activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now();
     link.download = 'Tejas_C_Waghmare_Resume.pdf';
     document.body.appendChild(link);
     link.click();

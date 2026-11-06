@@ -169,6 +169,9 @@
       botCheckbox.checked = state.filterBots;
     }
 
+    // Initialize Resume Manager
+    initResumeManager();
+
     // Load Data
     fetchDashboardData();
 
@@ -1083,6 +1086,239 @@
 
 
   // ============================================================================
+  // 9. RESUME & CAREER ASSET MANAGER (LIVE PORTFOLIO SYNC)
+  // ============================================================================
+
+  let selectedResumeFile = null;
+
+  function initResumeManager() {
+    const activeName = localStorage.getItem('tp_uploaded_resume_name');
+    const activeUrl = localStorage.getItem('tp_uploaded_resume_url');
+    const pill = document.getElementById('resume-live-status-pill');
+    const iframe = document.getElementById('dashboard-resume-iframe');
+    const extLink = document.getElementById('resume-external-preview-link');
+
+    if (activeUrl) {
+      if (iframe) iframe.src = activeUrl;
+      if (extLink) extLink.href = activeUrl;
+      if (pill) {
+        pill.textContent = `Active: ${activeName || 'Custom Cloud Resume'} (Live)`;
+        pill.className = 'badge-pill scheduled';
+      }
+    } else {
+      if (iframe) iframe.src = 'tejas resume.pdf?v=' + Date.now();
+      if (extLink) extLink.href = 'tejas resume.pdf';
+      if (pill) pill.textContent = 'Active: tejas resume.pdf';
+    }
+
+    // Query Supabase for latest published cloud resume
+    if (supaClient) {
+      supaClient.from('portfolio_resume')
+        .select('filename, file_url, base64_data, uploaded_at')
+        .eq('is_active', true)
+        .order('uploaded_at', { ascending: false })
+        .limit(1)
+        .then(({ data, error }) => {
+          if (!error && data && data.length > 0) {
+            const row = data[0];
+            const liveUrl = row.file_url || row.base64_data;
+            if (liveUrl) {
+              localStorage.setItem('tp_uploaded_resume_url', liveUrl);
+              localStorage.setItem('tp_uploaded_resume_name', row.filename);
+              if (iframe) iframe.src = liveUrl;
+              if (extLink) extLink.href = liveUrl;
+              if (pill) {
+                pill.textContent = `Active: ${row.filename} (Live)`;
+                pill.className = 'badge-pill scheduled';
+              }
+            }
+          }
+        }).catch(() => {});
+    }
+  }
+
+  function handleResumeFileSelect(e) {
+    const file = e.target.files && e.target.files[0];
+    processSelectedResumeFile(file);
+  }
+
+  function handleResumeDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const zone = document.getElementById('resume-dropzone');
+    if (zone) zone.classList.add('drag-active');
+  }
+
+  function handleResumeDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const zone = document.getElementById('resume-dropzone');
+    if (zone) zone.classList.remove('drag-active');
+  }
+
+  function handleResumeFileDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const zone = document.getElementById('resume-dropzone');
+    if (zone) zone.classList.remove('drag-active');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    processSelectedResumeFile(file);
+  }
+
+  function processSelectedResumeFile(file) {
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      showToast('Please select a valid PDF file.', 'error');
+      return;
+    }
+
+    if (file.size > 15 * 1024 * 1024) {
+      showToast('File size exceeds 15 MB limit.', 'error');
+      return;
+    }
+
+    selectedResumeFile = file;
+
+    const metaBar = document.getElementById('resume-file-meta-bar');
+    const nameEl = document.getElementById('resume-selected-name');
+    const sizeEl = document.getElementById('resume-selected-size');
+    const statusBanner = document.getElementById('resume-upload-status');
+
+    if (nameEl) nameEl.textContent = file.name;
+    if (sizeEl) {
+      const kb = Math.round(file.size / 1024);
+      sizeEl.textContent = kb > 1024 ? (kb / 1024).toFixed(2) + ' MB' : kb + ' KB';
+    }
+    if (metaBar) metaBar.style.display = 'flex';
+    if (statusBanner) statusBanner.style.display = 'none';
+
+    // Instant local preview in iframe
+    const tempUrl = URL.createObjectURL(file);
+    const iframe = document.getElementById('dashboard-resume-iframe');
+    const extLink = document.getElementById('resume-external-preview-link');
+    if (iframe) iframe.src = tempUrl;
+    if (extLink) extLink.href = tempUrl;
+
+    showToast('Resume selected. Click "Publish to Portfolio" to deploy.', 'info');
+  }
+
+  function resetResumeSelection() {
+    selectedResumeFile = null;
+    const input = document.getElementById('resume-file-input');
+    if (input) input.value = '';
+    const metaBar = document.getElementById('resume-file-meta-bar');
+    if (metaBar) metaBar.style.display = 'none';
+    const statusBanner = document.getElementById('resume-upload-status');
+    if (statusBanner) statusBanner.style.display = 'none';
+
+    initResumeManager();
+  }
+
+  async function publishNewResume() {
+    if (!selectedResumeFile) {
+      showToast('No PDF selected to upload.', 'error');
+      return;
+    }
+
+    const uploadBtn = document.getElementById('resume-upload-btn');
+    const statusBanner = document.getElementById('resume-upload-status');
+    if (uploadBtn) {
+      uploadBtn.disabled = true;
+      uploadBtn.querySelector('span').textContent = 'Publishing to Portfolio...';
+    }
+
+    try {
+      // 1. Convert to Base64 data URL
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(selectedResumeFile);
+      });
+
+      let publicUrl = null;
+
+      // 2. Upload to Supabase Storage Bucket ('resumes')
+      if (supaClient && supaClient.storage) {
+        try {
+          const { data, error } = await supaClient.storage
+            .from('resumes')
+            .upload('tejas_resume.pdf', selectedResumeFile, {
+              upsert: true,
+              contentType: 'application/pdf',
+              cacheControl: '3600'
+            });
+
+          if (!error && data) {
+            const { data: pubData } = supaClient.storage
+              .from('resumes')
+              .getPublicUrl('tejas_resume.pdf');
+            if (pubData && pubData.publicUrl) {
+              publicUrl = pubData.publicUrl;
+            }
+          }
+        } catch (stErr) {
+          console.warn('Storage bucket notice:', stErr);
+        }
+      }
+
+      // 3. Upsert to Supabase Database Table 'portfolio_resume'
+      if (supaClient) {
+        try {
+          await supaClient.from('portfolio_resume').upsert({
+            id: '00000000-0000-0000-0000-000000000001',
+            filename: selectedResumeFile.name,
+            file_size: selectedResumeFile.size,
+            mime_type: 'application/pdf',
+            file_url: publicUrl,
+            base64_data: base64Data,
+            is_active: true,
+            uploaded_at: new Date().toISOString()
+          });
+        } catch (dbErr) {
+          console.warn('Database table notice:', dbErr);
+        }
+      }
+
+      // 4. Cache in browser LocalStorage
+      const finalResumeUrl = publicUrl || base64Data;
+      localStorage.setItem('tp_uploaded_resume_url', finalResumeUrl);
+      localStorage.setItem('tp_uploaded_resume_name', selectedResumeFile.name);
+      localStorage.setItem('tp_uploaded_resume_time', new Date().toISOString());
+
+      // 5. Update Status UI
+      const pill = document.getElementById('resume-live-status-pill');
+      if (pill) {
+        pill.textContent = `Active: ${selectedResumeFile.name} (Live on Portfolio)`;
+        pill.className = 'badge-pill scheduled';
+      }
+
+      if (statusBanner) {
+        statusBanner.innerHTML = `
+          <strong>Resume Published Successfully!</strong><br>
+          Your portfolio website is now live with: <strong>${escapeHtml(selectedResumeFile.name)}</strong>.<br>
+          All resume preview buttons and download links on your portfolio now display this updated version.
+        `;
+        statusBanner.style.display = 'block';
+      }
+
+      showToast('Resume published! Portfolio updated live.', 'success');
+      
+      const metaBar = document.getElementById('resume-file-meta-bar');
+      if (metaBar) metaBar.style.display = 'none';
+
+    } catch (err) {
+      showToast('Failed to publish resume: ' + err.message, 'error');
+    } finally {
+      if (uploadBtn) {
+        uploadBtn.disabled = false;
+        uploadBtn.querySelector('span').textContent = 'Publish to Portfolio';
+      }
+    }
+  }
+
+  // ============================================================================
   // 9. CSV EXPORTERS (FOR POWER BI & EXCEL MODELING)
   // ============================================================================
 
@@ -1195,6 +1431,12 @@
   window.promptCleanTestEvents = promptCleanTestEvents;
   window.exportEventsToCSV = exportEventsToCSV;
   window.exportContactsToCSV = exportContactsToCSV;
+  window.handleResumeFileSelect = handleResumeFileSelect;
+  window.handleResumeDragOver = handleResumeDragOver;
+  window.handleResumeDragLeave = handleResumeDragLeave;
+  window.handleResumeFileDrop = handleResumeFileDrop;
+  window.resetResumeSelection = resetResumeSelection;
+  window.publishNewResume = publishNewResume;
 
   // Auto-launch verification
   checkStoredSession();

@@ -243,8 +243,8 @@
   
   <link rel="preload" href="/Asset/tejas-waghmare-data-analyst.jpg" as="image" type="image/jpeg" fetchpriority="high">
   <link rel="preload" href="Asset/profile_hero.webp" as="image" type="image/webp" fetchpriority="high">
-  <link rel="preload" href="style.css?v=20261105_orbs_hover" as="style">
-  <link rel="stylesheet" href="style.css?v=20261105_orbs_hover">
+  <link rel="preload" href="style.css?v=20261106_footer_resume" as="style">
+  <link rel="stylesheet" href="style.css?v=20261106_footer_resume">
 </head>
 <body>
 
@@ -2844,18 +2844,36 @@
               </div>
             </div>
 
-            <!-- Location & Time Zone -->
+            <!-- Location & Resume -->
             <div class="kova-footer-block">
-              <div class="kova-footer-label">LOCATION &amp; LOCAL TIME</div>
+              <div class="kova-footer-label">LOCATION &amp; RESUME</div>
               <div class="kova-location-card">
                 <div class="kova-location-line">
-                  <span class="kova-loc-pin">📍</span>
-                  <span class="kova-loc-city">Pune, Maharashtra, India</span>
+                  <svg class="kova-loc-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1-18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span class="kova-loc-city">Pune / Wardha, Maharashtra, India</span>
                 </div>
-                <div class="kova-time-badge">
+                <div class="kova-resume-btn-group">
+                  <a href="tejas resume.pdf" class="kova-resume-btn" onclick="openResumeModal(event)" data-track="resume-footer-view" aria-label="View Resume Preview" title="View Full Resume">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>View Resume</span>
+                  </a>
+                  <button type="button" class="kova-resume-download-btn" onclick="downloadResumeFromModal(this)" data-track="resume-footer-download" aria-label="Download Resume PDF" title="Download Resume PDF">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Download</span>
+                  </button>
+                </div>
+                <div class="kova-avail-status" title="Actively interviewing &amp; available for full-time roles">
                   <span class="kova-pulse-dot"></span>
-                  <span id="kova-pune-clock">05:30 PM IST</span>
-                  <span class="kova-time-sep">&bull;</span>
                   <span class="kova-status-text">Available for roles</span>
                 </div>
               </div>

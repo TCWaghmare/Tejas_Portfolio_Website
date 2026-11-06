@@ -6200,31 +6200,111 @@ img {
   color: #10b981;
 }
 
-/* Location Card & Live Clock */
+/* Location Card & Resume Actions */
 .kova-location-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .kova-location-line {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   font-size: 13.5px;
   font-weight: 600;
   color: var(--text-heading);
 }
 
-.kova-loc-pin {
-  font-size: 14px;
+.kova-loc-svg {
+  flex-shrink: 0;
+  color: var(--accent-yellow, #F5E025);
+  filter: drop-shadow(0 0 6px rgba(245, 224, 37, 0.45));
 }
 
-.kova-time-badge {
+[data-theme="light"] .kova-loc-svg {
+  color: #b45309;
+  filter: none;
+}
+
+.kova-resume-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.kova-resume-btn,
+.kova-resume-download-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.01em;
+}
+
+.kova-resume-btn {
+  background: rgba(245, 224, 37, 0.12);
+  border: 1px solid rgba(245, 224, 37, 0.35);
+  color: var(--accent-yellow, #F5E025);
+}
+
+.kova-resume-btn:hover {
+  background: var(--accent-yellow, #F5E025);
+  border-color: var(--accent-yellow, #F5E025);
+  color: #000000;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(245, 224, 37, 0.35);
+}
+
+.kova-resume-download-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text-heading, #ffffff);
+}
+
+.kova-resume-download-btn:hover {
+  background: var(--accent-yellow, #F5E025);
+  border-color: var(--accent-yellow, #F5E025);
+  color: #000000;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(245, 224, 37, 0.35);
+}
+
+[data-theme="light"] .kova-resume-btn {
+  background: rgba(245, 224, 37, 0.22);
+  border-color: rgba(245, 224, 37, 0.55);
+  color: #78350f;
+}
+
+[data-theme="light"] .kova-resume-btn:hover {
+  background: #F5E025;
+  color: #000000;
+}
+
+[data-theme="light"] .kova-resume-download-btn {
+  background: #f1f5f9;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #334155;
+}
+
+[data-theme="light"] .kova-resume-download-btn:hover {
+  background: #F5E025;
+  border-color: #F5E025;
+  color: #000000;
+}
+
+.kova-avail-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
   color: var(--text-body);
   font-family: var(--font-body, sans-serif);
 }
@@ -6242,10 +6322,6 @@ img {
 @keyframes pulseGreen {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.4); opacity: 0.6; }
-}
-
-.kova-time-sep {
-  opacity: 0.4;
 }
 
 /* Social pills */

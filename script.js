@@ -961,25 +961,27 @@
       });
     }
 
-    // 4. Live Pune Clock (IST: UTC+5:30)
+    // 4. Live Clock (If present in DOM)
     const clockEl = document.getElementById('kova-pune-clock');
-    function updatePuneClock() {
-      if (!clockEl) return;
-      try {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('en-US', {
-          timeZone: 'Asia/Kolkata',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        });
-        clockEl.textContent = `${timeStr} IST`;
-      } catch (err) {
-        clockEl.textContent = 'IST (UTC+5:30)';
+    if (clockEl) {
+      function updatePuneClock() {
+        if (!clockEl) return;
+        try {
+          const now = new Date();
+          const timeStr = now.toLocaleTimeString('en-US', {
+            timeZone: 'Asia/Kolkata',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+          clockEl.textContent = `${timeStr} IST`;
+        } catch (err) {
+          clockEl.textContent = 'IST (UTC+5:30)';
+        }
       }
+      updatePuneClock();
+      setInterval(updatePuneClock, 10000);
     }
-    updatePuneClock();
-    setInterval(updatePuneClock, 10000);
 
     // 4. Floating Cursor Tooltip for "Let's build something" (kova.me style)
     function initFooterTip() {

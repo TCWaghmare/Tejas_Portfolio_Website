@@ -9,6 +9,14 @@
   // --- Device & Viewport Detection ---
   const isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const isTablet = !isMobile && window.innerWidth >= 768 && window.innerWidth < 1024;
+  const isSlowNetwork = Boolean(
+    typeof navigator !== 'undefined' &&
+    navigator.connection && (
+      navigator.connection.saveData === true ||
+      navigator.connection.effectiveType === '2g' ||
+      navigator.connection.effectiveType === '3g'
+    )
+  );
 
   // --- Configuration (Active on BOTH Laptop & Mobile for 60FPS fluid scroll) ---
   const CONFIG = {
@@ -3551,31 +3559,38 @@
     }
   };
 
+  // --- Safe Component Initializer & Bootstrap ---
+  function safeInit(fn, name) {
+    try {
+      fn();
+    } catch (err) {
+      console.warn(`[Portfolio Engine] Non-critical warning in ${name}:`, err);
+    }
+  }
+
+  function bootstrap() {
+    // 1. Kinetic Typography (Immediate cursor & touch character scatter physics on all headings)
+    safeInit(initKineticTypography, 'initKineticTypography');
+
+    // 2. Visual Sequence & Preloading
+    safeInit(startPreloading, 'startPreloading');
+
+    // 3. UI Interactions & Animations
+    safeInit(initSplineCleaner, 'initSplineCleaner');
+    safeInit(initAllCarousels, 'initAllCarousels');
+    safeInit(initHeroAnimations, 'initHeroAnimations');
+    safeInit(initFloatingTools, 'initFloatingTools');
+    safeInit(initToolsMarquee, 'initToolsMarquee');
+    safeInit(initScrollReveals, 'initScrollReveals');
+    safeInit(initKovaContact, 'initKovaContact');
+    safeInit(initEducationTimeline, 'initEducationTimeline');
+  }
+
   // --- Initialize ---
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      startPreloading();
-      initSplineCleaner();
-      initAllCarousels();
-      initHeroAnimations();
-      initFloatingTools();
-      initToolsMarquee();
-      initKineticTypography();
-      initScrollReveals();
-      initKovaContact();
-      initEducationTimeline();
-    });
+    document.addEventListener('DOMContentLoaded', bootstrap);
   } else {
-    startPreloading();
-    initSplineCleaner();
-    initAllCarousels();
-    initHeroAnimations();
-    initFloatingTools();
-    initToolsMarquee();
-    initKineticTypography();
-    initScrollReveals();
-    initKovaContact();
-    initEducationTimeline();
+    bootstrap();
   }
 
 })();

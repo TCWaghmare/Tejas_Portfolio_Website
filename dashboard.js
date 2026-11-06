@@ -67,12 +67,19 @@
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  // Switch between Login, Forgot Password, and Reset Password views
+  // Switch between Login, Register, Forgot Password, and Reset Password views
   function switchAuthView(viewName) {
     const views = {
       login: document.getElementById('auth-login-view'),
+      signup: document.getElementById('auth-signup-view'),
       forgot: document.getElementById('auth-forgot-view'),
       reset: document.getElementById('auth-reset-view')
+    };
+
+    const tabs = {
+      login: document.getElementById('tab-login'),
+      signup: document.getElementById('tab-signup'),
+      forgot: document.getElementById('tab-forgot')
     };
 
     Object.keys(views).forEach(key => {
@@ -81,11 +88,88 @@
       }
     });
 
+    Object.keys(tabs).forEach(key => {
+      if (tabs[key]) {
+        if (key === viewName) {
+          tabs[key].classList.add('active');
+        } else {
+          tabs[key].classList.remove('active');
+        }
+      }
+    });
+
     // Reset error & success banners
-    ['auth-error-msg', 'forgot-error-msg', 'forgot-success-msg', 'reset-error-msg'].forEach(id => {
+    ['auth-error-msg', 'signup-error-msg', 'signup-success-msg', 'forgot-error-msg', 'forgot-success-msg', 'reset-error-msg'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
+  }
+
+  // Register / Set Admin Password in Supabase Auth
+  async function handleAdminRegister(e) {
+    if (e) e.preventDefault();
+    const emailInput = document.getElementById('signup-email');
+    const pwdInput = document.getElementById('signup-password');
+    const errBanner = document.getElementById('signup-error-msg');
+    const successBanner = document.getElementById('signup-success-msg');
+    const submitBtn = document.getElementById('signup-submit-btn');
+
+    const email = (emailInput.value || '').trim().toLowerCase();
+    const password = (pwdInput.value || '').trim();
+
+    errBanner.style.display = 'none';
+    successBanner.style.display = 'none';
+
+    if (email !== CONFIG.authorizedEmail.toLowerCase()) {
+      errBanner.textContent = 'Access Denied. Only the administrator account (' + CONFIG.authorizedEmail + ') can configure dashboard access.';
+      errBanner.style.display = 'block';
+      return;
+    }
+
+    if (password.length < 6) {
+      errBanner.textContent = 'Password must be at least 6 characters long.';
+      errBanner.style.display = 'block';
+      return;
+    }
+
+    if (!supaClient || !supaClient.auth) {
+      errBanner.textContent = 'Supabase client unavailable. You can log in using the master security key.';
+      errBanner.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.querySelector('.signup-btn-text').textContent = 'Configuring Supabase Auth...';
+
+    try {
+      const { data, error } = await supaClient.auth.signUp({
+        email: email,
+        password: password
+      });
+
+      if (error) throw error;
+
+      if (data && data.session) {
+        state.isAuthenticated = true;
+        sessionStorage.setItem('tp_supabase_jwt', data.session.access_token);
+        sessionStorage.setItem('tp_admin_auth_token', 'supabase_auth_' + Date.now());
+        showToast('Password registered with Supabase! Unlocking command center...', 'success');
+        setTimeout(unlockDashboard, 600);
+      } else {
+        successBanner.innerHTML = `<strong>Supabase Account Registered!</strong><br>A confirmation notice was dispatched to <strong>${escapeHtml(email)}</strong>.<br>If email confirmation is enabled in your Supabase project, click the link in your Gmail, then return here to Sign In. You can also sign in right now with the master key.`;
+        successBanner.style.display = 'block';
+        submitBtn.querySelector('.signup-btn-text').textContent = 'Registration Dispatched';
+      }
+    } catch (err) {
+      let errMsg = err.message || 'Unable to register credentials.';
+      if (errMsg.toLowerCase().includes('user already registered')) {
+        errMsg = 'An account with this email already exists in Supabase. You can sign in directly, or click "Forgot?" to reset your password.';
+      }
+      errBanner.textContent = errMsg;
+      errBanner.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.querySelector('.signup-btn-text').textContent = 'Register Password with Supabase';
+    }
   }
 
   // Toggle Password input visibility (works for any password field ID)
@@ -121,6 +205,8 @@
     try {
       let authSuccessful = false;
 
+      let supaAuthError = null;
+
       // 2. Try Supabase Auth email/password first
       if (supaClient && supaClient.auth) {
         try {
@@ -131,9 +217,12 @@
           if (data && data.session) {
             authSuccessful = true;
             sessionStorage.setItem('tp_supabase_jwt', data.session.access_token);
+            if (data.user) sessionStorage.setItem('tp_admin_email', data.user.email);
+          } else if (error) {
+            supaAuthError = error.message;
           }
         } catch (supaErr) {
-          // Fall through to Master Passcode validation
+          supaAuthError = supaErr.message;
         }
       }
 
@@ -150,7 +239,17 @@
         sessionStorage.setItem('tp_admin_auth_token', 'authorized_' + Date.now());
         unlockDashboard();
       } else {
-        showAuthError('Invalid Security Key or Password. If you forgot your password, use the "Forgot password?" link above.');
+        let errorHint = 'Invalid Password or Security Key.';
+        if (supaAuthError) {
+          if (supaAuthError.toLowerCase().includes('invalid login credentials')) {
+            errorHint = 'Invalid Supabase credentials. If you haven\'t registered your password yet, click "Set Password" above, or use the emergency master key: TejasAdmin@2026!';
+          } else if (supaAuthError.toLowerCase().includes('email not confirmed')) {
+            errorHint = 'Supabase email not confirmed yet. Check your Gmail (tejaswaghmare900@gmail.com), or use the "Forgot?" tab to send a direct password reset link.';
+          } else {
+            errorHint = supaAuthError + '. You can also log in with the emergency master key: TejasAdmin@2026!';
+          }
+        }
+        showAuthError(errorHint);
       }
     } catch (err) {
       showAuthError('Authentication error: ' + err.message);
@@ -326,9 +425,26 @@
     }
   }
 
-  function checkStoredSession() {
+  async function checkStoredSession() {
     initAuthRecoveryListeners();
 
+    // 1. Check active Supabase Auth session first
+    if (supaClient && supaClient.auth) {
+      try {
+        const { data } = await supaClient.auth.getSession();
+        if (data && data.session && data.session.user && data.session.user.email.toLowerCase() === CONFIG.authorizedEmail.toLowerCase()) {
+          state.isAuthenticated = true;
+          sessionStorage.setItem('tp_supabase_jwt', data.session.access_token);
+          sessionStorage.setItem('tp_admin_auth_token', 'supabase_session_' + Date.now());
+          unlockDashboard();
+          return;
+        }
+      } catch (e) {
+        console.warn('Supabase getSession notice:', e);
+      }
+    }
+
+    // 2. Check local session storage token
     const token = sessionStorage.getItem('tp_admin_auth_token');
     if (token) {
       state.isAuthenticated = true;
@@ -1216,6 +1332,7 @@
 
   // Global window exposure for UI button triggers
   window.switchAuthView = switchAuthView;
+  window.handleAdminRegister = handleAdminRegister;
   window.handleForgotPassword = handleForgotPassword;
   window.handleUpdateNewPassword = handleUpdateNewPassword;
   window.handleAdminLogin = handleAdminLogin;

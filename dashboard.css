@@ -1169,3 +1169,51 @@ body.dashboard-body {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* --------------------------------------------------------------------------
+   Auth Tabs Navigation (Sign In / Register / Forgot Password)
+   -------------------------------------------------------------------------- */
+.auth-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-heading);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-snappy);
+}
+
+.auth-tab-btn svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.auth-tab-btn:hover {
+  color: var(--text-pure);
+}
+
+.auth-tab-btn.active {
+  background: rgba(245, 224, 37, 0.14);
+  color: var(--accent-yellow);
+  border-color: rgba(245, 224, 37, 0.35);
+  box-shadow: 0 0 10px rgba(245, 224, 37, 0.15);
+}

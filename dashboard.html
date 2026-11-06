@@ -29,6 +29,22 @@
   <div id="auth-gate" class="auth-gate-overlay">
     <div class="auth-card bento-card">
 
+      <!-- Navigation Tabs: Sign In / Set Password / Forgot Password -->
+      <div class="auth-tabs" role="tablist" aria-label="Authentication Modes">
+        <button type="button" class="auth-tab-btn active" id="tab-login" onclick="switchAuthView('login')" aria-label="Sign In View">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span>Sign In</span>
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-signup" onclick="switchAuthView('signup')" aria-label="Set Password View">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+          <span>Set Password</span>
+        </button>
+        <button type="button" class="auth-tab-btn" id="tab-forgot" onclick="switchAuthView('forgot')" aria-label="Forgot Password View">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+          <span>Forgot?</span>
+        </button>
+      </div>
+
       <!-- VIEW 1: Standard Admin Login -->
       <div id="auth-login-view" class="auth-subview">
         <div class="auth-header">
@@ -40,10 +56,10 @@
           </div>
           <div class="auth-status-pill">
             <span class="auth-status-dot"></span>
-            <span>ADMIN ACCESS RESTRICTED</span>
+            <span>SUPABASE AUTH SECURED</span>
           </div>
           <h1 class="auth-title">Telemetry Command Center</h1>
-          <p class="auth-desc">Authorized administrator verification required. Enter your admin Gmail and password to access real-time metrics.</p>
+          <p class="auth-desc">Authorized administrator verification required. Log in with your Supabase credentials to access real-time portfolio metrics.</p>
         </div>
 
         <form id="admin-login-form" class="auth-form" onsubmit="handleAdminLogin(event)">
@@ -68,7 +84,7 @@
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              <input type="password" id="admin-password" class="auth-input" required autocomplete="current-password" placeholder="Enter password or security key">
+              <input type="password" id="admin-password" class="auth-input" required autocomplete="current-password" placeholder="Enter Supabase password or master key">
               <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('admin-password')" aria-label="Toggle password view">
                 <svg id="pwd-eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -100,7 +116,78 @@
         </div>
       </div>
 
-      <!-- VIEW 2: Forgot Password / Request Reset Email -->
+      <!-- VIEW 2: Set New / Register Admin Password with Supabase -->
+      <div id="auth-signup-view" class="auth-subview" style="display: none;">
+        <div class="auth-header">
+          <div class="auth-shield-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="20" y1="8" x2="20" y2="14"></line>
+              <line x1="23" y1="11" x2="17" y2="11"></line>
+            </svg>
+          </div>
+          <div class="auth-status-pill" style="border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.1); color: #38bdf8;">
+            <span class="auth-status-dot" style="background: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+            <span>SUPABASE CLOUD AUTHENTICATION</span>
+          </div>
+          <h1 class="auth-title">Set Admin Password</h1>
+          <p class="auth-desc">Register or set your password in Supabase Cloud Auth. Once configured, you can log in directly anytime.</p>
+        </div>
+
+        <form id="admin-signup-form" class="auth-form" onsubmit="handleAdminRegister(event)">
+          <div class="auth-input-group">
+            <label for="signup-email" class="auth-label">Administrator Gmail</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input type="email" id="signup-email" class="auth-input" value="tejaswaghmare900@gmail.com" required autocomplete="username" placeholder="tejaswaghmare900@gmail.com">
+            </div>
+          </div>
+
+          <div class="auth-input-group">
+            <label for="signup-password" class="auth-label">Choose Password</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input type="password" id="signup-password" class="auth-input" required autocomplete="new-password" placeholder="At least 6 characters" minlength="6">
+              <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('signup-password')" aria-label="Toggle password view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="signup-error-msg" class="auth-error-banner" style="display: none;"></div>
+          <div id="signup-success-msg" class="auth-success-banner" style="display: none;"></div>
+
+          <button type="submit" id="signup-submit-btn" class="auth-btn-primary">
+            <span class="signup-btn-text">Register Password with Supabase</span>
+            <svg class="auth-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <div class="auth-footer-note">
+          <a href="javascript:void(0)" onclick="switchAuthView('login')" class="auth-back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Already configured? Back to Sign In
+          </a>
+        </div>
+      </div>
+
+      <!-- VIEW 3: Forgot Password / Request Reset Email -->
       <div id="auth-forgot-view" class="auth-subview" style="display: none;">
         <div class="auth-header">
           <div class="auth-shield-icon">
@@ -146,12 +233,12 @@
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Back to Login
+            Back to Sign In
           </a>
         </div>
       </div>
 
-      <!-- VIEW 3: Set New Password (Triggered after clicking Supabase recovery email link) -->
+      <!-- VIEW 4: Set New Password (Triggered after clicking Supabase recovery email link) -->
       <div id="auth-reset-view" class="auth-subview" style="display: none;">
         <div class="auth-header">
           <div class="auth-shield-icon">
@@ -179,7 +266,7 @@
               <input type="password" id="new-password" class="auth-input" required autocomplete="new-password" placeholder="At least 6 characters" minlength="6">
               <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('new-password')" aria-label="Toggle password view">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
               </button>
@@ -214,7 +301,7 @@
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Cancel &amp; Return to Login
+            Cancel &amp; Return to Sign In
           </a>
         </div>
       </div>

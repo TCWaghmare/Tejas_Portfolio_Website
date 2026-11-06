@@ -9411,3 +9411,85 @@ select:focus-visible,
   box-shadow: 0 0 14px rgba(245, 224, 37, 0.25);
   transform: translateY(-1px);
 }
+
+
+/* --------------------------------------------------------------------------
+   Admin Dashboard Navigation Triggers (Mobile & Header Portal Buttons)
+   -------------------------------------------------------------------------- */
+.nav-portal-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s var(--ease-snappy);
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.nav-portal-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  transition: transform 0.25s ease;
+}
+
+.nav-portal-icon-btn:hover,
+.nav-portal-icon-btn:active {
+  background: rgba(245, 224, 37, 0.12);
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+  box-shadow: 0 0 12px var(--accent-yellow-glow);
+  transform: scale(1.06);
+}
+
+.nav-portal-icon-btn:hover svg {
+  transform: rotate(-10deg);
+}
+
+.nav-portal-icon-btn:focus-visible {
+  outline: 2px solid var(--accent-yellow) !important;
+  outline-offset: 3px !important;
+  border-color: var(--accent-yellow) !important;
+}
+
+.btn-portal-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 18px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  background: rgba(245, 224, 37, 0.06);
+  border: 1px solid rgba(245, 224, 37, 0.28);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  transition: all 0.25s var(--ease-snappy);
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+
+.btn-portal-mobile svg {
+  color: var(--accent-yellow);
+  flex-shrink: 0;
+}
+
+.btn-portal-mobile:hover,
+.btn-portal-mobile:active {
+  background: rgba(245, 224, 37, 0.16);
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+  box-shadow: 0 0 16px var(--accent-yellow-glow);
+  transform: translateY(-1px);
+}

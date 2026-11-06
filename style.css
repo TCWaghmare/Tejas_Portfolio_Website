@@ -52,7 +52,7 @@
 
 [data-theme="light"] {
   /* Light Theme Palette - Clean Slate with High Contrast Gold-Yellow Accent */
-  --bg-main: #ffffff;
+  --bg-main: #f5f6fa;
   --bg-surface: #ffffff;
   --bg-card: #ffffff;
   --bg-card-hover: #f8f9fd;
@@ -7835,11 +7835,11 @@ img {
   color: var(--text-body);
 }
 
-/* Navigation Header */
+/* Navigation Header - Matches Page Background Color */
 [data-theme="light"] .site-header .nav-container {
-  background: #ffffff !important;
-  border-color: rgba(0, 0, 0, 0.09);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  background: var(--bg-main, #f5f6fa) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
 }
 
 [data-theme="light"] .nav-brand {
@@ -7857,8 +7857,15 @@ img {
   background: transparent !important;
 }
 
+[data-theme="light"] .nav-links {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 [data-theme="light"] .nav-item {
   color: #334155 !important;
+  background: transparent !important;
 }
 
 [data-theme="light"] .nav-item:hover {
@@ -7867,10 +7874,10 @@ img {
 }
 
 [data-theme="light"] .nav-item.active {
-  background: #ffffff !important;
+  background: var(--bg-main, #f5f6fa) !important;
   color: var(--yellow-font) !important;
-  border: 1px solid var(--yellow-tint-border) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid var(--accent-yellow) !important;
+  box-shadow: 0 2px 10px rgba(148, 99, 0, 0.12) !important;
   font-weight: 700 !important;
 }
 
@@ -7878,8 +7885,20 @@ img {
   color: var(--yellow-font-hover) !important;
 }
 
+[data-theme="light"] .nav-portal-icon-btn {
+  background: var(--bg-main, #f5f6fa) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .nav-portal-icon-btn:hover {
+  background: #e2e5eb !important;
+  border-color: var(--yellow-font) !important;
+  color: var(--yellow-font) !important;
+}
+
 [data-theme="light"] #theme-toggle {
-  background: #f1f3f7 !important;
+  background: var(--bg-main, #f5f6fa) !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
   color: #0f172a !important;
 }
@@ -7891,7 +7910,7 @@ img {
 }
 
 [data-theme="light"] .btn-secondary-pill {
-  background: #f1f3f7 !important;
+  background: var(--bg-main, #f5f6fa) !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
   color: #0f172a !important;
   font-weight: 600 !important;
@@ -8305,10 +8324,12 @@ img {
   background: #0f172a;
 }
 
-[data-theme="light"] .nav-links {
-  background: rgba(255, 255, 255, 0.96) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12), 0 0 25px rgba(148, 99, 0, 0.08) !important;
+@media (max-width: 1024px) {
+  [data-theme="light"] .nav-links {
+    background: var(--bg-main, #f5f6fa) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12), 0 0 25px rgba(148, 99, 0, 0.08) !important;
+  }
 }
 
 [data-theme="light"] .nav-mobile-bottom {

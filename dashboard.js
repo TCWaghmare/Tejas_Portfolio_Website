@@ -1090,25 +1090,64 @@
   // ============================================================================
 
   let selectedResumeFile = null;
+  let activeDashboardBlobUrl = null;
+
+  function safeSetDashboardResumePreview(rawUrl, name) {
+    const iframe = document.getElementById('dashboard-resume-iframe');
+    const extLink = document.getElementById('resume-external-preview-link');
+    const pill = document.getElementById('resume-live-status-pill');
+
+    if (activeDashboardBlobUrl) {
+      try { URL.revokeObjectURL(activeDashboardBlobUrl); } catch (e) {}
+      activeDashboardBlobUrl = null;
+    }
+
+    if (!rawUrl) {
+      const defUrl = 'tejas resume.pdf?v=' + Date.now();
+      if (iframe) iframe.src = defUrl;
+      if (extLink) extLink.href = 'tejas resume.pdf';
+      if (pill) {
+        pill.textContent = 'Active: tejas resume.pdf';
+        pill.className = 'badge-pill scheduled';
+      }
+      return;
+    }
+
+    if (rawUrl.startsWith('data:')) {
+      try {
+        const parts = rawUrl.split(',');
+        const b64 = parts.length > 1 ? parts[1] : parts[0];
+        const bin = atob(b64.replace(/\s/g, ''));
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        activeDashboardBlobUrl = URL.createObjectURL(blob);
+        if (iframe) iframe.src = activeDashboardBlobUrl;
+        if (extLink) extLink.href = activeDashboardBlobUrl;
+      } catch (e) {
+        if (iframe) iframe.src = rawUrl;
+        if (extLink) extLink.href = rawUrl;
+      }
+    } else {
+      const busted = rawUrl.includes('?') ? rawUrl + '&v=' + Date.now() : rawUrl + '?v=' + Date.now();
+      if (iframe) iframe.src = busted;
+      if (extLink) extLink.href = rawUrl;
+    }
+
+    if (pill) {
+      pill.textContent = `Active: ${name || 'Custom Cloud Resume'} (Live)`;
+      pill.className = 'badge-pill scheduled';
+    }
+  }
 
   function initResumeManager() {
     const activeName = localStorage.getItem('tp_uploaded_resume_name');
     const activeUrl = localStorage.getItem('tp_uploaded_resume_url');
-    const pill = document.getElementById('resume-live-status-pill');
-    const iframe = document.getElementById('dashboard-resume-iframe');
-    const extLink = document.getElementById('resume-external-preview-link');
 
     if (activeUrl) {
-      if (iframe) iframe.src = activeUrl;
-      if (extLink) extLink.href = activeUrl;
-      if (pill) {
-        pill.textContent = `Active: ${activeName || 'Custom Cloud Resume'} (Live)`;
-        pill.className = 'badge-pill scheduled';
-      }
+      safeSetDashboardResumePreview(activeUrl, activeName);
     } else {
-      if (iframe) iframe.src = 'tejas resume.pdf?v=' + Date.now();
-      if (extLink) extLink.href = 'tejas resume.pdf';
-      if (pill) pill.textContent = 'Active: tejas resume.pdf';
+      safeSetDashboardResumePreview(null);
     }
 
     // Query Supabase for latest published cloud resume
@@ -1125,12 +1164,7 @@
             if (liveUrl) {
               localStorage.setItem('tp_uploaded_resume_url', liveUrl);
               localStorage.setItem('tp_uploaded_resume_name', row.filename);
-              if (iframe) iframe.src = liveUrl;
-              if (extLink) extLink.href = liveUrl;
-              if (pill) {
-                pill.textContent = `Active: ${row.filename} (Live)`;
-                pill.className = 'badge-pill scheduled';
-              }
+              safeSetDashboardResumePreview(liveUrl, row.filename);
             }
           }
         }).catch(() => {});
@@ -1287,12 +1321,8 @@
       localStorage.setItem('tp_uploaded_resume_name', selectedResumeFile.name);
       localStorage.setItem('tp_uploaded_resume_time', new Date().toISOString());
 
-      // 5. Update Status UI
-      const pill = document.getElementById('resume-live-status-pill');
-      if (pill) {
-        pill.textContent = `Active: ${selectedResumeFile.name} (Live on Portfolio)`;
-        pill.className = 'badge-pill scheduled';
-      }
+      // 5. Update Preview & Status UI
+      safeSetDashboardResumePreview(finalResumeUrl, selectedResumeFile.name);
 
       if (statusBanner) {
         statusBanner.innerHTML = `

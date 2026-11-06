@@ -1151,10 +1151,10 @@
       if (embedWrap) embedWrap.style.display = 'block';
       if (zoomControls) zoomControls.style.display = 'none';
 
-      // Always load latest version using cache-busting timestamp
+      // Always load latest version using safe resolved PDF source
       if (iframe) {
-        const activeResume = getPortfolioActiveResumeUrl();
-        iframe.src = (activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now()) + '#toolbar=1&navpanes=0&view=FitH';
+        const resData = getPortfolioResolvedResume();
+        iframe.src = resData.iframeSrc;
       }
     }
   };
@@ -1199,6 +1199,104 @@
            'tejas resume.pdf';
   }
 
+  // State cache for dynamic resume blob and Uint8Array binary buffer
+  let cachedResumeSource = null;
+  let cachedResumeBlobUrl = null;
+  let cachedResumeUint8Array = null;
+
+  // Resolves the resume source safely into format required by PDF.js, native iframe, and download
+  function getPortfolioResolvedResume() {
+    const rawSource = getPortfolioActiveResumeUrl();
+    if (!rawSource) {
+      const defUrl = 'tejas resume.pdf?v=' + Date.now();
+      return {
+        type: 'url',
+        pdfJsParam: { url: defUrl },
+        iframeSrc: defUrl + '#toolbar=1&navpanes=0&view=FitH',
+        downloadUrl: 'tejas resume.pdf'
+      };
+    }
+
+    // 1. Base64 Data URL (e.g., from local upload or database storage fallback)
+    if (rawSource.startsWith('data:')) {
+      if (cachedResumeSource === rawSource && cachedResumeBlobUrl && cachedResumeUint8Array) {
+        return {
+          type: 'base64',
+          pdfJsParam: { data: cachedResumeUint8Array },
+          iframeSrc: cachedResumeBlobUrl + '#toolbar=1&navpanes=0&view=FitH',
+          downloadUrl: cachedResumeBlobUrl
+        };
+      }
+
+      try {
+        if (cachedResumeBlobUrl) {
+          try { URL.revokeObjectURL(cachedResumeBlobUrl); } catch (e) {}
+        }
+        const parts = rawSource.split(',');
+        const b64 = parts.length > 1 ? parts[1] : parts[0];
+        const binaryStr = atob(b64.replace(/\s/g, ''));
+        const len = binaryStr.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryStr.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        cachedResumeBlobUrl = URL.createObjectURL(blob);
+        cachedResumeUint8Array = bytes;
+        cachedResumeSource = rawSource;
+
+        return {
+          type: 'base64',
+          pdfJsParam: { data: cachedResumeUint8Array },
+          iframeSrc: cachedResumeBlobUrl + '#toolbar=1&navpanes=0&view=FitH',
+          downloadUrl: cachedResumeBlobUrl
+        };
+      } catch (err) {
+        console.error('Error parsing base64 resume:', err);
+        const fallbackUrl = 'tejas resume.pdf?v=' + Date.now();
+        return {
+          type: 'url',
+          pdfJsParam: { url: fallbackUrl },
+          iframeSrc: fallbackUrl + '#toolbar=1&navpanes=0&view=FitH',
+          downloadUrl: 'tejas resume.pdf'
+        };
+      }
+    }
+
+    // 2. Blob URL (already created in memory)
+    if (rawSource.startsWith('blob:')) {
+      return {
+        type: 'blob',
+        pdfJsParam: { url: rawSource },
+        iframeSrc: rawSource + '#toolbar=1&navpanes=0&view=FitH',
+        downloadUrl: rawSource
+      };
+    }
+
+    // 3. Regular HTTP/HTTPS URL or relative file path (e.g., 'tejas resume.pdf')
+    const cacheBustedUrl = rawSource.includes('?') 
+      ? rawSource + '&v=' + Date.now() 
+      : rawSource + '?v=' + Date.now();
+
+    return {
+      type: 'url',
+      pdfJsParam: { url: cacheBustedUrl },
+      iframeSrc: cacheBustedUrl + '#toolbar=1&navpanes=0&view=FitH',
+      downloadUrl: rawSource
+    };
+  }
+
+  // Cross-tab and live storage sync listener
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'tp_uploaded_resume_url') {
+      isResumeLoaded = false;
+      const modal = document.getElementById('resume-modal');
+      if (modal && modal.classList.contains('active')) {
+        loadAndRenderResume();
+      }
+    }
+  });
+
   // Pre-fetch cloud resume from Supabase if updated by admin
   (async function checkCloudResumeAsset() {
     try {
@@ -1232,16 +1330,20 @@
 
     if (loader) loader.style.display = 'flex';
 
+    const resData = getPortfolioResolvedResume();
+
+    // Preload iframe with safe blob or cache-busted URL so it's ready when switched
+    if (iframe) {
+      iframe.src = resData.iframeSrc;
+    }
+
     // Attempt rendering using PDF.js
     if (window.pdfjsLib) {
       try {
         window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // Cache-busting URL guarantees the latest version is always rendered
-        const activeResume = getPortfolioActiveResumeUrl();
-        const pdfUrl = activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now();
         const loadingTask = window.pdfjsLib.getDocument({
-          url: pdfUrl,
+          ...resData.pdfJsParam,
           cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
           cMapPacked: true
         });
@@ -1258,10 +1360,6 @@
 
     // Fallback to native PDF iframe
     if (loader) loader.style.display = 'none';
-    if (iframe) {
-      const activeResume = getPortfolioActiveResumeUrl();
-      iframe.src = (activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now()) + '#toolbar=1&navpanes=0&view=FitH';
-    }
     window.switchResumeView('embed');
     isResumeLoaded = true;
   }
@@ -1314,10 +1412,10 @@
 
   // Download Resume Function (Triggered by Header or Footer Download CTA)
   window.downloadResumeFromModal = function (triggerBtn) {
-    // 1. Download file directly (with cache-busting to ensure latest version is fetched)
+    // 1. Download file directly using resolved blob or clean URL
     const link = document.createElement('a');
-    const activeResume = getPortfolioActiveResumeUrl();
-    link.href = activeResume.includes('?') ? activeResume + '&v=' + Date.now() : activeResume + '?v=' + Date.now();
+    const resData = getPortfolioResolvedResume();
+    link.href = resData.downloadUrl;
     link.download = 'Tejas_C_Waghmare_Resume.pdf';
     document.body.appendChild(link);
     link.click();

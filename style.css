@@ -52,7 +52,7 @@
 
 [data-theme="light"] {
   /* Light Theme Palette - Clean Slate with High Contrast Gold-Yellow Accent */
-  --bg-main: #f5f6fa;
+  --bg-main: #ffffff;
   --bg-surface: #ffffff;
   --bg-card: #ffffff;
   --bg-card-hover: #f8f9fd;
@@ -7837,18 +7837,24 @@ img {
 
 /* Navigation Header */
 [data-theme="light"] .site-header .nav-container {
-  background: rgba(255, 255, 255, 0.92);
+  background: #ffffff !important;
   border-color: rgba(0, 0, 0, 0.09);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .nav-brand {
+  background: transparent !important;
 }
 
 [data-theme="light"] .nav-brand .brand-name {
   color: #0f172a !important;
   font-weight: 800;
+  background: transparent !important;
 }
 
 [data-theme="light"] .nav-brand .brand-role {
   color: #64748b !important;
+  background: transparent !important;
 }
 
 [data-theme="light"] .nav-item {
@@ -7861,9 +7867,10 @@ img {
 }
 
 [data-theme="light"] .nav-item.active {
-  background: var(--yellow-tint-bg) !important;
+  background: #ffffff !important;
   color: var(--yellow-font) !important;
   border: 1px solid var(--yellow-tint-border) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   font-weight: 700 !important;
 }
 

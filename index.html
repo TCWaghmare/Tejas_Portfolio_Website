@@ -22,15 +22,23 @@
 
   <!-- Theme Initialization (Default Dark, Zero Flicker) -->
   <script>
+    function updateThemeMeta(theme) {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) {
+        meta.setAttribute('content', theme === 'light' ? '#ffffff' : '#131417');
+      }
+    }
     (function () {
       const savedTheme = localStorage.getItem('tejas_theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeMeta(savedTheme);
     })();
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme') || 'dark';
       const targetTheme = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', targetTheme);
       localStorage.setItem('tejas_theme', targetTheme);
+      updateThemeMeta(targetTheme);
     }
     window.toggleTheme = toggleTheme;
   </script>
@@ -243,8 +251,8 @@
   
   <link rel="preload" href="/Asset/tejas-waghmare-data-analyst.jpg" as="image" type="image/jpeg" fetchpriority="high">
   <link rel="preload" href="Asset/profile_hero.webp" as="image" type="image/webp" fetchpriority="high">
-  <link rel="preload" href="style.css?v=20261106_footer_resume" as="style">
-  <link rel="stylesheet" href="style.css?v=20261106_footer_resume">
+  <link rel="preload" href="style.css?v=20261106_match_header_color" as="style">
+  <link rel="stylesheet" href="style.css?v=20261106_match_header_color">
 </head>
 <body>
 

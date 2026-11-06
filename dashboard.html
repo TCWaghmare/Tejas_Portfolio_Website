@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Telemetry Command Center | Tejas C. Waghmare</title>
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Google Fonts: Plus Jakarta Sans, DM Sans, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Chart.js for high-fidelity dark charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Supabase JS Client for Cloud Authentication & Database Access -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.min.js"></script>
+
+  <!-- Dashboard Stylesheet -->
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard-body">
+
+  <!-- =========================================================================
+       1. SECURITY & AUTHENTICATION GATE (LOCKED BY DEFAULT)
+       ========================================================================= -->
+  <div id="auth-gate" class="auth-gate-overlay">
+    <div class="auth-card bento-card">
+
+      <!-- VIEW 1: Standard Admin Login -->
+      <div id="auth-login-view" class="auth-subview">
+        <div class="auth-header">
+          <div class="auth-shield-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <div class="auth-status-pill">
+            <span class="auth-status-dot"></span>
+            <span>ADMIN ACCESS RESTRICTED</span>
+          </div>
+          <h1 class="auth-title">Telemetry Command Center</h1>
+          <p class="auth-desc">Authorized administrator verification required. Enter your admin Gmail and password to access real-time metrics.</p>
+        </div>
+
+        <form id="admin-login-form" class="auth-form" onsubmit="handleAdminLogin(event)">
+          <div class="auth-input-group">
+            <label for="admin-email" class="auth-label">Administrator Gmail</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input type="email" id="admin-email" class="auth-input" value="tejaswaghmare900@gmail.com" required autocomplete="username" placeholder="tejaswaghmare900@gmail.com">
+            </div>
+          </div>
+
+          <div class="auth-input-group">
+            <div class="auth-label-row">
+              <label for="admin-password" class="auth-label">Admin Password</label>
+              <a href="javascript:void(0)" onclick="switchAuthView('forgot')" class="auth-forgot-link">Forgot password?</a>
+            </div>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input type="password" id="admin-password" class="auth-input" required autocomplete="current-password" placeholder="Enter password or security key">
+              <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('admin-password')" aria-label="Toggle password view">
+                <svg id="pwd-eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="auth-error-msg" class="auth-error-banner" style="display: none;"></div>
+
+          <button type="submit" id="auth-submit-btn" class="auth-btn-primary">
+            <span class="auth-btn-text">Authenticate &amp; Unlock</span>
+            <svg class="auth-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <div class="auth-footer-note">
+          <a href="index.html" class="auth-back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Return to Portfolio
+          </a>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Forgot Password / Request Reset Email -->
+      <div id="auth-forgot-view" class="auth-subview" style="display: none;">
+        <div class="auth-header">
+          <div class="auth-shield-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+            </svg>
+          </div>
+          <div class="auth-status-pill">
+            <span class="auth-status-dot"></span>
+            <span>ACCOUNT RECOVERY</span>
+          </div>
+          <h1 class="auth-title">Reset Admin Password</h1>
+          <p class="auth-desc">Enter your administrator Gmail. Supabase Auth will send a secure password recovery link to your inbox.</p>
+        </div>
+
+        <form id="forgot-password-form" class="auth-form" onsubmit="handleForgotPassword(event)">
+          <div class="auth-input-group">
+            <label for="forgot-email" class="auth-label">Administrator Gmail</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input type="email" id="forgot-email" class="auth-input" value="tejaswaghmare900@gmail.com" required autocomplete="email" placeholder="tejaswaghmare900@gmail.com">
+            </div>
+          </div>
+
+          <div id="forgot-error-msg" class="auth-error-banner" style="display: none;"></div>
+          <div id="forgot-success-msg" class="auth-success-banner" style="display: none;"></div>
+
+          <button type="submit" id="forgot-submit-btn" class="auth-btn-primary">
+            <span class="forgot-btn-text">Send Recovery Link</span>
+            <svg class="auth-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+
+        <div class="auth-footer-note">
+          <a href="javascript:void(0)" onclick="switchAuthView('login')" class="auth-back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Login
+          </a>
+        </div>
+      </div>
+
+      <!-- VIEW 3: Set New Password (Triggered after clicking Supabase recovery email link) -->
+      <div id="auth-reset-view" class="auth-subview" style="display: none;">
+        <div class="auth-header">
+          <div class="auth-shield-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <div class="auth-status-pill" style="border-color: rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.1); color: #4ade80;">
+            <span class="auth-status-dot" style="background: #22c55e; box-shadow: 0 0 8px #22c55e;"></span>
+            <span>VERIFIED RECOVERY SESSION</span>
+          </div>
+          <h1 class="auth-title">Set New Password</h1>
+          <p class="auth-desc">Enter your new administrator password below to regain full access to your telemetry dashboard.</p>
+        </div>
+
+        <form id="reset-password-form" class="auth-form" onsubmit="handleUpdateNewPassword(event)">
+          <div class="auth-input-group">
+            <label for="new-password" class="auth-label">New Password</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input type="password" id="new-password" class="auth-input" required autocomplete="new-password" placeholder="At least 6 characters" minlength="6">
+              <button type="button" class="auth-pwd-toggle" onclick="togglePasswordVisibility('new-password')" aria-label="Toggle password view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-input-group">
+            <label for="confirm-password" class="auth-label">Confirm New Password</label>
+            <div class="auth-input-wrapper">
+              <svg class="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <input type="password" id="confirm-password" class="auth-input" required autocomplete="new-password" placeholder="Re-enter new password" minlength="6">
+            </div>
+          </div>
+
+          <div id="reset-error-msg" class="auth-error-banner" style="display: none;"></div>
+
+          <button type="submit" id="reset-submit-btn" class="auth-btn-primary">
+            <span class="reset-btn-text">Save New Password &amp; Unlock</span>
+            <svg class="auth-btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <div class="auth-footer-note">
+          <a href="javascript:void(0)" onclick="switchAuthView('login')" class="auth-back-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Cancel &amp; Return to Login
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       2. SECURE ADMIN COMMAND CENTER (UNLOCKED AFTER VERIFICATION)
+       ========================================================================= -->
+  <div id="dashboard-app" class="dashboard-container" style="display: none;">
+
+    <!-- Top Navigation & Control Bar -->
+    <header class="dash-topbar bento-card">
+      <div class="dash-topbar-left">
+        <div class="dash-brand">
+          <div class="dash-brand-avatar">
+            <img src="Asset/profile_hero.webp" alt="Tejas C. Waghmare">
+          </div>
+          <div>
+            <div class="dash-brand-title">Tejas C. Waghmare</div>
+            <div class="dash-brand-subtitle">Telemetry &amp; Analytics Command Center</div>
+          </div>
+        </div>
+
+        <div class="dash-live-badge" title="Live Supabase real-time connection active">
+          <span class="pulse-orb"></span>
+          <span id="live-visitors-count">Live: 1 Active</span>
+        </div>
+      </div>
+
+      <div class="dash-topbar-controls">
+        <!-- Date Range Filter -->
+        <div class="dash-pill-group" id="date-range-filter">
+          <button type="button" class="dash-filter-btn" data-range="today" onclick="setFilterRange('today')">Today</button>
+          <button type="button" class="dash-filter-btn active" data-range="7d" onclick="setFilterRange('7d')">7 Days</button>
+          <button type="button" class="dash-filter-btn" data-range="30d" onclick="setFilterRange('30d')">30 Days</button>
+          <button type="button" class="dash-filter-btn" data-range="all" onclick="setFilterRange('all')">All Time</button>
+        </div>
+
+        <!-- Admin Opt-Out Toggle -->
+        <div class="admin-optout-wrapper" title="When active, your own visits are excluded from all statistics">
+          <label class="switch-label">
+            <input type="checkbox" id="admin-optout-checkbox" onchange="handleAdminOptOutToggle(this)">
+            <span class="switch-slider"></span>
+            <span class="switch-text">Exclude My Visits</span>
+          </label>
+        </div>
+
+        <!-- Bot Filter Toggle (Claude Suggestion) -->
+        <div class="admin-optout-wrapper" title="Filter out automated crawlers and bots">
+          <label class="switch-label">
+            <input type="checkbox" id="bot-filter-checkbox" checked onchange="handleBotFilterToggle(this)">
+            <span class="switch-slider"></span>
+            <span class="switch-text">Filter Bots</span>
+          </label>
+        </div>
+
+        <!-- Refresh Button -->
+        <button type="button" class="dash-icon-btn" onclick="fetchDashboardData(true)" title="Refresh Telemetry">
+          <svg id="refresh-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
+
+        <!-- Back to Website -->
+        <a href="index.html" class="dash-btn-secondary" title="View public portfolio">
+          <span>Website</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+
+        <!-- Sign Out -->
+        <button type="button" class="dash-btn-logout" onclick="handleAdminLogout()" title="Log out of admin session">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </header>
+
+
+    <!-- =======================================================================
+         3. TOP KPI METRICS CARDS (Bento Row)
+         ======================================================================= -->
+    <section class="kpi-grid">
+      <!-- KPI 1: Unique Visitors -->
+      <div class="kpi-card bento-card">
+        <div class="kpi-header">
+          <span class="kpi-label">UNIQUE VISITORS</span>
+          <span class="kpi-icon-badge yellow-glow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </span>
+        </div>
+        <div class="kpi-value" id="kpi-visitors">0</div>
+        <div class="kpi-subtext">
+          <span class="kpi-tag" id="kpi-returning-ratio">0% New / 0% Return</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Total Pageviews -->
+      <div class="kpi-card bento-card">
+        <div class="kpi-header">
+          <span class="kpi-label">TOTAL PAGEVIEWS</span>
+          <span class="kpi-icon-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </span>
+        </div>
+        <div class="kpi-value" id="kpi-pageviews">0</div>
+        <div class="kpi-subtext">
+          <span class="kpi-tag" id="kpi-views-per-session">0.0 Views / Session</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: Avg Session Focus Dwell Time -->
+      <div class="kpi-card bento-card">
+        <div class="kpi-header">
+          <span class="kpi-label">AVG FOCUSED DWELL</span>
+          <span class="kpi-icon-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </span>
+        </div>
+        <div class="kpi-value" id="kpi-dwell-time">0s</div>
+        <div class="kpi-subtext">
+          <span class="kpi-tag">Active focused tab time</span>
+        </div>
+      </div>
+
+      <!-- KPI 4: High-Value Recruiter Conversions -->
+      <div class="kpi-card bento-card">
+        <div class="kpi-header">
+          <span class="kpi-label">RECRUITER CONVERSION</span>
+          <span class="kpi-icon-badge yellow-glow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          </span>
+        </div>
+        <div class="kpi-value highlight-yellow" id="kpi-resume-rate">0.0%</div>
+        <div class="kpi-subtext">
+          <span class="kpi-tag" id="kpi-resume-counts">0 Downloads / 0 Leads</span>
+        </div>
+      </div>
+
+      <!-- KPI 5: Bounce Rate -->
+      <div class="kpi-card bento-card">
+        <div class="kpi-header">
+          <span class="kpi-label">BOUNCE RATE</span>
+          <span class="kpi-icon-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13l-6 6-6-6"></path><path d="M12 19V5"></path></svg>
+          </span>
+        </div>
+        <div class="kpi-value" id="kpi-bounce-rate">0.0%</div>
+        <div class="kpi-subtext">
+          <span class="kpi-tag">&lt;10s single event exits</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================================
+         4. CHARTS GRID (Row 1: Traffic Trend + Acquisition Platforms)
+         ======================================================================= -->
+    <section class="charts-row">
+      <!-- Traffic Over Time (8 cols) -->
+      <div class="chart-card bento-card card-8">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Traffic Volume &amp; Visitor Velocity</h2>
+            <p class="card-desc">Daily progression of Pageviews vs Unique Visitors</p>
+          </div>
+          <div class="card-legend">
+            <span class="legend-item"><span class="legend-color yellow"></span> Pageviews</span>
+            <span class="legend-item"><span class="legend-color blue"></span> Unique Visitors</span>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="trafficTrendChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Acquisition Channels / Platform Sources (4 cols) -->
+      <div class="chart-card bento-card card-4">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Recruiter Platforms &amp; Sources</h2>
+            <p class="card-desc">Where hiring managers arrive from</p>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper doughnut-wrapper">
+          <canvas id="platformPieChart"></canvas>
+        </div>
+        <div id="platform-breakdown-list" class="source-list"></div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================================
+         5. CHARTS GRID (Row 2: Section Heatmap + Resume Funnel)
+         ======================================================================= -->
+    <section class="charts-row">
+      <!-- Section Engagement & Dwell Time (6 cols) -->
+      <div class="chart-card bento-card card-6">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Section Scroll &amp; Dwell Heatmap</h2>
+            <p class="card-desc">Average seconds visitors spend reading each section</p>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="sectionDwellChart"></canvas>
+        </div>
+      </div>
+
+      <!-- High-Intent Conversion Funnel (6 cols) -->
+      <div class="chart-card bento-card card-6">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Recruiter Conversion Funnel</h2>
+            <p class="card-desc">Progression from Initial Landing to Resume Download &amp; Form Submit</p>
+          </div>
+        </div>
+        <div class="funnel-container" id="funnel-stages">
+          <div class="funnel-stage">
+            <div class="funnel-info">
+              <span class="funnel-label">1. Total Visitors</span>
+              <span class="funnel-count" id="funnel-v-count">0</span>
+            </div>
+            <div class="funnel-bar-bg"><div class="funnel-bar-fill" id="funnel-v-bar" style="width: 100%;"></div></div>
+            <span class="funnel-conv">100% baseline</span>
+          </div>
+
+          <div class="funnel-stage">
+            <div class="funnel-info">
+              <span class="funnel-label">2. Explored Projects</span>
+              <span class="funnel-count" id="funnel-p-count">0</span>
+            </div>
+            <div class="funnel-bar-bg"><div class="funnel-bar-fill" id="funnel-p-bar" style="width: 0%;"></div></div>
+            <span class="funnel-conv" id="funnel-p-conv">0%</span>
+          </div>
+
+          <div class="funnel-stage">
+            <div class="funnel-info">
+              <span class="funnel-label">3. Recruiter Intent (Resume Modal / Contact Form)</span>
+              <span class="funnel-count" id="funnel-r-count">0</span>
+            </div>
+            <div class="funnel-bar-bg"><div class="funnel-bar-fill" id="funnel-r-bar" style="width: 0%;"></div></div>
+            <span class="funnel-conv" id="funnel-r-conv">0%</span>
+          </div>
+
+          <div class="funnel-stage funnel-stage-highlight">
+            <div class="funnel-info">
+              <span class="funnel-label">4. High-Value Conversions (CV Download / Form Submitted)</span>
+              <span class="funnel-count highlight-yellow" id="funnel-d-count">0</span>
+            </div>
+            <div class="funnel-bar-bg"><div class="funnel-bar-fill yellow" id="funnel-d-bar" style="width: 0%;"></div></div>
+            <span class="funnel-conv highlight-yellow" id="funnel-d-conv">0%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================================
+         6. CHARTS GRID (Row 3: Button Interaction Matrix + Devices + Geography)
+         ======================================================================= -->
+    <section class="charts-row">
+      <!-- Button Interaction Matrix (6 cols) -->
+      <div class="chart-card bento-card card-6">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Interactive Button &amp; CTA Matrix</h2>
+            <p class="card-desc">Project links, Credly badges, resume downloads &amp; channels</p>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="buttonClicksChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Device, OS & Hardware (6 cols) -->
+      <div class="chart-card bento-card card-6">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Audience Tech &amp; Geography</h2>
+            <p class="card-desc">Visitor hardware, operating systems and geographic reach</p>
+          </div>
+        </div>
+        <div class="tech-grid">
+          <div class="tech-subcard">
+            <div class="tech-subcard-title">DEVICE TYPES</div>
+            <div id="tech-device-list" class="tech-breakdown-list"></div>
+          </div>
+          <div class="tech-subcard">
+            <div class="tech-subcard-title">TOP BROWSERS</div>
+            <div id="tech-browser-list" class="tech-breakdown-list"></div>
+          </div>
+          <div class="tech-subcard">
+            <div class="tech-subcard-title">TOP LOCATIONS</div>
+            <div id="tech-geo-list" class="tech-breakdown-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================================
+         7. CONTACT & INQUIRY CRM (READ, WRITE, EDIT DATA)
+         ======================================================================= -->
+    <section class="crm-section">
+      <div class="crm-card bento-card">
+        <div class="crm-header">
+          <div>
+            <div class="crm-badge">DIRECT CLIENT PIPELINE</div>
+            <h2 class="card-title">Inquiry CRM &amp; Lead Management</h2>
+            <p class="card-desc">Review, categorize, update status, and manage incoming portfolio leads</p>
+          </div>
+          <div class="crm-actions">
+            <button type="button" class="dash-btn-secondary" onclick="exportContactsToCSV()" title="Export contacts to Excel/Power BI">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              <span>Export Contacts CSV</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="crm-table-container">
+          <table class="dash-table" id="contacts-table">
+            <thead>
+              <tr>
+                <th>STAR</th>
+                <th>TIMESTAMP</th>
+                <th>SENDER &amp; EMAIL</th>
+                <th>TOPIC / URGENCY</th>
+                <th>MESSAGE</th>
+                <th>PIPELINE STATUS</th>
+                <th>ADMIN PRIVATE NOTES</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="contacts-table-body">
+              <tr>
+                <td colspan="8" class="table-empty-row">Loading inquiries...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================================
+         8. REAL-TIME TELEMETRY AUDIT STREAM & ADMIN TOOLS
+         ======================================================================= -->
+    <section class="audit-section">
+      <div class="audit-card bento-card">
+        <div class="crm-header">
+          <div>
+            <div class="crm-badge">LIVE EVENT STREAM</div>
+            <h2 class="card-title">Recent Telemetry Events</h2>
+            <p class="card-desc">Raw event log stream captured by client &amp; serverless sensor</p>
+          </div>
+          <div class="crm-actions">
+            <button type="button" class="dash-btn-secondary" onclick="exportEventsToCSV()" title="Export all telemetry to CSV">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              <span>Export Events CSV</span>
+            </button>
+            <button type="button" class="dash-btn-danger" onclick="promptCleanTestEvents()" title="Delete test/developer events">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <span>Clean Test Data</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="crm-table-container">
+          <table class="dash-table" id="audit-table">
+            <thead>
+              <tr>
+                <th>TIMESTAMP</th>
+                <th>EVENT NAME</th>
+                <th>CATEGORY</th>
+                <th>PLATFORM</th>
+                <th>DEVICE</th>
+                <th>SECTION / TAG</th>
+                <th>DWELL TIME</th>
+                <th>RAW METADATA</th>
+              </tr>
+            </thead>
+            <tbody id="audit-table-body">
+              <tr>
+                <td colspan="8" class="table-empty-row">Loading telemetry stream...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="dash-footer">
+      <div class="dash-footer-copy">
+        Tejas C. Waghmare &bull; Telemetry Engine v2.2 &bull; Private Administrator Environment
+      </div>
+      <div class="dash-footer-links">
+        <a href="index.html">Back to Portfolio</a>
+        <a href="javascript:void(0)" onclick="window.scrollTo({top:0, behavior:'smooth'})">Top &uarr;</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="dash-toast-container" class="dash-toast-container"></div>
+
+  <!-- Dashboard Controller Script -->
+  <script src="dashboard.js"></script>
+</body>
+</html>

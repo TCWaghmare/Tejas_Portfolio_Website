@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    Tejas C. Waghmare - Data Analyst & BI Specialist Portfolio
    Theme: Matte Graphite Bento UI with Electric Yellow Accents
    Visual Language: High-Contrast Bento Cards, Sleek Micro-Animations
@@ -9384,4 +9384,30 @@ select:focus-visible,
     font-size: 11px;
     min-width: 34px;
   }
+}
+
+
+/* --------------------------------------------------------------------------
+   Admin Portal Footer Trigger
+   -------------------------------------------------------------------------- */
+.footer-admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+  transition: all 0.25s var(--ease-snappy);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.footer-admin-link:hover {
+  background: rgba(245, 224, 37, 0.12);
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow) !important;
+  box-shadow: 0 0 14px rgba(245, 224, 37, 0.25);
+  transform: translateY(-1px);
 }

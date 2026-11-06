@@ -14,6 +14,13 @@
       <image:caption>Official profile portrait of Tejas Waghmare, Microsoft Certified Data Analyst and Business Intelligence Specialist.</image:caption>
     </image:image>
 
+    <!-- Official Brand Favicon & Logo -->
+    <image:image>
+      <image:loc>https://www.tejaswaghmare.me/favicon.svg</image:loc>
+      <image:title>Tejas Waghmare Official Site Logo</image:title>
+      <image:caption>Brand logo and favicon for Tejas Waghmare Data Analyst portfolio.</image:caption>
+    </image:image>
+
     <!-- Profile Avatar WebP -->
     <image:image>
       <image:loc>https://www.tejaswaghmare.me/Asset/profile_hero.webp</image:loc>

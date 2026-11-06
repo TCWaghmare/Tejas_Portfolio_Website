@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /favicon.ico
+Allow: /favicon.svg
 Allow: /favicon*.png
 Allow: /android-chrome*.png
 Allow: /apple-touch-icon.png
@@ -15,6 +16,9 @@ User-agent: Googlebot
 Allow: /
 
 User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Favicons
 Allow: /
 
 User-agent: Bingbot

@@ -51,6 +51,25 @@ for filename, size in png_specs:
     resized.save(filename, 'PNG', optimize=True)
     print(f'Generated circular {filename} ({size[0]}x{size[1]})')
 
+# Generate crisp SVG favicon with embedded high-res circular avatar and gold rim
+import base64
+with open('android-chrome-192x192.png', 'rb') as f:
+    b64_data = base64.b64encode(f.read()).decode('utf-8')
+
+svg_content = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="100%" height="100%">
+  <defs>
+    <clipPath id="circleClip">
+      <circle cx="96" cy="96" r="92" />
+    </clipPath>
+  </defs>
+  <circle cx="96" cy="96" r="94" fill="#131417" stroke="#eab308" stroke-width="4" />
+  <image href="data:image/png;base64,{b64_data}" x="0" y="0" width="192" height="192" clip-path="url(#circleClip)" />
+</svg>'''
+
+with open('favicon.svg', 'w', encoding='utf-8') as f:
+    f.write(svg_content)
+print('Generated favicon.svg (Vector SVG Favicon with high-res portrait and gold rim)')
+
 # 4. Generate high-resolution Search Snippet Portrait Thumbnails
 # Google, Bing, Yahoo search snippet thumbnail requirements:
 # High-resolution, square aspect ratio, solid RGB background so it displays cleanly in search result cards

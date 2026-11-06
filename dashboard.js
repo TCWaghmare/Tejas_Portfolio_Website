@@ -184,7 +184,99 @@
     window.location.reload();
   }
 
+  // Handle Setting New Password when arriving from Supabase Email Recovery Link
+  async function handleUpdateNewPassword(e) {
+    if (e) e.preventDefault();
+    const newPwdInput = document.getElementById('new-password');
+    const confirmPwdInput = document.getElementById('confirm-password');
+    const errBanner = document.getElementById('reset-error-msg');
+    const submitBtn = document.getElementById('reset-submit-btn');
+
+    const newPassword = (newPwdInput.value || '').trim();
+    const confirmPassword = (confirmPwdInput.value || '').trim();
+
+    errBanner.style.display = 'none';
+
+    if (newPassword.length < 6) {
+      errBanner.textContent = 'Password must be at least 6 characters long.';
+      errBanner.style.display = 'block';
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      errBanner.textContent = 'Passwords do not match. Please re-enter identical passwords.';
+      errBanner.style.display = 'block';
+      return;
+    }
+
+    if (!supaClient || !supaClient.auth) {
+      errBanner.textContent = 'Supabase client unavailable.';
+      errBanner.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.querySelector('.reset-btn-text').textContent = 'Updating password...';
+
+    try {
+      const { data, error } = await supaClient.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
+      showToast('Password updated successfully! Unlocking...', 'success');
+      state.isAuthenticated = true;
+      sessionStorage.setItem('tp_admin_auth_token', 'supabase_auth_' + Date.now());
+      if (data && data.user) {
+        sessionStorage.setItem('tp_admin_email', data.user.email);
+      }
+
+      // Clean recovery tokens from address bar URL
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      unlockDashboard();
+    } catch (err) {
+      errBanner.textContent = 'Password update failed: ' + (err.message || 'Session expired. Please request a new reset link.');
+      errBanner.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.querySelector('.reset-btn-text').textContent = 'Save New Password & Unlock';
+    }
+  }
+
+  // Show recovery box if arriving via a verified Supabase recovery email link
+  function checkRecoveryState() {
+    const hash = window.location.hash || '';
+    const search = window.location.search || '';
+    const isRecovery = hash.includes('type=recovery') || search.includes('type=recovery');
+
+    if (isRecovery) {
+      const loginBox = document.getElementById('auth-login-box');
+      const recoveryBox = document.getElementById('auth-recovery-box');
+      if (loginBox) loginBox.style.display = 'none';
+      if (recoveryBox) recoveryBox.style.display = 'block';
+    }
+
+    if (supaClient && supaClient.auth) {
+      try {
+        supaClient.auth.onAuthStateChange((event, session) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            const loginBox = document.getElementById('auth-login-box');
+            const recoveryBox = document.getElementById('auth-recovery-box');
+            if (loginBox) loginBox.style.display = 'none';
+            if (recoveryBox) recoveryBox.style.display = 'block';
+          }
+        });
+      } catch (e) {}
+    }
+  }
+
   async function checkStoredSession() {
+    // 0. Check if arriving via Supabase password recovery link
+    checkRecoveryState();
+
     // 1. Check active Supabase Auth session first
     if (supaClient && supaClient.auth) {
       try {
@@ -1089,6 +1181,7 @@
 
   // Global window exposure for UI button triggers
   window.handleAdminLogin = handleAdminLogin;
+  window.handleUpdateNewPassword = handleUpdateNewPassword;
   window.handleAdminLogout = handleAdminLogout;
   window.togglePasswordVisibility = togglePasswordVisibility;
   window.setFilterRange = setFilterRange;

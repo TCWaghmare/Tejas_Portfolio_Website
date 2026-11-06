@@ -3,29 +3,36 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.tejaswaghmare.me/</loc>
-    <lastmod>2026-11-04</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
     
+    <!-- Primary Official Profile Portrait for Search Snippets -->
+    <image:image>
+      <image:loc>https://www.tejaswaghmare.me/Asset/tejas-waghmare-data-analyst.jpg</image:loc>
+      <image:title>Tejas Waghmare - Data Analyst &amp; BI Specialist</image:title>
+      <image:caption>Official profile portrait of Tejas Waghmare, Microsoft Certified Data Analyst and Business Intelligence Specialist.</image:caption>
+    </image:image>
+
+    <!-- Profile Avatar WebP -->
+    <image:image>
+      <image:loc>https://www.tejaswaghmare.me/Asset/profile_hero.webp</image:loc>
+      <image:title>Tejas Waghmare - 3x Certified Microsoft Associate</image:title>
+      <image:caption>Portrait avatar of Tejas Waghmare, Data Analyst &amp; BI Specialist in Power BI, SQL, Python, and Fabric.</image:caption>
+    </image:image>
+
     <!-- Primary Portfolio Social Banner -->
     <image:image>
       <image:loc>https://www.tejaswaghmare.me/Asset/og-image.jpg</image:loc>
-      <image:title>Tejas C. Waghmare - Data Analyst &amp; BI Specialist Portfolio</image:title>
-      <image:caption>Microsoft Certified Data Analyst and Business Intelligence Specialist portfolio showcase.</image:caption>
-    </image:image>
-
-    <!-- Profile Hero Portrait -->
-    <image:image>
-      <image:loc>https://www.tejaswaghmare.me/Asset/profile_hero.webp</image:loc>
-      <image:title>Tejas C. Waghmare - Microsoft Certified Associate</image:title>
-      <image:caption>Portrait of Tejas C. Waghmare, Data Analyst &amp; BI Specialist.</image:caption>
+      <image:title>Tejas Waghmare - Data Analyst &amp; BI Specialist Portfolio</image:title>
+      <image:caption>Microsoft Certified Data Analyst and Business Intelligence Specialist interactive portfolio showcase.</image:caption>
     </image:image>
 
     <!-- Amazon Sales Dashboard Project -->
     <image:image>
       <image:loc>https://www.tejaswaghmare.me/Asset/amazon_sales_dashboard.jpg</image:loc>
-      <image:title>Amazon Global Sales Performance Dashboard</image:title>
-      <image:caption>Power BI interactive dashboard analyzing $32.8M in revenue, returns, and profitability.</image:caption>
+      <image:title>Amazon Global Sales Performance Dashboard - Power BI</image:title>
+      <image:caption>Power BI interactive dashboard analyzing $32.8M in revenue, orders, fulfillment, and product category margins.</image:caption>
     </image:image>
 
     <!-- Microsoft Certifications -->

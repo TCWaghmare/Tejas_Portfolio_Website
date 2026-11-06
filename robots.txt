@@ -1,9 +1,23 @@
 User-agent: *
+Allow: /
+Allow: /favicon.ico
+Allow: /favicon*.png
+Allow: /android-chrome*.png
+Allow: /apple-touch-icon.png
+Allow: /site.webmanifest
+Allow: /Asset/
+Allow: /Badges/
+Allow: /Certificates/
+Allow: /Projects/
 Disallow: /dashboard.html
+
+User-agent: Googlebot
 Allow: /
 
-# Host
-Host: https://www.tejaswaghmare.me
+User-agent: Googlebot-Image
+Allow: /
 
-# Sitemaps
+User-agent: Bingbot
+Allow: /
+
 Sitemap: https://www.tejaswaghmare.me/sitemap.xml

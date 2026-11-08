@@ -3561,6 +3561,224 @@
     }
   };
 
+  // --- 3D Video Ring Carousel (kova.me Signature Cylindrical Marquee) ---
+  function initRingCarousel() {
+    const track = document.getElementById('ring-carousel-track');
+    const scene = document.getElementById('ring-scene');
+    const badge = document.querySelector('.ring-badge');
+    if (!track || !scene) return;
+
+    let baseAutoSpeed = -0.038; // base slow drift (negative rotates left-to-right forward)
+    let currentRotation = 0;
+    let velocity = -0.42; // initial smooth entrance momentum
+    let isDragging = false;
+    let isHovered = false;
+    let startX = 0;
+    let startY = 0;
+    let startRot = 0;
+    let lastX = 0;
+    let lastTime = 0;
+    let dragVel = 0;
+    let hasMoved = false;
+    let isVisible = true;
+    let animId = null;
+
+    // Apply 3D transform with responsive scale
+    function applyTransform() {
+      const w = window.innerWidth;
+      const isMobile = w <= 768;
+      const isMedium = w <= 1400 && w > 768;
+      const scale = isMobile ? 0.94 : (isMedium ? 0.88 : 1);
+      scene.style.transform = `scale(${scale}) rotateY(${currentRotation}deg)`;
+    }
+
+    // Main RAF animation loop with silky physics momentum & inertia
+    function tick() {
+      if (isVisible) {
+        if (!isDragging) {
+          const targetVel = isHovered ? (baseAutoSpeed * 0.4) : baseAutoSpeed;
+          // Smooth asymptotic damping towards target speed
+          velocity += (targetVel - velocity) * 0.022;
+          currentRotation += velocity;
+          applyTransform();
+        }
+      }
+      animId = requestAnimationFrame(tick);
+    }
+    animId = requestAnimationFrame(tick);
+
+    // Mouse drag handlers
+    track.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      isDragging = true;
+      hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      lastX = e.clientX;
+      lastTime = performance.now();
+      startRot = currentRotation;
+      dragVel = 0;
+      track.classList.add('is-grabbing');
+      document.body.style.cursor = 'grabbing';
+      document.body.style.userSelect = 'none';
+      if (badge) {
+        badge.style.opacity = '0.15';
+        badge.style.transform = 'translate(-50%, -50%) scale(0.96)';
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const now = performance.now();
+      const dt = now - lastTime;
+      const dx = e.clientX - lastX;
+      if (Math.abs(e.clientX - startX) > 6 || Math.abs(e.clientY - startY) > 6) {
+        hasMoved = true;
+      }
+      if (dt > 0) {
+        const instantVel = dx / dt;
+        // Exponential moving average filter for noise-free momentum
+        dragVel = dragVel * 0.6 + instantVel * 0.4;
+      }
+      lastX = e.clientX;
+      lastTime = now;
+      currentRotation = startRot + (e.clientX - startX) * 0.11;
+      applyTransform();
+    });
+
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      track.classList.remove('is-grabbing');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      if (badge) {
+        badge.style.opacity = '1';
+        badge.style.transform = 'translate(-50%, -50%) scale(1)';
+      }
+      // If user paused pointer for > 50ms before releasing, kill the fling
+      const timeSinceLast = performance.now() - lastTime;
+      if (timeSinceLast > 55) {
+        dragVel = 0;
+      }
+      // Apply momentum fling with calibrated boundary limits
+      velocity = Math.max(-4.0, Math.min(4.0, dragVel * 5.2));
+    }
+
+    window.addEventListener('mouseup', endDrag);
+
+    // Touch swipe handlers
+    track.addEventListener('touchstart', (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      isDragging = true;
+      hasMoved = false;
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      lastX = touch.clientX;
+      lastTime = performance.now();
+      startRot = currentRotation;
+      dragVel = 0;
+      if (badge) {
+        badge.style.opacity = '0.15';
+        badge.style.transform = 'translate(-50%, -50%) scale(0.96)';
+      }
+    }, { passive: true });
+
+    track.addEventListener('touchmove', (e) => {
+      if (!isDragging || !e.touches || !e.touches[0]) return;
+      const touch = e.touches[0];
+      const now = performance.now();
+      const dt = now - lastTime;
+      const dx = touch.clientX - lastX;
+      const dy = touch.clientY - startY;
+
+      // Lock vertical page scroll if user is dragging horizontally
+      if (Math.abs(touch.clientX - startX) > Math.abs(dy) && e.cancelable) {
+        e.preventDefault();
+      }
+
+      if (Math.abs(touch.clientX - startX) > 6) {
+        hasMoved = true;
+      }
+      if (dt > 0) {
+        const instantVel = dx / dt;
+        dragVel = dragVel * 0.6 + instantVel * 0.4;
+      }
+      lastX = touch.clientX;
+      lastTime = now;
+      currentRotation = startRot + (touch.clientX - startX) * 0.13;
+      applyTransform();
+    }, { passive: false });
+
+    window.addEventListener('touchend', endDrag);
+    window.addEventListener('touchcancel', endDrag);
+
+    // Hover slowdown
+    track.addEventListener('mouseenter', () => { isHovered = true; });
+    track.addEventListener('mouseleave', () => { isHovered = false; });
+
+    // Video Autoplay & Inspection Handler
+    const cards = scene.querySelectorAll('.ring-card');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        if (hasMoved) return; // Ignore clicks if dragging
+        const videoSrc = card.getAttribute('data-video');
+        const title = card.getAttribute('data-title');
+        if (videoSrc && typeof window.openLightbox === 'function') {
+          window.openLightbox(videoSrc, 'video', title || 'Project Demo');
+        }
+      });
+
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const videoSrc = card.getAttribute('data-video');
+          const title = card.getAttribute('data-title');
+          if (videoSrc && typeof window.openLightbox === 'function') {
+            window.openLightbox(videoSrc, 'video', title || 'Project Demo');
+          }
+        }
+      });
+    });
+
+    // Ensure all videos play reliably
+    const videos = scene.querySelectorAll('video');
+    videos.forEach(v => {
+      v.muted = true;
+      v.defaultMuted = true;
+      v.playsInline = true;
+      v.loop = true;
+      const p = v.play();
+      if (p !== undefined) {
+        p.catch(() => {
+          const retry = () => {
+            v.play().catch(() => {});
+            window.removeEventListener('pointerdown', retry);
+          };
+          window.addEventListener('pointerdown', retry, { once: true });
+        });
+      }
+    });
+
+    // IntersectionObserver to pause processing and video playback when offscreen
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          isVisible = entry.isIntersecting;
+          videos.forEach(v => {
+            if (entry.isIntersecting) {
+              v.play().catch(() => {});
+            } else {
+              v.pause();
+            }
+          });
+        });
+      }, { threshold: 0.05 });
+      io.observe(track);
+    }
+  }
+
   // --- Safe Component Initializer & Bootstrap ---
   function safeInit(fn, name) {
     try {
@@ -3580,6 +3798,7 @@
     // 3. UI Interactions & Animations
     safeInit(initSplineCleaner, 'initSplineCleaner');
     safeInit(initAllCarousels, 'initAllCarousels');
+    safeInit(initRingCarousel, 'initRingCarousel');
     safeInit(initHeroAnimations, 'initHeroAnimations');
     safeInit(initFloatingTools, 'initFloatingTools');
     safeInit(initToolsMarquee, 'initToolsMarquee');

@@ -9597,3 +9597,342 @@ select:focus-visible,
   box-shadow: 0 0 16px var(--accent-yellow-glow);
   transform: translateY(-1px);
 }
+
+
+/* ==========================================================================
+   3D Cylindrical Video Drag Marquee (kova.me Signature Architecture)
+   ========================================================================== */
+
+:root {
+  --ring-radius: 856px;
+  --ring-card-w: 330px;
+  --ring-card-h: 215px;
+}
+
+@media (max-width: 1400px) {
+  :root {
+    --ring-radius: 780px;
+    --ring-card-w: 300px;
+    --ring-card-h: 195px;
+  }
+}
+
+@media (max-width: 992px) {
+  :root {
+    --ring-radius: 660px;
+    --ring-card-w: 260px;
+    --ring-card-h: 170px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --ring-radius: 520px;
+    --ring-card-w: 210px;
+    --ring-card-h: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --ring-radius: 440px;
+    --ring-card-w: 180px;
+    --ring-card-h: 125px;
+  }
+}
+
+.ring-carousel-section {
+  position: relative;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  margin-top: 40px;
+  margin-bottom: 28px;
+  padding: 10px 0 20px 0;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 5;
+}
+
+.ring-carousel {
+  perspective: 2400px;
+  -webkit-perspective: 2400px;
+  perspective-origin: 50% 50%;
+  width: 100%;
+  height: 380px;
+  position: relative;
+  cursor: grab;
+  touch-action: pan-y;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.ring-carousel.is-grabbing {
+  cursor: grabbing !important;
+}
+
+.ring-scene {
+  width: var(--ring-card-w);
+  height: var(--ring-card-h);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: calc(var(--ring-card-h) / -2);
+  margin-left: calc(var(--ring-card-w) / -2);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.ring-card {
+  position: absolute;
+  width: var(--ring-card-w);
+  height: var(--ring-card-h);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+[data-theme="light"] .ring-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.09), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.ring-card:hover {
+  border-color: var(--accent-yellow);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55), 0 0 25px var(--accent-yellow-glow);
+}
+
+[data-theme="light"] .ring-card:hover {
+  border-color: var(--accent-yellow);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14), 0 0 25px rgba(148, 99, 0, 0.2);
+}
+
+.ring-card-media {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #0d0e12;
+  border-radius: 14px;
+}
+
+[data-theme="light"] .ring-card-media {
+  background: #f1f3f7;
+}
+
+.ring-card-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  background: #000;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Crisp & Modern Card Overlay: Transparent with Floating Frosted Tags */
+.ring-card-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+  background: transparent !important;
+  padding: 0;
+  z-index: 2;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.ring-card-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-yellow);
+  font-weight: 700;
+  background: rgba(14, 16, 22, 0.78);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 4px 9px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ring-card-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 65%;
+  background: rgba(14, 16, 22, 0.78);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .ring-card-badge {
+  color: #8c5a00;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .ring-card-title {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Edge Fade Vignettes (Refined & Narrow so center remains 100% clean) */
+.ring-vignette {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 12%;
+  max-width: 150px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.ring-vignette--left {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-main) 0%, transparent 100%);
+}
+
+.ring-vignette--right {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-main) 0%, transparent 100%);
+}
+
+[data-theme="light"] .ring-vignette--left {
+  background: linear-gradient(to right, var(--bg-main) 0%, transparent 100%);
+}
+
+[data-theme="light"] .ring-vignette--right {
+  background: linear-gradient(to left, var(--bg-main) 0%, transparent 100%);
+}
+
+/* Central Floating "DRAG ME" Glass Badge (Transparent Frosted Glass matching kova.me) */
+.ring-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ring-badge span {
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  color: var(--text-pure);
+  font-family: var(--font-body);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 2.2rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.35), 
+    0 0 24px rgba(245, 224, 37, 0.16), 
+    inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  animation: badgeSoftPulse 3.5s infinite ease-in-out;
+}
+
+@keyframes badgeSoftPulse {
+  0%, 100% {
+    box-shadow: 
+      0 8px 30px rgba(0, 0, 0, 0.25), 
+      0 0 20px rgba(245, 224, 37, 0.15), 
+      inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  }
+  50% {
+    box-shadow: 
+      0 12px 36px rgba(0, 0, 0, 0.35), 
+      0 0 28px rgba(245, 224, 37, 0.3), 
+      inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Light Theme: Pure Transparent Frosted Glass with Rose/Pastel Ambient Glow */
+[data-theme="light"] .ring-badge span {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  color: #0f172a;
+  box-shadow: 
+    0 10px 28px rgba(15, 23, 42, 0.06), 
+    0 0 30px rgba(255, 175, 195, 0.42), 
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+  animation: badgeSoftPulseLight 3.5s infinite ease-in-out;
+}
+
+@keyframes badgeSoftPulseLight {
+  0%, 100% {
+    box-shadow: 
+      0 10px 28px rgba(15, 23, 42, 0.06), 
+      0 0 26px rgba(255, 175, 195, 0.38), 
+      inset 0 1px 2px rgba(255, 255, 255, 0.95);
+  }
+  50% {
+    box-shadow: 
+      0 14px 34px rgba(15, 23, 42, 0.1), 
+      0 0 36px rgba(255, 175, 195, 0.55), 
+      inset 0 1px 2px rgba(255, 255, 255, 1);
+  }
+}
+
+@media (max-width: 769px) {
+  .ring-carousel {
+    height: 250px;
+  }
+  .ring-badge span {
+    padding: 0.55rem 1.4rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+  }
+}

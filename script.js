@@ -3568,6 +3568,29 @@
     const badge = document.querySelector('.ring-badge');
     if (!track || !scene) return;
 
+    const cards = scene.querySelectorAll('.ring-card');
+    const totalCards = cards.length || 15;
+    const angleStep = 360 / totalCards;
+
+    // Dynamically calculate and enforce explicit 3D pixel placement on every card
+    function updateCardTransforms() {
+      const w = window.innerWidth;
+      let radius = 856;
+      if (w <= 480) {
+        radius = 440;
+      } else if (w <= 768) {
+        radius = 520;
+      } else if (w <= 992) {
+        radius = 660;
+      } else if (w <= 1400) {
+        radius = 780;
+      }
+      cards.forEach((card, idx) => {
+        const angle = idx * angleStep;
+        card.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+      });
+    }
+
     let baseAutoSpeed = -0.038; // base slow drift (negative rotates left-to-right forward)
     let currentRotation = 0;
     let velocity = -0.42; // initial smooth entrance momentum
@@ -3591,6 +3614,15 @@
       const scale = isMobile ? 0.94 : (isMedium ? 0.88 : 1);
       scene.style.transform = `scale(${scale}) rotateY(${currentRotation}deg)`;
     }
+
+    // Immediately position all cards in 3D cylinder
+    updateCardTransforms();
+    applyTransform();
+
+    window.addEventListener('resize', () => {
+      updateCardTransforms();
+      applyTransform();
+    });
 
     // Main RAF animation loop with silky physics momentum & inertia
     function tick() {
@@ -3719,7 +3751,6 @@
     track.addEventListener('mouseleave', () => { isHovered = false; });
 
     // Video Autoplay & Inspection Handler
-    const cards = scene.querySelectorAll('.ring-card');
     cards.forEach(card => {
       card.addEventListener('click', () => {
         if (hasMoved) return; // Ignore clicks if dragging

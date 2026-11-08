@@ -9643,18 +9643,17 @@ select:focus-visible,
 
 .ring-carousel-section {
   position: relative;
-  width: 100vw;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  margin-top: 40px;
-  margin-bottom: 28px;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 24px;
   padding: 10px 0 20px 0;
-  overflow: hidden;
+  overflow: visible;
   user-select: none;
   -webkit-user-select: none;
   z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .ring-carousel {
@@ -9670,6 +9669,7 @@ select:focus-visible,
   align-items: center;
   justify-content: center;
   outline: none;
+  overflow: visible;
 }
 
 .ring-carousel.is-grabbing {
@@ -9677,16 +9677,52 @@ select:focus-visible,
 }
 
 .ring-scene {
-  width: var(--ring-card-w);
-  height: var(--ring-card-h);
+  width: var(--ring-card-w, 330px);
+  height: var(--ring-card-h, 215px);
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: calc(var(--ring-card-h) / -2);
-  margin-left: calc(var(--ring-card-w) / -2);
+  margin-top: -108px;
+  margin-left: -165px;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   will-change: transform;
+}
+
+@media (max-width: 1400px) {
+  .ring-scene {
+    width: 300px;
+    height: 195px;
+    margin-top: -98px;
+    margin-left: -150px;
+  }
+}
+
+@media (max-width: 992px) {
+  .ring-scene {
+    width: 260px;
+    height: 170px;
+    margin-top: -85px;
+    margin-left: -130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ring-scene {
+    width: 210px;
+    height: 140px;
+    margin-top: -70px;
+    margin-left: -105px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ring-scene {
+    width: 180px;
+    height: 125px;
+    margin-top: -62px;
+    margin-left: -90px;
+  }
 }
 
 .ring-card {

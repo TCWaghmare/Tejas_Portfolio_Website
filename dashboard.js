@@ -50,10 +50,37 @@
     liveTickerTimer: null
   };
 
-  // Initialize Supabase Client
+  // Auto-lock on inactivity (30 minutes)
+  let inactivityTimer = null;
+  const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+  function resetInactivityTimer() {
+    if (!state.isAuthenticated) return;
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      if (state.isAuthenticated) {
+        showToast('Session locked due to inactivity.', 'info');
+        handleAdminLogout();
+      }
+    }, INACTIVITY_TIMEOUT);
+  }
+
+  ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach(evt => {
+    window.addEventListener(evt, resetInactivityTimer, { passive: true });
+  });
+
+  // Initialize Supabase Client with session storage preference to prevent leaked sessions
   let supaClient = null;
   if (typeof supabase !== 'undefined' && supabase.createClient) {
-    supaClient = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+    const rememberMe = localStorage.getItem('tp_admin_remember') === 'true';
+    supaClient = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey, {
+      auth: {
+        persistSession: true,
+        storage: rememberMe ? window.localStorage : window.sessionStorage,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
   }
 
   // ============================================================================
@@ -79,11 +106,13 @@
     if (e) e.preventDefault();
     const emailInput = document.getElementById('admin-email');
     const pwdInput = document.getElementById('admin-password');
+    const rememberInput = document.getElementById('admin-remember-me');
     const errBanner = document.getElementById('auth-error-msg');
     const submitBtn = document.getElementById('auth-submit-btn');
 
     const email = (emailInput.value || '').trim().toLowerCase();
     const password = (pwdInput.value || '').trim();
+    const rememberMe = rememberInput ? rememberInput.checked : false;
 
     errBanner.style.display = 'none';
     submitBtn.disabled = true;
@@ -131,9 +160,22 @@
       if (authSuccessful) {
         state.isAuthenticated = true;
         sessionStorage.setItem('tp_admin_auth_token', 'authorized_' + Date.now());
+
+        if (rememberMe) {
+          localStorage.setItem('tp_admin_remember', 'true');
+          localStorage.setItem('tp_admin_auth_token', 'remember_' + Date.now());
+        } else {
+          localStorage.removeItem('tp_admin_remember');
+          localStorage.removeItem('tp_admin_auth_token');
+        }
+
+        // Clear any deliberate logout flag
+        sessionStorage.removeItem('tp_logged_out_flag');
+
+        showToast('Authentication successful. Welcome, Tejas!', 'success');
         unlockDashboard();
       } else {
-        let errorHint = 'Invalid email or password.';
+        let errorHint = 'Invalid administrator credentials. Please check your password.';
         if (supaAuthError) {
           errorHint = supaAuthError;
         }
@@ -149,13 +191,51 @@
 
   function showAuthError(msg) {
     const errBanner = document.getElementById('auth-error-msg');
-    errBanner.textContent = msg;
-    errBanner.style.display = 'block';
+    if (errBanner) {
+      errBanner.textContent = msg;
+      errBanner.style.display = 'block';
+    }
+  }
+
+  function lockDashboardUI() {
+    state.isAuthenticated = false;
+    if (state.liveTickerTimer) {
+      clearInterval(state.liveTickerTimer);
+      state.liveTickerTimer = null;
+    }
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = null;
+    }
+
+    const authGate = document.getElementById('auth-gate');
+    const dashApp = document.getElementById('dashboard-app');
+    const loginBox = document.getElementById('auth-login-box');
+    const recoveryBox = document.getElementById('auth-recovery-box');
+    const pwdInput = document.getElementById('admin-password');
+    const errBanner = document.getElementById('auth-error-msg');
+
+    if (dashApp) dashApp.style.display = 'none';
+    if (authGate) authGate.style.display = 'flex';
+    if (loginBox) loginBox.style.display = 'block';
+    if (recoveryBox) recoveryBox.style.display = 'none';
+    if (pwdInput) pwdInput.value = '';
+    if (errBanner) {
+      errBanner.style.display = 'none';
+      errBanner.textContent = '';
+    }
   }
 
   function unlockDashboard() {
-    document.getElementById('auth-gate').style.display = 'none';
-    document.getElementById('dashboard-app').style.display = 'block';
+    state.isAuthenticated = true;
+
+    const authGate = document.getElementById('auth-gate');
+    const dashApp = document.getElementById('dashboard-app');
+    if (authGate) authGate.style.display = 'none';
+    if (dashApp) dashApp.style.display = 'block';
+
+    // Start inactivity tracking (30 minutes)
+    resetInactivityTimer();
 
     // Check opt-out toggle state
     const optOutCheckbox = document.getElementById('admin-optout-checkbox');
@@ -180,11 +260,87 @@
     state.liveTickerTimer = setInterval(fetchLiveActiveCount, 30000);
   }
 
-  function handleAdminLogout() {
+  async function handleAdminLogout(e) {
+    if (e && e.preventDefault) e.preventDefault();
+
+    const logoutBtn = document.getElementById('admin-logout-btn') || document.querySelector('.dash-btn-logout');
+    if (logoutBtn) {
+      logoutBtn.disabled = true;
+      const span = logoutBtn.querySelector('span');
+      if (span) span.textContent = 'Locking...';
+    }
+
+    // 1. Immediately reset state
+    state.isAuthenticated = false;
+    if (state.liveTickerTimer) {
+      clearInterval(state.liveTickerTimer);
+      state.liveTickerTimer = null;
+    }
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = null;
+    }
+
+    // 2. Clear application session and local flags
     sessionStorage.removeItem('tp_admin_auth_token');
     sessionStorage.removeItem('tp_supabase_jwt');
-    if (supaClient && supaClient.auth) supaClient.auth.signOut().catch(() => {});
-    window.location.reload();
+    sessionStorage.removeItem('tp_admin_email');
+    localStorage.removeItem('tp_admin_auth_token');
+    localStorage.removeItem('tp_admin_remember');
+
+    // 3. Purge ALL Supabase and auth-related tokens from both localStorage & sessionStorage
+    try {
+      const keysToRemoveLocal = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith('sb-') || k.includes('auth-token') || k.startsWith('tp_admin_'))) {
+          keysToRemoveLocal.push(k);
+        }
+      }
+      keysToRemoveLocal.forEach(k => localStorage.removeItem(k));
+
+      const keysToRemoveSession = [];
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const k = sessionStorage.key(i);
+        if (k && (k.startsWith('sb-') || k.includes('auth-token') || k.startsWith('tp_admin_'))) {
+          keysToRemoveSession.push(k);
+        }
+      }
+      keysToRemoveSession.forEach(k => sessionStorage.removeItem(k));
+    } catch (cleanErr) {
+      console.warn('Storage purge notice:', cleanErr);
+    }
+
+    // 4. Properly await Supabase sign out
+    if (supaClient && supaClient.auth) {
+      try {
+        await supaClient.auth.signOut({ scope: 'local' });
+      } catch (err) {}
+      try {
+        await supaClient.auth.signOut();
+      } catch (err) {}
+    }
+
+    // 5. Flag that a deliberate logout occurred
+    sessionStorage.setItem('tp_logged_out_flag', 'true');
+
+    // 6. Reset UI to locked state immediately
+    lockDashboardUI();
+
+    // 7. Show confirmation toast
+    showToast('Logged out successfully. Security gate locked.', 'success');
+
+    // 8. Reset logout button label
+    if (logoutBtn) {
+      logoutBtn.disabled = false;
+      const span = logoutBtn.querySelector('span');
+      if (span) span.textContent = 'Lock & Sign Out';
+    }
+
+    // 9. Clean redirect without query/hash
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 350);
   }
 
   // Handle Setting New Password when arriving from Supabase Email Recovery Link
@@ -274,34 +430,69 @@
         });
       } catch (e) {}
     }
+    return isRecovery;
   }
 
   async function checkStoredSession() {
     // 0. Check if arriving via Supabase password recovery link
-    checkRecoveryState();
+    const isRecovery = checkRecoveryState();
+    if (isRecovery) {
+      return;
+    }
 
-    // 1. Check active Supabase Auth session first
+    // 1. Check if deliberate logout occurred
+    if (sessionStorage.getItem('tp_logged_out_flag') === 'true') {
+      sessionStorage.removeItem('tp_logged_out_flag');
+      lockDashboardUI();
+      return;
+    }
+
+    // 2. Check if remember me was requested or if session storage has active token
+    const hasSessionToken = sessionStorage.getItem('tp_admin_auth_token');
+    const rememberMe = localStorage.getItem('tp_admin_remember') === 'true';
+    const hasLocalToken = rememberMe ? localStorage.getItem('tp_admin_auth_token') : null;
+
+    if (!hasSessionToken && !hasLocalToken) {
+      // No active session in this tab/device -> MUST remain locked!
+      lockDashboardUI();
+      // Ensure any lingering Supabase auth in storage is cleared
+      if (!rememberMe && supaClient && supaClient.auth) {
+        try { await supaClient.auth.signOut({ scope: 'local' }); } catch (e) {}
+      }
+      return;
+    }
+
+    // 3. If active session token exists, verify with Supabase Auth
     if (supaClient && supaClient.auth) {
       try {
         const { data } = await supaClient.auth.getSession();
-        if (data && data.session && data.session.user && data.session.user.email.toLowerCase() === CONFIG.authorizedEmail.toLowerCase()) {
-          state.isAuthenticated = true;
-          sessionStorage.setItem('tp_supabase_jwt', data.session.access_token);
-          sessionStorage.setItem('tp_admin_auth_token', 'supabase_session_' + Date.now());
-          unlockDashboard();
-          return;
+        if (data && data.session && data.session.user) {
+          if (data.session.user.email.toLowerCase() === CONFIG.authorizedEmail.toLowerCase()) {
+            state.isAuthenticated = true;
+            sessionStorage.setItem('tp_supabase_jwt', data.session.access_token);
+            unlockDashboard();
+            return;
+          } else {
+            // Logged in user does not match authorized admin email
+            await supaClient.auth.signOut();
+            lockDashboardUI();
+            showAuthError('Access Denied. Account ' + data.session.user.email + ' is not authorized.');
+            return;
+          }
         }
       } catch (e) {
         console.warn('Supabase getSession notice:', e);
       }
     }
 
-    // 2. Check local session storage token
-    const token = sessionStorage.getItem('tp_admin_auth_token');
-    if (token) {
+    // 4. Fallback: Valid session token present in sessionStorage or rememberMe in localStorage
+    if (hasSessionToken || hasLocalToken) {
       state.isAuthenticated = true;
       unlockDashboard();
+      return;
     }
+
+    lockDashboardUI();
   }
 
   // ============================================================================
@@ -1467,6 +1658,17 @@
   window.handleResumeFileDrop = handleResumeFileDrop;
   window.resetResumeSelection = resetResumeSelection;
   window.publishNewResume = publishNewResume;
+
+  // Programmatic event listener for logout button as fail-safe
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('admin-logout-btn');
+      if (btn) btn.addEventListener('click', handleAdminLogout);
+    });
+  } else {
+    const btn = document.getElementById('admin-logout-btn');
+    if (btn) btn.addEventListener('click', handleAdminLogout);
+  }
 
   // Auto-launch verification
   checkStoredSession();

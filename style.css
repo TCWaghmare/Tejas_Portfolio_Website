@@ -9732,30 +9732,32 @@ select:focus-visible,
   border-radius: 14px;
   overflow: hidden;
   background: var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   cursor: pointer;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+  contain: layout style;
+  isolation: isolate;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 [data-theme="light"] .ring-card {
   background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.09), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.11);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03);
 }
 
 .ring-card:hover {
   border-color: var(--accent-yellow);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55), 0 0 25px var(--accent-yellow-glow);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.6), 0 0 28px var(--accent-yellow-glow);
 }
 
 [data-theme="light"] .ring-card:hover {
   border-color: var(--accent-yellow);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14), 0 0 25px rgba(148, 99, 0, 0.2);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14), 0 0 25px rgba(230, 160, 20, 0.22);
 }
 
 .ring-card-media {
@@ -9780,9 +9782,11 @@ select:focus-visible,
   pointer-events: none;
   -webkit-user-drag: none;
   background: #000;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  image-rendering: -webkit-optimize-contrast;
   will-change: transform;
 }
 
@@ -9843,16 +9847,16 @@ select:focus-visible,
 
 [data-theme="light"] .ring-card-badge {
   color: #8c5a00;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.11);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
 [data-theme="light"] .ring-card-title {
   color: #0f172a;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.11);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
 /* Edge Fade Vignettes (Refined & Narrow so center remains 100% clean) */
@@ -9860,8 +9864,8 @@ select:focus-visible,
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 12%;
-  max-width: 150px;
+  width: 10%;
+  max-width: 110px;
   pointer-events: none;
   z-index: 10;
 }
@@ -9884,10 +9888,10 @@ select:focus-visible,
   background: linear-gradient(to left, var(--bg-main) 0%, transparent 100%);
 }
 
-/* Central Floating "DRAG ME" Glass Badge (Transparent Frosted Glass matching kova.me) */
+/* Central Floating "DRAG ME" Glass Badge (Transparent Frosted Glass matching kova.me signature look) */
 .ring-badge {
   position: absolute;
-  top: 50%;
+  top: 22%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 30;
@@ -9896,79 +9900,71 @@ select:focus-visible,
 }
 
 .ring-badge span {
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
   color: var(--text-pure);
   font-family: var(--font-body);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   pointer-events: none;
   white-space: nowrap;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(20, 22, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 100px;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.75rem 2.2rem;
+  padding: 0.72rem 2.2rem;
   font-size: 0.82rem;
   font-weight: 700;
   display: inline-flex;
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.35), 
-    0 0 24px rgba(245, 224, 37, 0.16), 
+    0 8px 30px rgba(0, 0, 0, 0.35), 
+    0 0 22px rgba(245, 224, 37, 0.16), 
     inset 0 1px 1px rgba(255, 255, 255, 0.35);
-  animation: badgeSoftPulse 3.5s infinite ease-in-out;
 }
 
-@keyframes badgeSoftPulse {
-  0%, 100% {
-    box-shadow: 
-      0 8px 30px rgba(0, 0, 0, 0.25), 
-      0 0 20px rgba(245, 224, 37, 0.15), 
-      inset 0 1px 1px rgba(255, 255, 255, 0.35);
-  }
-  50% {
-    box-shadow: 
-      0 12px 36px rgba(0, 0, 0, 0.35), 
-      0 0 28px rgba(245, 224, 37, 0.3), 
-      inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  }
-}
-
-/* Light Theme: Pure Transparent Frosted Glass with Rose/Pastel Ambient Glow */
+/* Light Theme: Pure Transparent Frosted Glass with Delicate Rose/Peach Reflection */
 [data-theme="light"] .ring-badge span {
-  background: rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.88);
   color: #0f172a;
   box-shadow: 
-    0 10px 28px rgba(15, 23, 42, 0.06), 
-    0 0 30px rgba(255, 175, 195, 0.42), 
+    0 8px 24px rgba(15, 23, 42, 0.07), 
+    0 0 24px rgba(255, 175, 195, 0.28), 
     inset 0 1px 2px rgba(255, 255, 255, 0.95);
-  animation: badgeSoftPulseLight 3.5s infinite ease-in-out;
-}
-
-@keyframes badgeSoftPulseLight {
-  0%, 100% {
-    box-shadow: 
-      0 10px 28px rgba(15, 23, 42, 0.06), 
-      0 0 26px rgba(255, 175, 195, 0.38), 
-      inset 0 1px 2px rgba(255, 255, 255, 0.95);
-  }
-  50% {
-    box-shadow: 
-      0 14px 34px rgba(15, 23, 42, 0.1), 
-      0 0 36px rgba(255, 175, 195, 0.55), 
-      inset 0 1px 2px rgba(255, 255, 255, 1);
-  }
 }
 
 @media (max-width: 769px) {
   .ring-carousel {
     height: 250px;
   }
+  .ring-badge {
+    top: 20%;
+  }
   .ring-badge span {
-    padding: 0.55rem 1.4rem;
-    font-size: 0.74rem;
+    padding: 0.5rem 1.3rem;
+    font-size: 0.72rem;
     letter-spacing: 0.08em;
+  }
+  .ring-vignette {
+    width: 6%;
+    max-width: 26px;
+  }
+  .ring-card-overlay {
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    gap: 4px;
+  }
+  .ring-card-badge {
+    font-size: 8px;
+    padding: 2.5px 6px;
+    border-radius: 6px;
+  }
+  .ring-card-title {
+    font-size: 9px;
+    padding: 2.5px 7px;
+    border-radius: 6px;
+    max-width: 62%;
   }
 }

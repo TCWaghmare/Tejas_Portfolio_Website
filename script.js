@@ -3568,7 +3568,7 @@
     const badge = document.querySelector('.ring-badge');
     if (!track || !scene) return;
 
-    const cards = scene.querySelectorAll('.ring-card');
+    const cards = Array.from(scene.querySelectorAll('.ring-card'));
     const totalCards = cards.length || 15;
     const angleStep = 360 / totalCards;
 
@@ -3591,9 +3591,15 @@
       });
     }
 
-    let baseAutoSpeed = -0.038; // base slow drift (negative rotates left-to-right forward)
+    // Dynamic responsive cruising speeds: smooth, crisp, and never sluggish
+    function getTargetSpeed() {
+      const w = window.innerWidth;
+      const base = w <= 768 ? -0.088 : -0.076;
+      return isHovered ? (base * 0.35) : base;
+    }
+
     let currentRotation = 0;
-    let velocity = -0.42; // initial smooth entrance momentum
+    let velocity = -0.45; // initial smooth entrance momentum
     let isDragging = false;
     let isHovered = false;
     let startX = 0;
@@ -3605,6 +3611,7 @@
     let hasMoved = false;
     let isVisible = true;
     let animId = null;
+    let lastVideoCheckTime = 0;
 
     // Apply 3D transform with responsive scale
     function applyTransform() {
@@ -3613,6 +3620,38 @@
       const isMedium = w <= 1400 && w > 768;
       const scale = isMobile ? 0.94 : (isMedium ? 0.88 : 1);
       scene.style.transform = `scale(${scale}) rotateY(${currentRotation}deg)`;
+    }
+
+    // High-performance video manager: only decodes 2-3 front-facing cards at any time
+    // Prevents mobile GPU hardware decoder stalls, saves battery & 4G bandwidth
+    function updateActiveVideos(force) {
+      if (!isVisible) return;
+      const now = performance.now();
+      if (!force && (now - lastVideoCheckTime < 130)) return;
+      lastVideoCheckTime = now;
+
+      const isFastFling = Math.abs(velocity) > 0.85;
+      const frontArc = window.innerWidth <= 768 ? 38 : 44;
+
+      cards.forEach((card, idx) => {
+        const video = card.querySelector('video');
+        if (!video) return;
+
+        let facingAngle = ((idx * angleStep + currentRotation) % 360 + 360) % 360;
+        if (facingAngle > 180) facingAngle -= 360;
+
+        const isFacing = Math.abs(facingAngle) <= frontArc;
+
+        if (isFacing && !isFastFling) {
+          if (video.paused) {
+            video.play().catch(() => {});
+          }
+        } else {
+          if (!video.paused) {
+            video.pause();
+          }
+        }
+      });
     }
 
     // Immediately position all cards in 3D cylinder
@@ -3624,16 +3663,25 @@
       applyTransform();
     });
 
-    // Main RAF animation loop with silky physics momentum & inertia
+    // Main 60/120fps RAF animation loop with silky physics momentum & inertia
     function tick() {
       if (isVisible) {
         if (!isDragging) {
-          const targetVel = isHovered ? (baseAutoSpeed * 0.4) : baseAutoSpeed;
-          // Smooth asymptotic damping towards target speed
-          velocity += (targetVel - velocity) * 0.022;
+          const targetVel = getTargetSpeed();
+          if (Math.abs(velocity) > Math.abs(targetVel)) {
+            // Decelerating from drag fling: smooth natural physics friction
+            velocity *= 0.962;
+            if (Math.abs(velocity) <= Math.abs(targetVel)) {
+              velocity = targetVel;
+            }
+          } else {
+            // Returning from static touch: snappy recovery (takes ~200ms, NEVER appears stuck)
+            velocity += (targetVel - velocity) * 0.085;
+          }
           currentRotation += velocity;
           applyTransform();
         }
+        updateActiveVideos(false);
       }
       animId = requestAnimationFrame(tick);
     }
@@ -3669,12 +3717,11 @@
       }
       if (dt > 0) {
         const instantVel = dx / dt;
-        // Exponential moving average filter for noise-free momentum
-        dragVel = dragVel * 0.6 + instantVel * 0.4;
+        dragVel = dragVel * 0.55 + instantVel * 0.45;
       }
       lastX = e.clientX;
       lastTime = now;
-      currentRotation = startRot + (e.clientX - startX) * 0.11;
+      currentRotation = startRot + (e.clientX - startX) * 0.12;
       applyTransform();
     });
 
@@ -3688,18 +3735,22 @@
         badge.style.opacity = '1';
         badge.style.transform = 'translate(-50%, -50%) scale(1)';
       }
-      // If user paused pointer for > 50ms before releasing, kill the fling
       const timeSinceLast = performance.now() - lastTime;
-      if (timeSinceLast > 55) {
+      if (timeSinceLast > 100) {
         dragVel = 0;
       }
-      // Apply momentum fling with calibrated boundary limits
-      velocity = Math.max(-4.0, Math.min(4.0, dragVel * 5.2));
+      if (Math.abs(dragVel) > 0.06) {
+        const flingMultiplier = window.innerWidth <= 768 ? 5.2 : 4.6;
+        velocity = Math.max(-4.2, Math.min(4.2, dragVel * flingMultiplier));
+      } else {
+        // Instantly resume target speed so marquee NEVER freezes or sits stuck
+        velocity = getTargetSpeed();
+      }
     }
 
     window.addEventListener('mouseup', endDrag);
 
-    // Touch swipe handlers
+    // Touch swipe handlers (optimized for mobile touchscreens)
     track.addEventListener('touchstart', (e) => {
       if (!e.touches || !e.touches[0]) return;
       isDragging = true;
@@ -3725,32 +3776,32 @@
       const dx = touch.clientX - lastX;
       const dy = touch.clientY - startY;
 
-      // Lock vertical page scroll if user is dragging horizontally
-      if (Math.abs(touch.clientX - startX) > Math.abs(dy) && e.cancelable) {
-        e.preventDefault();
-      }
-
-      if (Math.abs(touch.clientX - startX) > 6) {
+      // When horizontal drag intent is detected, prevent page scroll contention
+      if (Math.abs(touch.clientX - startX) > 8) {
         hasMoved = true;
+        if (Math.abs(touch.clientX - startX) > Math.abs(dy) && e.cancelable) {
+          e.preventDefault();
+        }
       }
       if (dt > 0) {
         const instantVel = dx / dt;
-        dragVel = dragVel * 0.6 + instantVel * 0.4;
+        dragVel = dragVel * 0.55 + instantVel * 0.45;
       }
       lastX = touch.clientX;
       lastTime = now;
-      currentRotation = startRot + (touch.clientX - startX) * 0.13;
+      // 0.18 ratio provides natural, tactile 1:1 mobile responsiveness
+      currentRotation = startRot + (touch.clientX - startX) * 0.18;
       applyTransform();
     }, { passive: false });
 
     window.addEventListener('touchend', endDrag);
     window.addEventListener('touchcancel', endDrag);
 
-    // Hover slowdown
+    // Hover slowdown on desktop
     track.addEventListener('mouseenter', () => { isHovered = true; });
     track.addEventListener('mouseleave', () => { isHovered = false; });
 
-    // Video Autoplay & Inspection Handler
+    // Video Lightbox & keyboard accessibility
     cards.forEach(card => {
       card.addEventListener('click', () => {
         if (hasMoved) return; // Ignore clicks if dragging
@@ -3773,37 +3824,37 @@
       });
     });
 
-    // Ensure all videos play reliably
-    const videos = scene.querySelectorAll('video');
-    videos.forEach(v => {
+    // Configure all videos with muted, playsinline attributes
+    const allVideos = scene.querySelectorAll('video');
+    allVideos.forEach(v => {
       v.muted = true;
       v.defaultMuted = true;
       v.playsInline = true;
       v.loop = true;
-      const p = v.play();
-      if (p !== undefined) {
-        p.catch(() => {
-          const retry = () => {
-            v.play().catch(() => {});
-            window.removeEventListener('pointerdown', retry);
-          };
-          window.addEventListener('pointerdown', retry, { once: true });
-        });
-      }
     });
+
+    // Start playback for initially front-facing cards
+    updateActiveVideos(true);
+
+    // First user gesture unlocks playback unconditionally across mobile OS policies
+    const unlockGesture = () => {
+      updateActiveVideos(true);
+      window.removeEventListener('pointerdown', unlockGesture);
+      window.removeEventListener('touchstart', unlockGesture);
+    };
+    window.addEventListener('pointerdown', unlockGesture, { once: true });
+    window.addEventListener('touchstart', unlockGesture, { once: true });
 
     // IntersectionObserver to pause processing and video playback when offscreen
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           isVisible = entry.isIntersecting;
-          videos.forEach(v => {
-            if (entry.isIntersecting) {
-              v.play().catch(() => {});
-            } else {
-              v.pause();
-            }
-          });
+          if (entry.isIntersecting) {
+            updateActiveVideos(true);
+          } else {
+            allVideos.forEach(v => v.pause());
+          }
         });
       }, { threshold: 0.05 });
       io.observe(track);
